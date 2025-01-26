@@ -8,11 +8,11 @@
 		<version>3.4.2</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.jhaps.userrecords</groupId>
-	<artifactId>UserRecords</artifactId>
+	<groupId>com.jhaps.clientrecords</groupId>
+	<artifactId>ClientRecords</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>UserRecords</name>
-	<description>This Contains the API&apos;s of User Records of 20,000 users</description>
+	<name>ClientRecords</name>
+	<description>This Contains the API of Client Records of 20,000 rows of datas</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -38,7 +38,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-
+		<dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter-data-jpa</artifactId>
+		    <version>3.4.1</version>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
