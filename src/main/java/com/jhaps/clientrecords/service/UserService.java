@@ -7,6 +7,9 @@ import com.jhaps.clientrecords.entity.User;
 
 public interface UserService {
 
+	public List<User> findAllUsers();
+	
+	public Optional<User> findUserById(int id);
 	
 	public Optional<User> findUserByEmail(String email);
 	

@@ -13,11 +13,25 @@ import com.jhaps.clientrecords.repository.UserRepository;
 @Service
 public class UserServiceImpl implements UserService{
 
-	@Autowired
 	private UserRepository userRepo;
-	
-	@Autowired
 	private RoleServiceImpl roleServiceImpl;
+	
+	public UserServiceImpl(UserRepository userRepo, RoleServiceImpl roleServiceImpl) {
+		this.userRepo = userRepo;
+		this.roleServiceImpl = roleServiceImpl;
+	}
+	
+	
+	
+	@Override
+	public List<User> findAllUsers() {
+		return userRepo.findAll();
+	}
+	
+	@Override
+	public Optional<User> findUserById(int id) {
+		return userRepo.findById(id);				
+	}
 
 	@Override
 	public Optional<User> findUserByEmail(String email) {
@@ -28,7 +42,7 @@ public class UserServiceImpl implements UserService{
 	public List<User> findUsersByRoleName(String roleName) {
 		return userRepo.findByRole_Name(roleName);
 	}
-
+	
 	@Override
 	public void saveUser(User user) {
 		
@@ -47,12 +61,10 @@ public class UserServiceImpl implements UserService{
 	
 	@Override
 	public void deleteUserById(int id) {
-		
-		if(userRepo.existsById(id)) {
-			userRepo.deleteById(id);
-		}else {
+		if(!userRepo.existsById(id)) {
 			throw new UsernameNotFoundException("user with "+id + " not found");
 		}
+		userRepo.deleteById(id);
 	}//ends method.
 
 	
@@ -61,6 +73,10 @@ public class UserServiceImpl implements UserService{
 		// TODO Auto-generated method stub
 		
 	}
+
+	
+
+	
 	
 	
 	
