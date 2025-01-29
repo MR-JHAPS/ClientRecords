@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,7 +30,23 @@ public class UserController {
 	}
 
 
-
+//DEMO
+//	@PostMapping("/login")
+//	public String userLogin(@RequestBody User user){
+//		
+//		System.out.println(user);
+//		return "success";
+//	}
+	
+	//we are trying to print the bearer/JWT token in postman console so return type is String
+	@PostMapping("/login")
+	public String userLogin(@RequestBody User user){
+		
+		return userService.verifyUser(user);
+	}
+	
+	
+	
 	@GetMapping
 	public ResponseEntity<List<User>> getAllUsers() {
 		
@@ -40,22 +58,6 @@ public class UserController {
 		return ResponseEntity.ok(userList);
 		
 	}
-	
-	
-//	@GetMapping("/id/{id}")
-//	public ResponseEntity<User> getUserById(@PathVariable int id) {
-//		
-//		Optional<User> user = userService.findUserById(id);
-//		
-//		//optional is never null so just checking for empty/present.
-//		if(user.isEmpty() ) {
-//			return ResponseEntity.notFound().build();
-//		}	else {
-//			//if user.isPresent() then we will do user.get() because user-->is optional a return type is just a user.
-//			//converting from optionalUser to user.
-//		return ResponseEntity.ok(user.get());
-//		}
-//	}  //OR
 	
 
 	@GetMapping("/id/{id}")
@@ -87,6 +89,33 @@ public class UserController {
 //				.map(ResponseEntity::ok)
 //				.orelse(ResponseEntity.notFound().build());
 //	}
+	
+	
+	
+	
+//	@GetMapping("/id/{id}")
+//	public ResponseEntity<User> getUserById(@PathVariable int id) {
+//		
+//		Optional<User> user = userService.findUserById(id);
+//		
+//		//optional is never null so just checking for empty/present.
+//		if(user.isEmpty() ) {
+//			return ResponseEntity.notFound().build();
+//		}	else {
+//			//if user.isPresent() then we will do user.get() because user-->is optional a return type is just a user.
+//			//converting from optionalUser to user.
+//		return ResponseEntity.ok(user.get());
+//		}
+//	}  //OR
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	

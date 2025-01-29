@@ -26,6 +26,11 @@ public interface ClientService {
 	
 	public void updateClientById(int id);
 	
+	//THIS IS FOR THE SEARCH QUERY 
+	
+	//NEED TO ADD THIS LATER.
+	
+	
 	//THIS IS FOR SORTING CLIENTS
 	public List<Client> sortClientByFirstNameAscending(List<Client> clientList);
 	

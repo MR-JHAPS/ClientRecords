@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -15,11 +18,34 @@ public class UserServiceImpl implements UserService{
 
 	private UserRepository userRepo;
 	private RoleServiceImpl roleServiceImpl;
+	private JWTServiceImpl jwtServiceImpl;
+	private AuthenticationManager authManager;
 	
-	public UserServiceImpl(UserRepository userRepo, RoleServiceImpl roleServiceImpl) {
+	public UserServiceImpl(UserRepository userRepo, RoleServiceImpl roleServiceImpl, 
+							JWTServiceImpl jwtServiceImpl, AuthenticationManager authManager ) {
 		this.userRepo = userRepo;
 		this.roleServiceImpl = roleServiceImpl;
+		this.jwtServiceImpl = jwtServiceImpl;
+		this.authManager = authManager;
 	}
+	
+	
+	//FOR VERIFICATION
+	@Override
+	public String verifyUser(User user) {
+		
+		Authentication auth = authManager.authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
+		
+		if(auth.isAuthenticated()) {
+			return jwtServiceImpl.generateJWTToken(user.getEmail());
+		}
+		
+		return "failed to authenticated";
+		
+	}
+
+	
+	
 	
 	
 	
@@ -74,6 +100,9 @@ public class UserServiceImpl implements UserService{
 		
 	}
 
+
+
+	
 	
 
 	

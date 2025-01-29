@@ -20,6 +20,8 @@ public interface UserService {
 	public void deleteUserById(int id);
 	
 	public void updateUserById(int id);
+
+	public String verifyUser(User user);
 	
 	
 	
