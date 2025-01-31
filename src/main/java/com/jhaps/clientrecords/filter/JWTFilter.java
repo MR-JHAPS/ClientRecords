@@ -9,6 +9,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -28,16 +29,14 @@ public class JWTFilter extends OncePerRequestFilter{
 	
 	
 	@Autowired
-	ApplicationContext context;
+	UserDetailsServiceImpl userDetailsServiceImpl;
 	
-//	@Autowired
-//	UserDetailsServiceImpl userDetailsServiceImpl;
-	
-	
-	/*THIS METHOD IS IMPLEMENTED FROM THE  "OncePerRequestFilter class" 
-	even though it is class this  "method is abstract" 
-	 and so we need to  "implement this abstract method" when we extend the OncePerRequestFilter class .
-	*/
+	//THIS IS TO SKIP THE JWT FILTER FOR "/user/login" page to disable the JWT interference for login.
+	@Override
+		protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+		    return request.getServletPath().equals("/user/login");
+		}
+
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
@@ -66,7 +65,7 @@ public class JWTFilter extends OncePerRequestFilter{
 	 */
 		if(username!=null && SecurityContextHolder.getContext().getAuthentication()==null) {
 		
-				UserDetails userDetails = context.getBean(UserDetailsServiceImpl.class).loadUserByUsername(username);
+				UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(username);
 			
 					//if the token contains the userDetails and is valid.
 				if(jwtServiceImpl.validateToken(token, userDetails)) {
@@ -76,6 +75,8 @@ public class JWTFilter extends OncePerRequestFilter{
 						and setting the authentication in SecurityContext.
 					*/
 					UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null , userDetails.getAuthorities());
+//					 authToken.setDetails(new WebAuthenticationDetailsSource()
+//		                        .buildDetails(request));
 					SecurityContextHolder.getContext().setAuthentication(authToken);
 				}//ends inner if
 			

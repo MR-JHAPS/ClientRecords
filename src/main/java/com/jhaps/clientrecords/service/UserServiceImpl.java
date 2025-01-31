@@ -29,6 +29,13 @@ public class UserServiceImpl implements UserService{
 		this.authManager = authManager;
 	}
 	
+//	public UserServiceImpl(UserRepository userRepo, RoleServiceImpl roleServiceImpl, 
+//			 AuthenticationManager authManager ) {
+//this.userRepo = userRepo;
+//this.roleServiceImpl = roleServiceImpl;
+//
+//this.authManager = authManager;
+//}
 	
 	//FOR VERIFICATION
 	@Override

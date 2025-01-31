@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -21,8 +22,8 @@ import com.jhaps.clientrecords.service.UserDetailsServiceImpl;
 @EnableWebSecurity
 public class SecurityConfig {
 
-//	@Autowired
-//	private UserDetailsServiceImpl userDetailsServiceImpl;
+	@Autowired
+	private UserDetailsServiceImpl userDetailsServiceImpl;
 	
 	@Autowired
 	private JWTFilter jwtFilter;
@@ -32,6 +33,24 @@ public class SecurityConfig {
 		return new BCryptPasswordEncoder();
 	}
 	
+//	 @Bean
+//	    public AuthenticationProvider authenticationProvider() {
+//	        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+//	        provider.setPasswordEncoder(passwordEncoder());
+//	        provider.setUserDetailsService(userDetailsServiceImpl);
+//
+//
+//	        return provider;
+//	    }
+	
+//	@Bean 
+//	public AuthenticationManager authManagerBuilder(HttpSecurity http) throws Exception {
+//		
+//		AuthenticationManagerBuilder authBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
+//			authBuilder.userDetailsService(userDetailsServiceImpl).passwordEncoder(passwordEncoder());
+//			return authBuilder.build();
+//	}
+//	
 	@Bean
 	public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
 		return config.getAuthenticationManager();
@@ -46,7 +65,10 @@ public class SecurityConfig {
 				.httpBasic(Customizer.withDefaults())//this is for the API's like Postman
 				.authorizeHttpRequests(auth->auth
 						.requestMatchers("/user/login").permitAll()
-						.anyRequest().hasAuthority("admin")  	)
+						.anyRequest().authenticated()  )
+
+				.userDetailsService(userDetailsServiceImpl)
+				
 				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
 				
 				

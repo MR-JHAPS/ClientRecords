@@ -1,11 +1,15 @@
 package com.jhaps.clientrecords.controller;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import javax.naming.AuthenticationException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,14 +17,19 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.jhaps.clientrecords.entity.User;
+import com.jhaps.clientrecords.service.JWTServiceImpl;
 import com.jhaps.clientrecords.service.UserService;
 
 @RestController
 @RequestMapping("/user")
 public class UserController {
 
+	@Autowired
+	private JWTServiceImpl jwtService;
+	@Autowired
+	private AuthenticationManager authManager;
+	
 	private PasswordEncoder passwordEncoder;
 	private UserService userService;	
 	
@@ -38,11 +47,17 @@ public class UserController {
 //		return "success";
 //	}
 	
+	
+	
+	
 	//we are trying to print the bearer/JWT token in postman console so return type is String
 	@PostMapping("/login")
 	public String userLogin(@RequestBody User user){
 		
-		return userService.verifyUser(user);
+
+        return userService.verifyUser(user);
+		
+
 	}
 	
 	

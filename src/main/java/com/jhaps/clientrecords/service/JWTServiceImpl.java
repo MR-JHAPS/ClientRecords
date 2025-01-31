@@ -1,18 +1,11 @@
 package com.jhaps.clientrecords.service;
 
-import java.security.Key;
-import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
-import java.util.Base64.Decoder;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import javax.management.RuntimeErrorException;
-
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -24,45 +17,24 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JWTServiceImpl {
 
-	private String secretKey ="";
+	private String secretKey ="5IPbklh1IEQOxzN4UUqb4qaCG7r6e3UQsIE2+XLAi96q+LRm4VvBY76ox7PuaCNtQeJdEiYF/04X/VJbC6LXKPYohgfDF256PLOHnW1z/Pk5woh91PIsFyg28e6uXv0WSmZW1E7QtXl50HsnkN6vtr70Wzk/ws35IFi+HfA6gE4c09nwcB0+yn2wOIMSlXinb578qtgtxKGvYmnz6hQcbaqoh0VXsA3pGVKkdIeYbsxNHVnwg/wZhmltYrd4suPUC0M5nBtXAwk8G0D5coqGk12n3ttLCPdsRBVR8GN8aa6hL+FZYwAU5rDHk4X7yN4xJGTOJ7SgjGD7DJ6sVNdA";
 	
-	public JWTServiceImpl() {
-		
-	}
-	
+
 //------------ GENERATING JWT TOKEN --------------------------------------------------------------------------------------------------------------------------------	
 	
+
 	
-	//This generates random    "SecretKey" type ------>  key.
-	private SecretKey generateHmacKey() throws NoSuchAlgorithmException {	
-		KeyGenerator keyGen = KeyGenerator.getInstance("HmacSHA256");
-		return keyGen.generateKey();
-	}
 	
-	private String encodingSecretKeyBase64() {
-		try {
-			//calling the method "generateHmacKey" because it has generated A Secret Key.
-			SecretKey secretKey = generateHmacKey();
-//			String encodedSecretKey = Base64.getEncoder().encodeToString(secretKey.getEncoded()); //.getEncoded converts from SecretKey type to byte[]
-			String encodedSecretKey = Base64.getEncoder().encodeToString(secretKey.getEncoded());
-			return encodedSecretKey;
-			
-		} catch (NoSuchAlgorithmException e) {
-			throw new RuntimeException("cannot encode the SecretKey to the Base64 " + e);	
-		}
-	}//ends method
 	
 	
 	//generating key for the signing/signature it will be of type Key .
-	private SecretKey generateKeyForTokenSignature() {
-		//getting the base64Encoded String secretKey.
-		String secretKey = encodingSecretKeyBase64();
-		byte[] secretKeyByte = Decoders.BASE64.decode(secretKey);
-		SecretKey keyForSignature = Keys.hmacShaKeyFor(secretKeyByte);
-		return keyForSignature;
-	}
-	
-	
+		private SecretKey generateKeyForTokenSignature() {
+			//converting our string to byte because To convert it to secretKey of HmacShaKey.
+			byte[] secretKeyByte = Decoders.BASE64.decode(secretKey);
+//			SecretKey keyForSignature = Keys.hmacShaKeyFor(secretKeyByte);
+//			return keyForSignature;
+			return Keys.hmacShaKeyFor(secretKeyByte);
+		}
 	
 	public String generateJWTToken(String email) {
 		Map<String, Object> claims = new HashMap<>();
@@ -129,9 +101,6 @@ public class JWTServiceImpl {
 			return false;
 		}
 	}
-	
-	
-	
 	
 	
 	
