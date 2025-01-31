@@ -83,30 +83,44 @@ public class JWTServiceImpl {
 	
 //----- Validating Token ------------------------------------------------------------------------------------------------------------------------------------------
 
-//this is to get the username from the JWT payload.
-	public String extractUsername(String token) {
-		return extractClaim(token, Claims::getSubject);
-	}
 
 	
-	public <T> T extractClaim(String token , Function<Claims, T> claimResolver) {
-		
-		final Claims claims = extractAllClaims(token);
-        return claimResolver.apply(claims);
-	}
-	
+	//Extracting All Claims from token
 	private Claims extractAllClaims(String token) {
         return Jwts.parser()
-//                .verifyWith(getKey())
                 .verifyWith(generateKeyForTokenSignature())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
     }
 	
+	//method that implements the Functional Interface and allows the extraction of username, exp date, issu date.
+	public <T> T extractClaim(String token , Function<Claims, T> claimResolver) {	
+		final Claims claims = extractAllClaims(token);
+        return claimResolver.apply(claims);
+	}
 	
+	//extracting Username from extractClaim method because of magic of Functional Interface
+	public String extractUsername(String token) {
+		return extractClaim(token, Claims::getSubject);
+	}
+
+	//extracting expiration Date	
+	public Date extractExpiration(String token) {
+		return extractClaim(token, Claims::getExpiration);
+	}
+	
+	//checking if the token is expired
+	public boolean isTokenExpired(String token) {
+		if(extractExpiration(token).before(new Date())){
+			return true;
+		}else {
+			return false;
+		}	
+	}
+	
+	//validating the token. with the "token ----> Username" and   "DB/userDetails ----> Username".
 	public boolean validateToken(String token, UserDetails userDetails) {
-		
 		//we need to compare the username/subject of token and username in DB matches and the token is not expired.
 		String username = extractUsername(token);
 		if(username.equals(userDetails.getUsername()) && !isTokenExpired(token)) {
@@ -117,20 +131,10 @@ public class JWTServiceImpl {
 	}
 	
 	
-	public Date extractExpiration(String token) {
-		return extractClaim(token, Claims::getExpiration);
-	}
 	
 	
-	public boolean isTokenExpired(String token) {
-		if(extractExpiration(token).before(new Date())){
-			return true;
-		}else {
-			return false;
-		}
-		
-		
-	}
+	
+	
 	
 	
 	
