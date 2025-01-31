@@ -7,13 +7,16 @@ import java.util.Base64.Decoder;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.management.RuntimeErrorException;
 
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -27,6 +30,9 @@ public class JWTServiceImpl {
 		
 	}
 	
+//------------ GENERATING JWT TOKEN --------------------------------------------------------------------------------------------------------------------------------	
+	
+	
 	//This generates random    "SecretKey" type ------>  key.
 	private SecretKey generateHmacKey() throws NoSuchAlgorithmException {	
 		KeyGenerator keyGen = KeyGenerator.getInstance("HmacSHA256");
@@ -37,8 +43,10 @@ public class JWTServiceImpl {
 		try {
 			//calling the method "generateHmacKey" because it has generated A Secret Key.
 			SecretKey secretKey = generateHmacKey();
-			String encodedSecretKey = Base64.getEncoder().encodeToString(secretKey.getEncoded()); //.getEncoded converts from SecretKey type to byte[]
+//			String encodedSecretKey = Base64.getEncoder().encodeToString(secretKey.getEncoded()); //.getEncoded converts from SecretKey type to byte[]
+			String encodedSecretKey = Base64.getEncoder().encodeToString(secretKey.getEncoded());
 			return encodedSecretKey;
+			
 		} catch (NoSuchAlgorithmException e) {
 			throw new RuntimeException("cannot encode the SecretKey to the Base64 " + e);	
 		}
@@ -46,7 +54,7 @@ public class JWTServiceImpl {
 	
 	
 	//generating key for the signing/signature it will be of type Key .
-	private Key generateKeyForTokenSignature() {
+	private SecretKey generateKeyForTokenSignature() {
 		//getting the base64Encoded String secretKey.
 		String secretKey = encodingSecretKeyBase64();
 		byte[] secretKeyByte = Decoders.BASE64.decode(secretKey);
@@ -70,108 +78,61 @@ public class JWTServiceImpl {
 				.compact();
 
 	}
+
+
+	
+//----- Validating Token ------------------------------------------------------------------------------------------------------------------------------------------
+
+//this is to get the username from the JWT payload.
+	public String extractUsername(String token) {
+		return extractClaim(token, Claims::getSubject);
+	}
+
+	
+	public <T> T extractClaim(String token , Function<Claims, T> claimResolver) {
+		
+		final Claims claims = extractAllClaims(token);
+        return claimResolver.apply(claims);
+	}
+	
+	private Claims extractAllClaims(String token) {
+        return Jwts.parser()
+//                .verifyWith(getKey())
+                .verifyWith(generateKeyForTokenSignature())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+    }
 	
 	
+	public boolean validateToken(String token, UserDetails userDetails) {
+		
+		//we need to compare the username/subject of token and username in DB matches and the token is not expired.
+		String username = extractUsername(token);
+		if(username.equals(userDetails.getUsername()) && !isTokenExpired(token)) {
+			return true;
+		}else {
+			return false;
+		}
+	}
 	
 	
+	public Date extractExpiration(String token) {
+		return extractClaim(token, Claims::getExpiration);
+	}
 	
 	
+	public boolean isTokenExpired(String token) {
+		if(extractExpiration(token).before(new Date())){
+			return true;
+		}else {
+			return false;
+		}
+		
+		
+	}
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-//	private HashMap<String, Object> buildClaim(){
-//		
-//		Map<String, Object> claims = new HashMap<>();
-//		
-//		
-//		
-//		
-//	}
-	
-	
-//	private String creatingToken
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-//	private String secretKey= "";
-//	
-//	public JWTServiceImpl() {
-//		try {
-//			//defining type of keyGenerator we want with "HmacSHA256" algorithm.
-//			KeyGenerator keyGen = KeyGenerator.getInstance("HmacSHA256");
-//			//generating a key using above algorithm.
-//			SecretKey sk = keyGen.generateKey();
-//			
-//			/*  "sk.getEncoded"  ------> transform sk to byte[].
-//			 *  "Base64.getEncoder().encodeToString"  ------> this converts the byte[] to string using Base64 encoder.
-//			 * */
-//			
-//			 secretKey = Base64.getEncoder().encodeToString(sk.getEncoded());
-//					
-//					
-//		}catch (NoSuchAlgorithmException e) {
-//			e.printStackTrace();
-//		}
-//		
-//	}
-//	
-//	public String generateToken(String email) {
-//		// we are building claims here i.e "payload" in JWT 
-//		Map<String, Object> claims = new HashMap<>();
-//		return Jwts.builder()
-//				.claims()
-//				.add(claims)
-//				.subject(email)
-//				.issuedAt( new Date(System.currentTimeMillis()))
-//				.expiration( new Date(System.currentTimeMillis() + 1000 * 60 * 10))
-//				.and()
-//				.signWith(getKey())
-//				.compact();
-//				
-//	}
-//
-//	private Key getKey() {
-//		
-//		//byte[] keyByte = secretKey.getBytes();
-//		/* We have encoded "sk.getencoded" from byte[] to Base64 encoder string 
-//		 * so we are decoding it back to byte so that we can pass it to "Keys.hmacShaKeyFor(keyByte)".
-//		 * */
-//		byte[] keyByte = Decoders.BASE64.decode(secretKey);
-//		return Keys.hmacShaKeyFor(keyByte);
-//	}
-//	
 	
 	
 	

@@ -12,7 +12,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.jhaps.clientrecords.filter.JWTFilter;
 import com.jhaps.clientrecords.service.UserDetailsServiceImpl;
 
 @Configuration
@@ -22,6 +24,8 @@ public class SecurityConfig {
 //	@Autowired
 //	private UserDetailsServiceImpl userDetailsServiceImpl;
 	
+	@Autowired
+	private JWTFilter jwtFilter;
 	
 	@Bean
 	public PasswordEncoder passwordEncoder() {
@@ -38,22 +42,16 @@ public class SecurityConfig {
 	public SecurityFilterChain securityFilterChain(HttpSecurity security) throws Exception {
 		
 		return security
-				.csrf(csrf->csrf.disable())
-				
+				.csrf(csrf->csrf.disable())	
+				.httpBasic(Customizer.withDefaults())//this is for the API's like Postman
 				.authorizeHttpRequests(auth->auth
-//										.anyRequest().permitAll()
 						.requestMatchers("/user/login").permitAll()
-						.anyRequest().hasAuthority("admin")
-				
-						)
-				//this is for the API's like Postman
-				.httpBasic(Customizer.withDefaults())
+						.anyRequest().hasAuthority("admin")  	)
+				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
 				
 				
 				.build();
-		
-		
-	}//ends filter method
+	}//ends SecurityChainFilter method.
 	
 	
 	
