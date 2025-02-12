@@ -7,10 +7,16 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import com.jhaps.clientrecords.entity.Client;
+import com.jhaps.clientrecords.exceptionHandler.EntityNotFoundException;
+import com.jhaps.clientrecords.exceptionHandler.EntityOperationException;
 import com.jhaps.clientrecords.repository.ClientRepository;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class ClientServiceImpl implements ClientService  {
@@ -61,19 +67,43 @@ public class ClientServiceImpl implements ClientService  {
 
 	@Override
 	public void saveClient(Client client) {
-		// TODO Auto-generated method stub
+		try{
+			clientRepo.save(client);
+			
+		}catch(IllegalArgumentException e) { //this catches only database related exceptions.
+			//EntityOperationException is a manually created ExceptionHandler.
+			throw new EntityOperationException("save", "client", e);				
+		}
 		
 	}
 
 	@Override
 	public void deleteClientById(int id) {
-		// TODO Auto-generated method stub
+		
+		try {
+			clientRepo.deleteById(id);
+		}catch(IllegalArgumentException e) {
+			throw new EntityOperationException("Delete", "Client", e);
+		}
 		
 	}
 
+	@Transactional
 	@Override
-	public void updateClientById(int id) {
-		// TODO Auto-generated method stub
+	public void updateClientById(int id, Client clientUpdateInfo) {
+		try {
+			Client client = clientRepo.findById(id).orElseThrow(
+								()-> new EntityNotFoundException("Client", id));
+			
+			client.setFirstName(clientUpdateInfo.getFirstName());
+			client.setLastName(clientUpdateInfo.getLastName());
+			client.setDateOfBirth(clientUpdateInfo.getDateOfBirth());
+			client.setPostalCode(clientUpdateInfo.getPostalCode());
+			clientRepo.save(client);
+			
+		}catch(Exception e) {
+			throw new EntityOperationException("Update", "Client", e);
+		}
 		
 	}
 

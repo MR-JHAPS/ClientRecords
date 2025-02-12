@@ -24,7 +24,7 @@ public interface ClientService {
 	
 	public void deleteClientById(int id);
 	
-	public void updateClientById(int id);
+	public void updateClientById(int id, Client clientUpdateInfo);
 	
 	//THIS IS FOR THE SEARCH QUERY 
 	

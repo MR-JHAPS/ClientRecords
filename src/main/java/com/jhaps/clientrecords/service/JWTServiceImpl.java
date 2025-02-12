@@ -66,6 +66,9 @@ public class JWTServiceImpl {
                 .getPayload();
     }
 	
+	
+	
+	
 	//method that implements the Functional Interface and allows the extraction of username, exp date, issu date.
 	public <T> T extractClaim(String token , Function<Claims, T> claimResolver) {	
 		final Claims claims = extractAllClaims(token);
@@ -84,11 +87,8 @@ public class JWTServiceImpl {
 	
 	//checking if the token is expired
 	public boolean isTokenExpired(String token) {
-		if(extractExpiration(token).before(new Date())){
-			return true;
-		}else {
-			return false;
-		}	
+		return extractExpiration(token).before(new Date());
+			
 	}
 	
 	//validating the token. with the "token ----> Username" and   "DB/userDetails ----> Username".
