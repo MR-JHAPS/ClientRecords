@@ -28,6 +28,9 @@ public class SecurityConfig {
 	@Autowired
 	private JWTFilter jwtFilter;
 	
+//	@Autowired
+//	private WebConfig corsConfig;
+	
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
@@ -61,6 +64,8 @@ public class SecurityConfig {
 	public SecurityFilterChain securityFilterChain(HttpSecurity security) throws Exception {
 		
 		return security
+//				.cors(cors->cors.configurationSource(corsConfig.corsConfigurer()))// enable cors
+				 .cors(Customizer.withDefaults())
 				.csrf(csrf->csrf.disable())	
 				.httpBasic(Customizer.withDefaults())//this is for the API's like Postman
 				.authorizeHttpRequests(auth->auth

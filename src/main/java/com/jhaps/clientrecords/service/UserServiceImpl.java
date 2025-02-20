@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService{
 			return jwtServiceImpl.generateJWTToken(user.getEmail());
 		}
 		
-		return "failed to authenticated";
+		return "failed to authenticate";
 		
 	}
 

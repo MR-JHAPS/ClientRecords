@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,6 +24,7 @@ import com.jhaps.clientrecords.entity.Client;
 import com.jhaps.clientrecords.service.ClientService;
 
 import jakarta.validation.Valid;
+//@CrossOrigin(origins = "http://localhost:4209") // Allow Angular frontend
 
 @RestController
 @RequestMapping("/clients")

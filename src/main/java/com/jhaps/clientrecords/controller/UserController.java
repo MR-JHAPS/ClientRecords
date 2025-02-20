@@ -1,5 +1,7 @@
 package com.jhaps.clientrecords.controller;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import javax.naming.AuthenticationException;
 
@@ -11,6 +13,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,6 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.jhaps.clientrecords.entity.User;
 import com.jhaps.clientrecords.service.JWTServiceImpl;
 import com.jhaps.clientrecords.service.UserService;
+
+//@CrossOrigin(origins = "http://localhost:4209") // Allow Angular frontend
 
 @RestController
 @RequestMapping("/user")
@@ -52,10 +57,14 @@ public class UserController {
 	
 	//we are trying to print the bearer/JWT token in postman console so return type is String
 	@PostMapping("/login")
-	public String userLogin(@RequestBody User user){
+	public ResponseEntity<?> userLogin(@RequestBody User user){
 		
 
-        return userService.verifyUser(user);
+		String token = userService.verifyUser(user);
+		
+		HashMap<String, String> response = new HashMap<>();
+		response.put("token", token);
+        return  ResponseEntity.ok(response);
 		
 
 	}
