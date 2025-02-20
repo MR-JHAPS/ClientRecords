@@ -36,6 +36,10 @@ public class ClientServiceImpl implements ClientService  {
 		return clientRepo.findAll();
 	}
 
+	@Override
+	public List<Client> findClientBySearchQuery(String searchQuery) {
+		return clientRepo.searchClients(searchQuery);
+	}
 
 	
 	@Override
@@ -173,6 +177,9 @@ public class ClientServiceImpl implements ClientService  {
 		return clientList;
 	}
 
+
+
+	
 
 
 

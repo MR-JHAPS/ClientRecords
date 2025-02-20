@@ -12,6 +12,8 @@ public interface ClientService {
 	
 	public Optional<Client> findClientById(int id);
 	
+	public List<Client> findClientBySearchQuery(String searchQuery);
+	
 	public List<Client> findClientsByFirstName(String firstName);
 	
 	public List<Client> findClientsByLastName(String lastName);

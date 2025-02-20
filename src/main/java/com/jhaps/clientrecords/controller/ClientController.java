@@ -49,6 +49,16 @@ public class ClientController {
 	}//ends method
 	
 	
+	@GetMapping("/search/{searchQuery}")
+	public ResponseEntity<List<Client>> getClientsBySearchQuery(@PathVariable String searchQuery){
+		
+		List<Client> clientList = clientService.findClientBySearchQuery(searchQuery);
+		if(clientList.isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+		return ResponseEntity.ok(clientList);
+	}
+	
 	
 	@GetMapping("/firstName/{firstName}")
 	public ResponseEntity<List<Client>> getClientsByFirstName(@PathVariable String firstName){
@@ -70,6 +80,18 @@ public class ClientController {
 			return ResponseEntity.notFound().build();
 		}	
 		return ResponseEntity.ok(clientList);	
+	}
+	
+	@GetMapping("/postalCode/{postalCode}")
+	public ResponseEntity<List<Client>> getClientsByPostalCode(@PathVariable String postalCode){
+		
+		List<Client> clientList = clientService.findClientsByPostalCode(postalCode);
+		
+		if(clientList.isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+		return ResponseEntity.ok(clientList);
+		
 	}
 	
 	
