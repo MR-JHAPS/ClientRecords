@@ -1,6 +1,8 @@
 package com.jhaps.clientrecords.controller;
 
+import java.net.URI;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,14 +22,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.jhaps.clientrecords.dto.ApiResponse;
 import com.jhaps.clientrecords.entity.Client;
+import com.jhaps.clientrecords.enums.ResponseMessage;
 import com.jhaps.clientrecords.service.ClientService;
 
 import jakarta.validation.Valid;
-//@CrossOrigin(origins = "http://localhost:4209") // Allow Angular frontend
+/*This Contains The Basic CRUD Operations.*/
 
 @RestController
-@RequestMapping("/clients")
+@RequestMapping("/api/clients")
 public class ClientController {
 
 	private ClientService clientService;
@@ -35,123 +39,56 @@ public class ClientController {
 	public ClientController(ClientService clientService) {
 		this.clientService = clientService;
 	}
+	
+	
+	
 
 	@GetMapping
-	public ResponseEntity<?> getAllClients(){
-//		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		
+	public ResponseEntity<ApiResponse<List<Client>>> getAllClients(){
 		List<Client> clientList = clientService.findAllClients();
 		if(clientList!=null && !clientList.isEmpty()) {
-			return new ResponseEntity<>(clientList,HttpStatus.OK);
+			ApiResponse<List<Client>> response = new ApiResponse<>(ResponseMessage.SUCCESS, HttpStatus.OK, clientList);
+			return ResponseEntity.ok(response);
 		}else {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			ApiResponse<List<Client>> errorResponse = new ApiResponse<>(ResponseMessage.NOT_FOUND, HttpStatus.NOT_FOUND);
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
 		}
 	}//ends method
 	
-	
-	@GetMapping("/search/{searchQuery}")
-	public ResponseEntity<List<Client>> getClientsBySearchQuery(@PathVariable String searchQuery){
-		
-		List<Client> clientList = clientService.findClientBySearchQuery(searchQuery);
-		if(clientList.isEmpty()) {
-			return ResponseEntity.notFound().build();
-		}
-		return ResponseEntity.ok(clientList);
-	}
-	
-	
-	@GetMapping("/firstName/{firstName}")
-	public ResponseEntity<List<Client>> getClientsByFirstName(@PathVariable String firstName){
-		
-		List<Client> clientList = clientService.findClientsByFirstName(firstName);
-		if(clientList.isEmpty()) {
-			return ResponseEntity.notFound().build();
-		}else {
-			return ResponseEntity.ok(clientList);
-		}	
-	}//ends method
-	
-	
-	@GetMapping("/lastName/{lastName}")
-	public ResponseEntity<List<Client>> getClientsByLastName(@PathVariable String lastName){
-		
-		List<Client> clientList =  clientService.findClientsByLastName(lastName);
-		if(clientList.isEmpty()) {
-			return ResponseEntity.notFound().build();
-		}	
-		return ResponseEntity.ok(clientList);	
-	}
-	
-	@GetMapping("/postalCode/{postalCode}")
-	public ResponseEntity<List<Client>> getClientsByPostalCode(@PathVariable String postalCode){
-		
-		List<Client> clientList = clientService.findClientsByPostalCode(postalCode);
-		
-		if(clientList.isEmpty()) {
-			return ResponseEntity.notFound().build();
-		}
-		return ResponseEntity.ok(clientList);
-		
-	}
-	
-	
-	
-	@GetMapping("/dateOfBirth/{dateOfBirth}")
-	public ResponseEntity<List<Client>> getClientsByDateOfBirth(@PathVariable String dateOfBirth){
-		//Converting string date to LocalDate because service Layer parameter is LocalDate.
-		LocalDate parsedDate = LocalDate.parse(dateOfBirth);
-		
-		List<Client> clientList = clientService.findClientsByDateOfBirth(parsedDate);
-		if(clientList.isEmpty()) {
-			return ResponseEntity.notFound().build();
-		}	
-		return ResponseEntity.ok(clientList);
-	}
-	
-//	@PostMapping("/insert")
-//	public ResponseEntity<?> saveNewClient(@Valid @RequestBody Client client, BindingResult result){
-//		
-//		if(result.hasErrors()) {
-//			return ResponseEntity.badRequest().body("Invalid Client Date " + result.getAllErrors() );
-//		}
-//		try {
-//			clientService.saveClient(client);
-//			return ResponseEntity.status(HttpStatus.CREATED).body("New Client " + client.getFirstName() +"Saved successfully");
-////			return ResponseEntity.accepted().body("Created successfully");
-////			return ResponseEntity.created(null).build();
-//		}catch(Exception e){
-//			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to save the Client");
-//			
-//		}
-//	}
 	
 	@PostMapping("/insert")
-	public ResponseEntity<?> saveNewClient(@RequestBody Client client){
-		
-	
+	public ResponseEntity<ApiResponse<String>> saveNewClient(@RequestBody Client client){
 		try {
 			clientService.saveClient(client);
-			return ResponseEntity.status(HttpStatus.CREATED).body("New Client " + client.getFirstName() +"Saved successfully");
-//			return ResponseEntity.accepted().body("Created successfully");
-//			return ResponseEntity.created(null).build();
+			URI location = URI.create("/client/"+ client.getId());
+			ApiResponse<String> response = new ApiResponse<String>(ResponseMessage.SUCCESS, HttpStatus.CREATED, "");
+			return ResponseEntity.created(location).body(response);
+
 		}catch(Exception e){
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to save the Client");
+			ApiResponse<String> errorResponse = new ApiResponse<String>(ResponseMessage.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
 			
 		}
 	}
 	
+	
 	//WHAT is the benefit of using the @valid and BindingResults here in this method and what will happen if i don't use it
 	//STUDY THIS FURTHER FOR BETTER UNDERSTANDING.
 	@DeleteMapping("/delete/id/{id}")
-	public ResponseEntity<?> deleteClientById(@PathVariable int id){
-		
+	public ResponseEntity<ApiResponse<String>> deleteClientById(@PathVariable int id){
 		try {
 			clientService.deleteClientById(id);
-			return ResponseEntity.ok("Client Of Id " + id + " Deleted Successfully");
+			ApiResponse<String> response = new ApiResponse<String>(ResponseMessage.SUCCESS, HttpStatus.NO_CONTENT);
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
 		}catch(Exception e) {
-			return ResponseEntity.internalServerError().body("Unable To Delete The Client By Given Id At The Moment.");
+			ApiResponse<String> errorResponse = new ApiResponse<String>(ResponseMessage.NOT_FOUND, HttpStatus.NOT_FOUND);
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
 		}
 	}//ends method
+	
+	
+
+
 	
 	
 	
