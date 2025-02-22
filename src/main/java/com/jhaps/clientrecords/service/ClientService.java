@@ -8,10 +8,18 @@ import com.jhaps.clientrecords.entity.Client;
 
 public interface ClientService {
 
+	//CRUD OPERATIONS
 	public List<Client> findAllClients();
 	
 	public Optional<Client> findClientById(int id);
+
+	public void saveClient(Client client);
 	
+	public void deleteClientById(int id);
+	
+	public void updateClientById(int id, Client clientUpdateInfo);
+	
+	//THIS IS FOR THE SEARCH QUERY 
 	public List<Client> findClientBySearchQuery(String searchQuery);
 	
 	public List<Client> findClientsByFirstName(String firstName);
@@ -21,16 +29,6 @@ public interface ClientService {
 	public List<Client> findClientsByDateOfBirth(LocalDate dateOfBirth);
 	
 	public List<Client> findClientsByPostalCode(String postalCode);
-	
-	public void saveClient(Client client);
-	
-	public void deleteClientById(int id);
-	
-	public void updateClientById(int id, Client clientUpdateInfo);
-	
-	//THIS IS FOR THE SEARCH QUERY 
-	
-	//NEED TO ADD THIS LATER.
 	
 	
 	//THIS IS FOR SORTING CLIENTS

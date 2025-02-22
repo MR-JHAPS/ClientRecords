@@ -74,7 +74,7 @@ public class ClientServiceImpl implements ClientService  {
 		try{
 			clientRepo.save(client);
 			
-		}catch(IllegalArgumentException e) { //this catches only database related exceptions.
+		}catch(DataAccessException e) { //this catches only database related exceptions.
 			//EntityOperationException is a manually created ExceptionHandler.
 			throw new EntityOperationException("save", "client", e);				
 		}
@@ -86,7 +86,7 @@ public class ClientServiceImpl implements ClientService  {
 		
 		try {
 			clientRepo.deleteById(id);
-		}catch(IllegalArgumentException e) {
+		}catch(DataAccessException e) {
 			throw new EntityOperationException("Delete", "Client", e);
 		}
 		
@@ -105,7 +105,7 @@ public class ClientServiceImpl implements ClientService  {
 			client.setPostalCode(clientUpdateInfo.getPostalCode());
 			clientRepo.save(client);
 			
-		}catch(Exception e) {
+		}catch(DataAccessException e) {
 			throw new EntityOperationException("Update", "Client", e);
 		}
 		

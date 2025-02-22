@@ -10,19 +10,29 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.jhaps.clientrecords.dto.ApiResponse;
 import com.jhaps.clientrecords.entity.Client;
-import com.jhaps.clientrecords.enums.ResponseMessage;
+import com.jhaps.clientrecords.response.ApiResponse;
+import com.jhaps.clientrecords.response.ResponseMessage;
 import com.jhaps.clientrecords.service.ClientService;
+import com.jhaps.clientrecords.util.ApiResponseBuilder;
 
 @RestController
 @RequestMapping("/api/clients/search")
-public class ClientSearchController {
-
+public class ClientSearchController {	
+	/*In the ApiResponseBuilder.class, responseEntity building method is created
+		to reduce the boilerplate code
+		no need to create :
+						ApiResponse<List<Client>> response = new ApiResponse<>(ResponseMessage.SUCCESS, HttpStatus.OK, clientList);
+						return ResponseEntity.ok(response);
+						for each (if/Else).
+	*/
+	private ApiResponseBuilder apiResponseBuilder;
+	
 	private ClientService clientService;
 
-	public ClientSearchController(ClientService clientService) {
+	public ClientSearchController(ClientService clientService, ApiResponseBuilder apiResponseBuilder) {
 		this.clientService = clientService;
+		this.apiResponseBuilder = apiResponseBuilder;
 	}
 	
 	
@@ -31,11 +41,9 @@ public class ClientSearchController {
 	public ResponseEntity<ApiResponse<List<Client>>> getClientsBySearchQuery(@PathVariable String searchQuery){
 		List<Client> clientList = clientService.findClientBySearchQuery(searchQuery);
 		if(!clientList.isEmpty()) {
-			ApiResponse<List<Client>> response = new ApiResponse<List<Client>>(ResponseMessage.SUCCESS, HttpStatus.OK, clientList);
-			return ResponseEntity.status(HttpStatus.OK).body(response);
+			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, clientList);
 		}else {
-			ApiResponse<List<Client>> errorResponse = new ApiResponse<>(ResponseMessage.NOT_FOUND, HttpStatus.NOT_FOUND);
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+			return apiResponseBuilder.buildApiResponse(ResponseMessage.NOT_FOUND, HttpStatus.NOT_FOUND);
 		}
 	}
 	
@@ -44,11 +52,9 @@ public class ClientSearchController {
 	public ResponseEntity<ApiResponse<List<Client>>> getClientsByFirstName(@PathVariable String firstName){
 		List<Client> clientList = clientService.findClientsByFirstName(firstName);
 		if(!clientList.isEmpty()) {
-			ApiResponse<List<Client>> response = new ApiResponse<List<Client>>(ResponseMessage.SUCCESS, HttpStatus.OK, clientList);
-			return ResponseEntity.status(HttpStatus.OK).body(response);
+			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, clientList);
 		}else {
-			ApiResponse<List<Client>> errorResponse = new ApiResponse<>(ResponseMessage.NOT_FOUND, HttpStatus.NOT_FOUND);
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+			return apiResponseBuilder.buildApiResponse(ResponseMessage.NOT_FOUND, HttpStatus.NOT_FOUND);
 		}	
 	}
 	
@@ -57,11 +63,9 @@ public class ClientSearchController {
 	public ResponseEntity<ApiResponse<List<Client>>> getClientsByLastName(@PathVariable String lastName){
 		List<Client> clientList =  clientService.findClientsByLastName(lastName);
 		if(!clientList.isEmpty()) {
-			ApiResponse<List<Client>> response = new ApiResponse<List<Client>>(ResponseMessage.SUCCESS, HttpStatus.OK, clientList);
-			return ResponseEntity.status(HttpStatus.OK).body(response);
+			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, clientList);
 		}else {
-			ApiResponse<List<Client>> errorResponse = new ApiResponse<>(ResponseMessage.NOT_FOUND, HttpStatus.NOT_FOUND);
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+			return apiResponseBuilder.buildApiResponse(ResponseMessage.NOT_FOUND, HttpStatus.NOT_FOUND);
 		}
 	}
 	
@@ -69,12 +73,10 @@ public class ClientSearchController {
 	@GetMapping("/postalCode/{postalCode}")
 	public ResponseEntity<ApiResponse<List<Client>>> getClientsByPostalCode(@PathVariable String postalCode){
 		List<Client> clientList = clientService.findClientsByPostalCode(postalCode);	
-		if(clientList.isEmpty()) {
-			ApiResponse<List<Client>> response = new ApiResponse<List<Client>>(ResponseMessage.SUCCESS, HttpStatus.OK, clientList);
-			return ResponseEntity.status(HttpStatus.OK).body(response);
-		}else{
-			ApiResponse<List<Client>> errorResponse = new ApiResponse<>(ResponseMessage.NOT_FOUND, HttpStatus.NOT_FOUND);
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);	
+		if(!clientList.isEmpty()) {
+			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, clientList);
+		}else {
+			return apiResponseBuilder.buildApiResponse(ResponseMessage.NOT_FOUND, HttpStatus.NOT_FOUND);
 		}
 	}
 	

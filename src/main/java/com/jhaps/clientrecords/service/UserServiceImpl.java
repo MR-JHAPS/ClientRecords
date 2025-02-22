@@ -40,15 +40,11 @@ public class UserServiceImpl implements UserService{
 	//FOR VERIFICATION
 	@Override
 	public String verifyUser(User user) {
-		
 		Authentication auth = authManager.authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
-		
 		if(auth.isAuthenticated()) {
 			return jwtServiceImpl.generateJWTToken(user.getEmail());
 		}
-		
 		return "failed to authenticate";
-		
 	}
 
 	

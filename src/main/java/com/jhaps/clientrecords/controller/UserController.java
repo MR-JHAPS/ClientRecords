@@ -20,7 +20,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.jhaps.clientrecords.entity.User;
+import com.jhaps.clientrecords.response.ApiResponse;
 import com.jhaps.clientrecords.service.JWTServiceImpl;
 import com.jhaps.clientrecords.service.UserService;
 
@@ -44,30 +46,23 @@ public class UserController {
 	}
 
 
-//DEMO
-//	@PostMapping("/login")
-//	public String userLogin(@RequestBody User user){
-//		
-//		System.out.println(user);
-//		return "success";
-//	}
+
 	
 	
 	
 	
 	//we are trying to print the bearer/JWT token in postman console so return type is String
-	@PostMapping("/login")
-	public ResponseEntity<?> userLogin(@RequestBody User user){
+//	@PostMapping("/login")
+//	public ResponseEntity<ApiResponse<String>> userLogin(@RequestBody User user){
+//		String token = userService.verifyUser(user);
+//		if(token!=null || token)
+//		
+//		HashMap<String, String> response = new HashMap<>();
+//		response.put("token", token);
+//        return  ResponseEntity.ok(response);
 		
 
-		String token = userService.verifyUser(user);
-		
-		HashMap<String, String> response = new HashMap<>();
-		response.put("token", token);
-        return  ResponseEntity.ok(response);
-		
-
-	}
+//	}
 	
 	
 	
