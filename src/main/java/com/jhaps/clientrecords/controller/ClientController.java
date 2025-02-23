@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.jhaps.clientrecords.dto.ClientDto;
 import com.jhaps.clientrecords.entity.Client;
 import com.jhaps.clientrecords.exception.EntityNotFoundException;
 import com.jhaps.clientrecords.response.ApiResponse;
@@ -44,8 +45,8 @@ public class ClientController {
 	
 
 	@GetMapping
-	public ResponseEntity<ApiResponse<List<Client>>> getAllClients(){
-		List<Client> clientList = clientService.findAllClients();
+	public ResponseEntity<ApiResponse<List<ClientDto>>> getAllClients(){
+		List<ClientDto> clientList = clientService.findAllClients();
 		if(clientList!=null && !clientList.isEmpty()) {
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, clientList);
 		}else {
@@ -55,7 +56,7 @@ public class ClientController {
 	
 	
 	@PostMapping("/insert")
-	public ResponseEntity<ApiResponse<String>> saveNewClient(@RequestBody Client client){
+	public ResponseEntity<ApiResponse<String>> saveNewClient(@RequestBody ClientDto client){
 		try {
 			clientService.saveClient(client);
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.CREATED, client.getFirstName());
@@ -79,7 +80,7 @@ public class ClientController {
 	
 	
 	@PutMapping("/update/id/{id}")
-	public ResponseEntity<ApiResponse<Object>> updateClientById(@PathVariable int id, @Valid @RequestBody Client clientUpdateInfo){
+	public ResponseEntity<ApiResponse<Object>> updateClientById(@PathVariable int id, @Valid @RequestBody ClientDto clientUpdateInfo){
 		try {
 			clientService.updateClientById(id, clientUpdateInfo);
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, "Your Data is updated.");

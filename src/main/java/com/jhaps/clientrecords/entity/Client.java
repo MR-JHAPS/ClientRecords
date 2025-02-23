@@ -30,19 +30,15 @@ public class Client {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	public int id;
 	
-	@NotBlank(message = "FirstName cannot be Blank")
 	@Column(name="first_name", nullable = false)
 	private String firstName;
 	
-	@NotBlank(message = "LastName cannot be Blank")
 	@Column(name="last_name", nullable = false)
 	private String lastName;
 	
-	@NotBlank(message = "PostalCode cannot be Blank")
 	@Column(name="postal_code", nullable = false)
 	private String postalCode;
 	
-	@NotNull(message="Date Of Birth cannot be Null")
 	@Column(name="date_of_birth", nullable = false)
 	private LocalDate dateOfBirth;
 	

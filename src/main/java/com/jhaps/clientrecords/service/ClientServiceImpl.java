@@ -5,14 +5,19 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
+import com.jhaps.clientrecords.dto.ClientDto;
 import com.jhaps.clientrecords.entity.Client;
 import com.jhaps.clientrecords.exception.EntityNotFoundException;
 import com.jhaps.clientrecords.exception.EntityOperationException;
 import com.jhaps.clientrecords.repository.ClientRepository;
+import com.jhaps.clientrecords.util.ClientMapper;
+import com.jhaps.clientrecords.util.Mapper;
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -21,10 +26,14 @@ import jakarta.validation.Valid;
 public class ClientServiceImpl implements ClientService  {
 
 	private ClientRepository clientRepo;
+	
+	private Mapper mapper;
 
 //CONSTRUCTOR	
-	public ClientServiceImpl(ClientRepository clientRepo) {
+	
+	public ClientServiceImpl(ClientRepository clientRepo, Mapper mapper) {
 		this.clientRepo = clientRepo;
+		this.mapper = mapper;
 	}
 	
 	
@@ -32,16 +41,19 @@ public class ClientServiceImpl implements ClientService  {
 //METHODS
 //------------------------------CRUD------------------------------------------------------------------------------------------------
 	@Override
-	public List<Client> findAllClients() {
-			return clientRepo.findAll();
-		}
+	public List<ClientDto> findAllClients() {
+		List<Client> clientList = clientRepo.findAll();
+		return clientList.stream()
+					.map(mapper::toClientDto)
+					.collect(Collectors.toList());
+	}
 
 	
 	
 	@Override
-	public Optional<Client> findClientById(int id) {		
+	public Optional<ClientDto> findClientById(int id) {		
 		try {
-			return clientRepo.findById(id);
+			return clientRepo.findById(id).map(mapper::toClientDto);
 		}catch(DataAccessException e) {
 			throw new EntityNotFoundException("client", id, e );
 		}
@@ -49,9 +61,9 @@ public class ClientServiceImpl implements ClientService  {
 	
 	
 	@Override
-	public void saveClient(Client client) {
+	public void saveClient(ClientDto clientDto) {
 		try{
-			clientRepo.save(client);
+			clientRepo.save(mapper.toClientEntity(clientDto));
 		}catch(DataAccessException e) { 
 			throw new EntityOperationException("save", "client", e);				
 		}
@@ -70,7 +82,7 @@ public class ClientServiceImpl implements ClientService  {
 	
 	@Transactional
 	@Override
-	public void updateClientById(int id, @Valid Client clientUpdateInfo) {
+	public void updateClientById(int id, @Valid ClientDto clientUpdateInfo) {
 		try {
 			Client client = clientRepo.findById(id).orElseThrow(
 								()-> new EntityNotFoundException("Client", id));
@@ -86,9 +98,12 @@ public class ClientServiceImpl implements ClientService  {
 
 //--------------------SEARCHING----------------------------------------------------------------------------------------------------------	
 	@Override
-	public List<Client> findClientBySearchQuery(String searchQuery) {
+	public List<ClientDto> findClientBySearchQuery(String searchQuery) {
 		try {
-			return clientRepo.searchClients(searchQuery);
+			return clientRepo.searchClients(searchQuery)
+							.stream()
+							.map(mapper::toClientDto)
+							.collect(Collectors.toList());
 		}catch (DataAccessException e) {
 			throw new EntityOperationException("Searching", "client", e);
 		}
@@ -96,9 +111,12 @@ public class ClientServiceImpl implements ClientService  {
 
 	
 	@Override
-	public List<Client> findClientsByFirstName(String firstName) {
+	public List<ClientDto> findClientsByFirstName(String firstName) {
 		try {
-			return clientRepo.findByFirstName(firstName);
+			return clientRepo.findByFirstName(firstName)
+					.stream()
+					.map(mapper::toClientDto)
+					.collect(Collectors.toList());
 		}catch (DataAccessException e) {
 			throw new EntityOperationException("Searching By FirstName", "client", e);
 		}	
@@ -106,9 +124,12 @@ public class ClientServiceImpl implements ClientService  {
 
 	
 	@Override
-	public List<Client> findClientsByLastName(String lastName) {
+	public List<ClientDto> findClientsByLastName(String lastName) {
 		try {
-			return clientRepo.findByLastName(lastName);
+			return clientRepo.findByLastName(lastName)
+					.stream()
+					.map(mapper::toClientDto)
+					.collect(Collectors.toList());
 		}catch (DataAccessException e) {
 			throw new EntityOperationException("Searching By LastName", "client", e);
 		}	
@@ -116,9 +137,12 @@ public class ClientServiceImpl implements ClientService  {
 
 	
 	@Override
-	public List<Client> findClientsByDateOfBirth(LocalDate dateOfBirth) {
+	public List<ClientDto> findClientsByDateOfBirth(LocalDate dateOfBirth) {
 		try {
-			return clientRepo.findByDateOfBirth(dateOfBirth);
+			return clientRepo.findByDateOfBirth(dateOfBirth)
+					.stream()
+					.map(mapper::toClientDto)
+					.collect(Collectors.toList());
 		}catch (DataAccessException e) {
 			throw new EntityOperationException("Searching By DateOfBirth", "client", e);
 		}	
@@ -127,9 +151,12 @@ public class ClientServiceImpl implements ClientService  {
 
 	
 	@Override
-	public List<Client> findClientsByPostalCode(String postalCode) {
+	public List<ClientDto> findClientsByPostalCode(String postalCode) {
 		try {
-			return clientRepo.findByPostalCode(postalCode);
+			return clientRepo.findByPostalCode(postalCode)
+					.stream()
+					.map(mapper::toClientDto)
+					.collect(Collectors.toList());
 		}catch (DataAccessException e) {
 			throw new EntityOperationException("Searching By PostalCode", "client", e);
 		}	

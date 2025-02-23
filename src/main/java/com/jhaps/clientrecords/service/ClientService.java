@@ -4,31 +4,32 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import com.jhaps.clientrecords.dto.ClientDto;
 import com.jhaps.clientrecords.entity.Client;
 
 public interface ClientService {
 
 	//CRUD OPERATIONS
-	public List<Client> findAllClients();
+	public List<ClientDto> findAllClients();
 	
-	public Optional<Client> findClientById(int id);
+	public Optional<ClientDto> findClientById(int id);
 
-	public void saveClient(Client client);
+	public void saveClient(ClientDto clientDto);
 	
 	public void deleteClientById(int id);
 	
-	public void updateClientById(int id, Client clientUpdateInfo);
+	public void updateClientById(int id, ClientDto clientUpdateInfo);
 	
 	//THIS IS FOR THE SEARCH QUERY 
-	public List<Client> findClientBySearchQuery(String searchQuery);
+	public List<ClientDto> findClientBySearchQuery(String searchQuery);
 	
-	public List<Client> findClientsByFirstName(String firstName);
+	public List<ClientDto> findClientsByFirstName(String firstName);
 	
-	public List<Client> findClientsByLastName(String lastName);
+	public List<ClientDto> findClientsByLastName(String lastName);
 	
-	public List<Client> findClientsByDateOfBirth(LocalDate dateOfBirth);
+	public List<ClientDto> findClientsByDateOfBirth(LocalDate dateOfBirth);
 	
-	public List<Client> findClientsByPostalCode(String postalCode);
+	public List<ClientDto> findClientsByPostalCode(String postalCode);
 	
 	
 	//THIS IS FOR SORTING CLIENTS
