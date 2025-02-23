@@ -11,6 +11,8 @@ import com.jhaps.clientrecords.entity.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer>{
 
+	boolean existsByEmail(String email);
+	
 	Optional<User> findByEmail(String email);
 	
 	//In findByRole_Name "_" it is used for nested property like 'User.Role.Name' OR 'User-->Role-->Name'

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +17,9 @@ import com.jhaps.clientrecords.response.ResponseMessage;
 import com.jhaps.clientrecords.service.ClientService;
 import com.jhaps.clientrecords.util.ApiResponseBuilder;
 
+import jakarta.validation.constraints.NotBlank;
+
+@Validated // this is so that "@NotBlank" can be used in @pathVariable
 @RestController
 @RequestMapping("/api/clients/search")
 public class ClientSearchController {	
@@ -37,8 +41,8 @@ public class ClientSearchController {
 	
 	
 	
-	@GetMapping("/search/{searchQuery}")
-	public ResponseEntity<ApiResponse<List<Client>>> getClientsBySearchQuery(@PathVariable String searchQuery){
+	@GetMapping("/{searchQuery}")
+	public ResponseEntity<ApiResponse<List<Client>>> getClientsBySearchQuery( @PathVariable @NotBlank String searchQuery){
 		List<Client> clientList = clientService.findClientBySearchQuery(searchQuery);
 		if(!clientList.isEmpty()) {
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, clientList);
@@ -49,7 +53,7 @@ public class ClientSearchController {
 	
 	
 	@GetMapping("/firstName/{firstName}")
-	public ResponseEntity<ApiResponse<List<Client>>> getClientsByFirstName(@PathVariable String firstName){
+	public ResponseEntity<ApiResponse<List<Client>>> getClientsByFirstName(@PathVariable @NotBlank String firstName){
 		List<Client> clientList = clientService.findClientsByFirstName(firstName);
 		if(!clientList.isEmpty()) {
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, clientList);
@@ -60,7 +64,7 @@ public class ClientSearchController {
 	
 	
 	@GetMapping("/lastName/{lastName}")
-	public ResponseEntity<ApiResponse<List<Client>>> getClientsByLastName(@PathVariable String lastName){
+	public ResponseEntity<ApiResponse<List<Client>>> getClientsByLastName(@PathVariable @NotBlank String lastName){
 		List<Client> clientList =  clientService.findClientsByLastName(lastName);
 		if(!clientList.isEmpty()) {
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, clientList);
@@ -71,7 +75,7 @@ public class ClientSearchController {
 	
 	
 	@GetMapping("/postalCode/{postalCode}")
-	public ResponseEntity<ApiResponse<List<Client>>> getClientsByPostalCode(@PathVariable String postalCode){
+	public ResponseEntity<ApiResponse<List<Client>>> getClientsByPostalCode(@PathVariable @NotBlank String postalCode){
 		List<Client> clientList = clientService.findClientsByPostalCode(postalCode);	
 		if(!clientList.isEmpty()) {
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, clientList);

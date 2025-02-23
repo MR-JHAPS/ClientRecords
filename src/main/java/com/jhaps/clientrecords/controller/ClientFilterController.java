@@ -1,9 +1,11 @@
 package com.jhaps.clientrecords.controller;
 
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jhaps.clientrecords.service.ClientService;
+
 
 @RestController
 @RequestMapping("api/clients/filter")

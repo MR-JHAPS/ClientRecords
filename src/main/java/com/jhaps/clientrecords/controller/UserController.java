@@ -23,8 +23,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jhaps.clientrecords.entity.User;
 import com.jhaps.clientrecords.response.ApiResponse;
+import com.jhaps.clientrecords.response.ResponseMessage;
 import com.jhaps.clientrecords.service.JWTServiceImpl;
 import com.jhaps.clientrecords.service.UserService;
+import com.jhaps.clientrecords.util.ApiResponseBuilder;
+
+import jakarta.validation.Valid;
 
 //@CrossOrigin(origins = "http://localhost:4209") // Allow Angular frontend
 
@@ -32,17 +36,25 @@ import com.jhaps.clientrecords.service.UserService;
 @RequestMapping("/user")
 public class UserController {
 
-	@Autowired
 	private JWTServiceImpl jwtService;
-	@Autowired
+	
 	private AuthenticationManager authManager;
 	
 	private PasswordEncoder passwordEncoder;
-	private UserService userService;	
 	
-	public UserController(PasswordEncoder passwordEncoder, UserService userService) {
+	private UserService userService;
+	
+	private ApiResponseBuilder apiResponseBuilder;
+	
+	
+	public UserController(PasswordEncoder passwordEncoder, UserService userService, 
+							JWTServiceImpl jwtService, AuthenticationManager authManager,
+							ApiResponseBuilder apiResponseBuilder) {
 		this.passwordEncoder = passwordEncoder;
 		this.userService = userService;
+		this.jwtService = jwtService;
+		this.authManager= authManager;
+		this.apiResponseBuilder = apiResponseBuilder;
 	}
 
 
@@ -52,17 +64,16 @@ public class UserController {
 	
 	
 	//we are trying to print the bearer/JWT token in postman console so return type is String
-//	@PostMapping("/login")
-//	public ResponseEntity<ApiResponse<String>> userLogin(@RequestBody User user){
-//		String token = userService.verifyUser(user);
-//		if(token!=null || token)
-//		
-//		HashMap<String, String> response = new HashMap<>();
-//		response.put("token", token);
-//        return  ResponseEntity.ok(response);
-		
+	@PostMapping("/login")
+	public ResponseEntity<ApiResponse<String>> userLogin(@Valid @RequestBody User user){
+		String token = userService.verifyUser(user);
+		if(token!=null) {
+			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, token);
+		}else {
+			return apiResponseBuilder.buildApiResponse(ResponseMessage.UNAUTHORIZED, HttpStatus.NOT_FOUND);
+		}
 
-//	}
+	}
 	
 	
 	

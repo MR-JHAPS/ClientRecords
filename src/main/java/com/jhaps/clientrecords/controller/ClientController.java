@@ -14,11 +14,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jhaps.clientrecords.entity.Client;
-import com.jhaps.clientrecords.exceptionHandler.EntityNotFoundException;
+import com.jhaps.clientrecords.exception.EntityNotFoundException;
 import com.jhaps.clientrecords.response.ApiResponse;
 import com.jhaps.clientrecords.response.ResponseMessage;
 import com.jhaps.clientrecords.service.ClientService;
 import com.jhaps.clientrecords.util.ApiResponseBuilder;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/clients")
@@ -77,7 +79,7 @@ public class ClientController {
 	
 	
 	@PutMapping("/update/id/{id}")
-	public ResponseEntity<ApiResponse<String>> updateClientById(@PathVariable int id, @RequestBody Client clientUpdateInfo){
+	public ResponseEntity<ApiResponse<Object>> updateClientById(@PathVariable int id, @Valid @RequestBody Client clientUpdateInfo){
 		try {
 			clientService.updateClientById(id, clientUpdateInfo);
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, "Your Data is updated.");

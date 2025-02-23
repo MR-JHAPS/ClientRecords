@@ -6,17 +6,16 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import com.jhaps.clientrecords.entity.Client;
-import com.jhaps.clientrecords.exceptionHandler.EntityNotFoundException;
-import com.jhaps.clientrecords.exceptionHandler.EntityOperationException;
+import com.jhaps.clientrecords.exception.EntityNotFoundException;
+import com.jhaps.clientrecords.exception.EntityOperationException;
 import com.jhaps.clientrecords.repository.ClientRepository;
 
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 
 @Service
 public class ClientServiceImpl implements ClientService  {
@@ -31,96 +30,119 @@ public class ClientServiceImpl implements ClientService  {
 	
 	
 //METHODS
+//------------------------------CRUD------------------------------------------------------------------------------------------------
 	@Override
 	public List<Client> findAllClients() {
-		return clientRepo.findAll();
-	}
-
-	@Override
-	public List<Client> findClientBySearchQuery(String searchQuery) {
-		return clientRepo.searchClients(searchQuery);
-	}
+			return clientRepo.findAll();
+		}
 
 	
+	
 	@Override
-	public Optional<Client> findClientById(int id) {
-		//Here I need to implement logger
-		
-		return clientRepo.findById(id);
+	public Optional<Client> findClientById(int id) {		
+		try {
+			return clientRepo.findById(id);
+		}catch(DataAccessException e) {
+			throw new EntityNotFoundException("client", id, e );
+		}
 	}
-
-	@Override
-	public List<Client> findClientsByFirstName(String firstName) {
-		return clientRepo.findByFirstName(firstName);
-	}
-
-	@Override
-	public List<Client> findClientsByLastName(String lastName) {
-		return clientRepo.findByLastName(lastName);
-	}
-
-	@Override
-	public List<Client> findClientsByDateOfBirth(LocalDate dateOfBirth) {
-		return clientRepo.findByDateOfBirth(dateOfBirth);
-	}
-
-	@Override
-	public List<Client> findClientsByPostalCode(String postalCode) {
-		return clientRepo.findByPostalCode(postalCode);
-	}
-
+	
+	
 	@Override
 	public void saveClient(Client client) {
 		try{
 			clientRepo.save(client);
-			
-		}catch(DataAccessException e) { //this catches only database related exceptions.
-			//EntityOperationException is a manually created ExceptionHandler.
+		}catch(DataAccessException e) { 
 			throw new EntityOperationException("save", "client", e);				
 		}
-		
 	}
 
+	
 	@Override
 	public void deleteClientById(int id) {
-		
 		try {
 			clientRepo.deleteById(id);
 		}catch(DataAccessException e) {
 			throw new EntityOperationException("Delete", "Client", e);
 		}
-		
 	}
 
+	
 	@Transactional
 	@Override
-	public void updateClientById(int id, Client clientUpdateInfo) {
+	public void updateClientById(int id, @Valid Client clientUpdateInfo) {
 		try {
 			Client client = clientRepo.findById(id).orElseThrow(
 								()-> new EntityNotFoundException("Client", id));
-			
 			client.setFirstName(clientUpdateInfo.getFirstName());
 			client.setLastName(clientUpdateInfo.getLastName());
 			client.setDateOfBirth(clientUpdateInfo.getDateOfBirth());
 			client.setPostalCode(clientUpdateInfo.getPostalCode());
-			clientRepo.save(client);
-			
+			clientRepo.save(client);	
 		}catch(DataAccessException e) {
 			throw new EntityOperationException("Update", "Client", e);
 		}
+	}
+
+//--------------------SEARCHING----------------------------------------------------------------------------------------------------------	
+	@Override
+	public List<Client> findClientBySearchQuery(String searchQuery) {
+		try {
+			return clientRepo.searchClients(searchQuery);
+		}catch (DataAccessException e) {
+			throw new EntityOperationException("Searching", "client", e);
+		}
+	}
+
+	
+	@Override
+	public List<Client> findClientsByFirstName(String firstName) {
+		try {
+			return clientRepo.findByFirstName(firstName);
+		}catch (DataAccessException e) {
+			throw new EntityOperationException("Searching By FirstName", "client", e);
+		}	
+	}
+
+	
+	@Override
+	public List<Client> findClientsByLastName(String lastName) {
+		try {
+			return clientRepo.findByLastName(lastName);
+		}catch (DataAccessException e) {
+			throw new EntityOperationException("Searching By LastName", "client", e);
+		}	
+	}
+
+	
+	@Override
+	public List<Client> findClientsByDateOfBirth(LocalDate dateOfBirth) {
+		try {
+			return clientRepo.findByDateOfBirth(dateOfBirth);
+		}catch (DataAccessException e) {
+			throw new EntityOperationException("Searching By DateOfBirth", "client", e);
+		}	
 		
 	}
 
+	
+	@Override
+	public List<Client> findClientsByPostalCode(String postalCode) {
+		try {
+			return clientRepo.findByPostalCode(postalCode);
+		}catch (DataAccessException e) {
+			throw new EntityOperationException("Searching By PostalCode", "client", e);
+		}	
+	}
 
+	
+//-------------------------------SORTING-----------------------------------------------------------------------------------------------	
 
 	@Override
 	public List<Client> sortClientByFirstNameAscending(List<Client> clientList) {
-//		clientList.sort((user1, user2)->(user1.getFirstName()).compareToIgnoreCase(user2.getFirstName()));
-//		return clientList;
 		clientList.sort(Comparator.comparing(Client::getFirstName, String::compareToIgnoreCase));
 		return clientList;
 	}
-
 
 
 	@Override
@@ -130,13 +152,11 @@ public class ClientServiceImpl implements ClientService  {
 	}
 
 
-
 	@Override
 	public List<Client> sortClientByLastNameAscending(List<Client> clientList) {
 		clientList.sort(Comparator.comparing(Client::getLastName, String::compareToIgnoreCase));
 		return clientList;
 	}
-
 
 
 	@Override
@@ -146,13 +166,11 @@ public class ClientServiceImpl implements ClientService  {
 	}
 
 
-
 	@Override
 	public List<Client> sortClientByDateOfBirthAscending(List<Client> clientList) {
 		clientList.sort(Comparator.comparing(Client::getDateOfBirth));
 		return clientList;
 	}
-
 
 
 	@Override
@@ -162,13 +180,11 @@ public class ClientServiceImpl implements ClientService  {
 	}
 
 
-
 	@Override
 	public List<Client> sortClientByPostalCodeAscending(List<Client> clientList) {
 		clientList.sort(Comparator.comparing(Client::getPostalCode, String::compareToIgnoreCase));
 		return clientList;
 	}
-
 
 
 	@Override
@@ -178,59 +194,6 @@ public class ClientServiceImpl implements ClientService  {
 	}
 
 
-
-	
-
-
-
-
-	
-
-
-
-
-////@Override
-////public List<Client> findAllClientsAsc() {
-////	List<Client> clientList = clientRepo.findAll();
-////	clientList.sort((user1, user2)->(user1.getFirstName()).compareToIgnoreCase(user2.getFirstName()));
-////	return clientList;
-////
-////}
-//
-//
-//public List<Client> findAllClientsAsc() {
-//	List<Client> clientList = clientRepo.findAll();
-//	sortClientByFirstNameAsc(clientList);
-//	return clientList;
-//
-//}	
-//
-//
-////THIS METHOD IS FOR HANDLING SORTING BY FIRSTNAME
-//public List<Client> sortClientByFirstNameAsc(List<Client> clientList){
-//	clientList.sort((user1, user2)->(user1.getFirstName()).compareToIgnoreCase(user2.getFirstName()));
-//	return clientList;
-//}
-
-
-
-
-//@Override
-//public List<Client> findAllClientsAsc() {
-//	List<Client> clientList = clientRepo.findAll();
-//	return sortByFirstName(clientList);
-//	
-//}
-//
-//public List<Client> sortByFirstName(List<Client> clientList){
-//	
-//	return clientList.sort((user1, user2)->(user1.getFirstName().compareToIgnoreCase(user2.getFirstName())));
-//}
-	
-	
-	
-	
-	
 	
 	
 	
