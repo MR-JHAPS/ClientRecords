@@ -3,7 +3,9 @@ package com.jhaps.clientrecords.util;
 import org.springframework.stereotype.Component;
 
 import com.jhaps.clientrecords.dto.ClientDto;
+import com.jhaps.clientrecords.dto.UserDto;
 import com.jhaps.clientrecords.entity.Client;
+import com.jhaps.clientrecords.entity.User;
 
 @Component
 public class Mapper {
@@ -32,6 +34,31 @@ public class Mapper {
 		return client;
 		
 	}
+	
+	
+	
+	//USER ---> USER-DTO
+	public UserDto toUserDto(User user) {
+		UserDto dto = new UserDto();
+				dto.setEmail(user.getEmail());
+				dto.setPassword(user.getPassword());
+		return dto;
+	}
+	
+	
+	//USER-DTO ------> USER-ENTITY
+	public User toUserEntity(UserDto userDto) {
+		User user = new User();
+			 user.setEmail(userDto.getEmail());
+			 user.setPassword(userDto.getPassword());
+		return user;	 
+	}
+	
+	
+	
+	
+	
+	
 	
 	
 	

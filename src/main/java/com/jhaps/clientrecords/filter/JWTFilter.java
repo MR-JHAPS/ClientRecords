@@ -33,30 +33,28 @@ public class JWTFilter extends OncePerRequestFilter{
 	
 	//THIS IS TO SKIP THE JWT FILTER FOR "/user/login" page to disable the JWT interference for login.
 	@Override
-		protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-		    return request.getServletPath().equals("/user/login");
-		}
+	protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+	String req = request.getServletPath(); 
+	return req.equals("/public/login") || 
+			req.equals("/public/signup") ||
+           req.contains("swagger-ui")||
+           req.contains("api-docs");
+	}
 
+	
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-			throws ServletException, IOException {
-	
+										throws ServletException, IOException {
 		//Inside POSTMAN there is Header and inside the header there is 'Authorization', it refers to that field.
 		String authHeader = request.getHeader("Authorization");
 		String token ="";
-		String username="";
-		
+		String username="";	
 		//we are checking if the auth header is not null
-		if(authHeader!=null && authHeader.startsWith("Bearer ")) {
-			
+		if(authHeader!=null && authHeader.startsWith("Bearer ")) {	
 			token = authHeader.substring(7);
-			
 			//from the (token.claims/payload) we will extract the username.
-			username = jwtServiceImpl.extractUsername(token);
-			
-			
+			username = jwtServiceImpl.extractUsername(token);	
 		}
-		
 	/*    If the token contains a username and the user is not already authenticated:
 	 * 	Because if the user is already authenticated in another filter we don't want to redo the same to prevent performance issues.
 		       1.  Load the user details from the database using userDetailsService.
@@ -64,12 +62,9 @@ public class JWTFilter extends OncePerRequestFilter{
 		       3.  Set the UsernamePasswordAuthenticationToken and then set that authentication to SecurityContextHolder.
 	 */
 		if(username!=null && SecurityContextHolder.getContext().getAuthentication()==null) {
-		
-				UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(username);
-			
+				UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(username);	
 					//if the token contains the userDetails and is valid.
-				if(jwtServiceImpl.validateToken(token, userDetails)) {
-					
+				if(jwtServiceImpl.validateToken(token, userDetails)) {	
 					/*since the token contains the userDetails from the previous login page 
 						we are saving that userdetails to the new instance of a token
 						and setting the authentication in SecurityContext.
@@ -79,19 +74,8 @@ public class JWTFilter extends OncePerRequestFilter{
 //		                        .buildDetails(request));
 					SecurityContextHolder.getContext().setAuthentication(authToken);
 				}//ends inner if
-			
 		}//ends outer if
-		
-
-		
-		
-		
-		filterChain.doFilter(request, response);
-		
-		
-		
-		
-		
+		filterChain.doFilter(request, response);	
 	}//ends method
 
 	

@@ -2,6 +2,9 @@ package com.jhaps.clientrecords.repository;
 
 import java.time.LocalDate;
 import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -29,8 +32,9 @@ public interface ClientRepository extends JpaRepository<Client, Integer>{
 	           " c.postalCode =:query OR " +
 	           " LOWER(c.postalCode) LIKE LOWER(CONCAT(:query, '%')) OR " +
 	           " CAST(c.dateOfBirth AS string) LIKE CONCAT('%', :query, '%'))")
-	    List<Client> searchClients(@Param("query") String query);
+	    Page<Client> searchClients(@Param("query") String query, Pageable pageable);
 	 
+	 Page<Client> findAll(Pageable pageable);
 	List<Client> findByFirstName(String firstName);
 	List<Client> findByLastName(String lastName);
 	List<Client> findByDateOfBirth(LocalDate dateOfBirth);

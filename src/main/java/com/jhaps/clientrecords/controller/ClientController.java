@@ -2,6 +2,9 @@ package com.jhaps.clientrecords.controller;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -11,20 +14,24 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jhaps.clientrecords.dto.ClientDto;
 import com.jhaps.clientrecords.entity.Client;
 import com.jhaps.clientrecords.exception.EntityNotFoundException;
 import com.jhaps.clientrecords.response.ApiResponse;
+import com.jhaps.clientrecords.response.ApiResponseBuilder;
 import com.jhaps.clientrecords.response.ResponseMessage;
 import com.jhaps.clientrecords.service.ClientService;
-import com.jhaps.clientrecords.util.ApiResponseBuilder;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/clients")
+@Tag(name = "Client Controller", description = "Create, Read, Update, Delete CLIENT-INFORMATION")
 public class ClientController {
 	/*In the ApiResponseBuilder.class, responseEntity building method is created
 	to reduce the boilerplate code
@@ -43,10 +50,12 @@ public class ClientController {
 //--------------------------------------------------------------------------------------------------------------------------------------------	
 	
 	
-
+	@Operation(summary = "get all clients")
 	@GetMapping
-	public ResponseEntity<ApiResponse<List<ClientDto>>> getAllClients(){
-		List<ClientDto> clientList = clientService.findAllClients();
+	public ResponseEntity<ApiResponse<Page<ClientDto>>> getAllClients( @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size){
+		Pageable pageData = PageRequest.of(page, size);
+		Page<ClientDto> clientList = clientService.findAllClients(pageData);
 		if(clientList!=null && !clientList.isEmpty()) {
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, clientList);
 		}else {
@@ -55,11 +64,12 @@ public class ClientController {
 	}
 	
 	
+	@Operation(summary = "create new client")
 	@PostMapping("/insert")
 	public ResponseEntity<ApiResponse<String>> saveNewClient(@RequestBody ClientDto client){
 		try {
 			clientService.saveClient(client);
-			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.CREATED, client.getFirstName());
+			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.CREATED, "Client Data Created Successfully");
 		}catch(Exception e){
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);			
 		}
@@ -68,6 +78,7 @@ public class ClientController {
 	
 	//WHAT is the benefit of using the @valid and BindingResults here in this method and what will happen if i don't use it
 	//STUDY THIS FURTHER FOR BETTER UNDERSTANDING.
+	@Operation(summary = "delete client by id")
 	@DeleteMapping("/delete/id/{id}")
 	public ResponseEntity<ApiResponse<String>> deleteClientById(@PathVariable int id){
 		try {
@@ -79,6 +90,7 @@ public class ClientController {
 	}
 	
 	
+	@Operation(summary = "update client by id")
 	@PutMapping("/update/id/{id}")
 	public ResponseEntity<ApiResponse<Object>> updateClientById(@PathVariable int id, @Valid @RequestBody ClientDto clientUpdateInfo){
 		try {

@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.jhaps.clientrecords.exception.DuplicateDataException;
 import com.jhaps.clientrecords.exception.EntityNotFoundException;
 import com.jhaps.clientrecords.response.ApiResponse;
+import com.jhaps.clientrecords.response.ApiResponseBuilder;
 import com.jhaps.clientrecords.response.ResponseMessage;
-import com.jhaps.clientrecords.util.ApiResponseBuilder;
 
 //LOGGING IS NOT DONE YET.
 

@@ -2,6 +2,7 @@ package com.jhaps.clientrecords.dto;
 
 import java.time.LocalDate;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -15,6 +16,7 @@ public class ClientDto {
 
 	public int id;
 	
+	@Schema(description = "client's first name")
 	@NotBlank(message = "FirstName cannot be Blank")
 	private String firstName;
 	

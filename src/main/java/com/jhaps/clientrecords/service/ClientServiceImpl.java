@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.jhaps.clientrecords.dto.ClientDto;
@@ -41,11 +43,9 @@ public class ClientServiceImpl implements ClientService  {
 //METHODS
 //------------------------------CRUD------------------------------------------------------------------------------------------------
 	@Override
-	public List<ClientDto> findAllClients() {
-		List<Client> clientList = clientRepo.findAll();
-		return clientList.stream()
-					.map(mapper::toClientDto)
-					.collect(Collectors.toList());
+	public Page<ClientDto> findAllClients(Pageable pageable) {
+		Page<Client> clientList = clientRepo.findAll(pageable);
+		return clientList.map(mapper::toClientDto);
 	}
 
 	
@@ -98,12 +98,10 @@ public class ClientServiceImpl implements ClientService  {
 
 //--------------------SEARCHING----------------------------------------------------------------------------------------------------------	
 	@Override
-	public List<ClientDto> findClientBySearchQuery(String searchQuery) {
+	public Page<ClientDto> findClientBySearchQuery(String searchQuery, Pageable pageable) {
 		try {
-			return clientRepo.searchClients(searchQuery)
-							.stream()
-							.map(mapper::toClientDto)
-							.collect(Collectors.toList());
+			Page<Client> clientList = clientRepo.searchClients(searchQuery, pageable);
+			return clientList.map(mapper::toClientDto);
 		}catch (DataAccessException e) {
 			throw new EntityOperationException("Searching", "client", e);
 		}

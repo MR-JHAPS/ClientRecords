@@ -1,8 +1,12 @@
 package com.jhaps.clientrecords.service;
 
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.jhaps.clientrecords.dto.ClientDto;
 import com.jhaps.clientrecords.entity.Client;
@@ -10,7 +14,7 @@ import com.jhaps.clientrecords.entity.Client;
 public interface ClientService {
 
 	//CRUD OPERATIONS
-	public List<ClientDto> findAllClients();
+	public Page<ClientDto> findAllClients(Pageable pageable);
 	
 	public Optional<ClientDto> findClientById(int id);
 
@@ -21,7 +25,7 @@ public interface ClientService {
 	public void updateClientById(int id, ClientDto clientUpdateInfo);
 	
 	//THIS IS FOR THE SEARCH QUERY 
-	public List<ClientDto> findClientBySearchQuery(String searchQuery);
+	public Page<ClientDto> findClientBySearchQuery(String searchQuery, Pageable pageable);
 	
 	public List<ClientDto> findClientsByFirstName(String firstName);
 	
