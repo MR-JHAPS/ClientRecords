@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.function.Function;
 
 import javax.crypto.SecretKey;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -17,9 +19,9 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JWTServiceImpl {
 
-	private String secretKey ="5IPbklh1IEQOxzN4UUqb4qaCG7r6e3UQsIE2+XLAi96q+LRm4VvBY76ox7PuaCNtQeJdEiYF/04X/VJbC6LXKPYohgfDF256PLOHnW1z/Pk5woh91PIsFyg28e6uXv0WSmZW1E7QtXl50HsnkN6vtr70Wzk/ws35IFi+HfA6gE4c09nwcB0+yn2wOIMSlXinb578qtgtxKGvYmnz6hQcbaqoh0VXsA3pGVKkdIeYbsxNHVnwg/wZhmltYrd4suPUC0M5nBtXAwk8G0D5coqGk12n3ttLCPdsRBVR8GN8aa6hL+FZYwAU5rDHk4X7yN4xJGTOJ7SgjGD7DJ6sVNdA";
-	
-
+//	private String secretKey ="5IPbklh1IEQOxzN4UUqb4qaCG7r6e3UQsIE2+XLAi96q+LRm4VvBY76ox7PuaCNtQeJdEiYF/04X/VJbC6LXKPYohgfDF256PLOHnW1z/Pk5woh91PIsFyg28e6uXv0WSmZW1E7QtXl50HsnkN6vtr70Wzk/ws35IFi+HfA6gE4c09nwcB0+yn2wOIMSlXinb578qtgtxKGvYmnz6hQcbaqoh0VXsA3pGVKkdIeYbsxNHVnwg/wZhmltYrd4suPUC0M5nBtXAwk8G0D5coqGk12n3ttLCPdsRBVR8GN8aa6hL+FZYwAU5rDHk4X7yN4xJGTOJ7SgjGD7DJ6sVNdA";
+	@Value("${jwt.secret.key}")
+private String secretKey ;
 //------------ GENERATING JWT TOKEN --------------------------------------------------------------------------------------------------------------------------------	
 	
 

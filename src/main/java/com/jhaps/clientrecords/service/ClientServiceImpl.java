@@ -111,7 +111,7 @@ public class ClientServiceImpl implements ClientService  {
 	@Override
 	public Page<ClientDto> findClientsByFirstName(String firstName, Pageable pageable) {
 		try {
-			Page<Client> clientList = clientRepo.findByFirstName(firstName, pageable);
+			Page<Client> clientList = clientRepo.findByFirstNameStartingWithIgnoreCase(firstName, pageable);
 			return clientList.map(mapper::toClientDto);
 		}catch (DataAccessException e) {
 			throw new EntityOperationException("Searching By FirstName", "client", e);
@@ -122,7 +122,7 @@ public class ClientServiceImpl implements ClientService  {
 	@Override
 	public Page<ClientDto> findClientsByLastName(String lastName, Pageable pageable) {
 		try {
-			Page<Client> clientList = clientRepo.findByLastName(lastName, pageable);
+			Page<Client> clientList = clientRepo.findByLastNameStartingWithIgnoreCase(lastName, pageable);
 			return clientList.map(mapper::toClientDto); /* OR using Lambda : return clientList.map(list -> mapper.toClientDto(list));*/
 		}catch (DataAccessException e) {
 			throw new EntityOperationException("Searching By LastName", "client", e);
@@ -145,7 +145,7 @@ public class ClientServiceImpl implements ClientService  {
 	@Override
 	public Page<ClientDto> findClientsByPostalCode(String postalCode, Pageable pageable) {
 		try {
-			Page<Client> clientList = clientRepo.findByPostalCode(postalCode, pageable);
+			Page<Client> clientList = clientRepo.findByPostalCodeStartingWithIgnoreCase(postalCode, pageable);
 			return clientList.map(mapper::toClientDto);
 		}catch (DataAccessException e) {
 			throw new EntityOperationException("Searching By PostalCode", "client", e);

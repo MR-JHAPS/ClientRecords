@@ -26,19 +26,27 @@ public interface ClientRepository extends JpaRepository<Client, Integer>{
 //	            @Param("postalCode") String postalCode
 //	    );
 	
+	 Page<Client> findAll(Pageable pageable);
+	
 	 @Query("SELECT c FROM Client c WHERE " +
-	           "(:query IS NULL OR LOWER(c.firstName) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
-	           " LOWER(c.lastName) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+	           "(:query IS NULL OR LOWER(c.firstName) LIKE LOWER(CONCAT(:query, '%')) OR " +
+	           " LOWER(c.lastName) LIKE LOWER(CONCAT(:query, '%')) OR " +
 	           " c.postalCode =:query OR " +
 	           " LOWER(c.postalCode) LIKE LOWER(CONCAT(:query, '%')) OR " +
 	           " CAST(c.dateOfBirth AS string) LIKE CONCAT('%', :query, '%'))")
-	    Page<Client> searchClients(@Param("query") String query, Pageable pageable);
+    Page<Client> searchClients(@Param("query") String query, Pageable pageable);
 	 
-	 Page<Client> findAll(Pageable pageable);
-	Page<Client> findByFirstName(String firstName, Pageable pageable);
-	Page<Client> findByLastName(String lastName, Pageable pageable);
+	
+//	 @Query("SELECT c from Client c WHERE LOWER(c.firstName) LIKE LOWER(CONCAT(:firstName,'%'))")
+//	Page<Client> findByFirstName(@Param("firstName") String firstName, Pageable pageable);
+	 //OR
+	 Page<Client> findByFirstNameStartingWithIgnoreCase(String firstName, Pageable pageable);
+	
+	Page<Client> findByLastNameStartingWithIgnoreCase(String lastName, Pageable pageable);
+	
 	Page<Client> findByDateOfBirth(LocalDate dateOfBirth, Pageable pageable);
-	Page<Client> findByPostalCode(String postalCode, Pageable pageable);
+	
+	Page<Client> findByPostalCodeStartingWithIgnoreCase(String postalCode, Pageable pageable);
 	
 	
 	
