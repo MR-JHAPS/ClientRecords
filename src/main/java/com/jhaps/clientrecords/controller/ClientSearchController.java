@@ -6,6 +6,8 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -21,6 +23,7 @@ import com.jhaps.clientrecords.response.ApiResponse;
 import com.jhaps.clientrecords.response.ApiResponseBuilder;
 import com.jhaps.clientrecords.response.ResponseMessage;
 import com.jhaps.clientrecords.service.ClientService;
+import com.jhaps.clientrecords.service.PagedResourceAssemblerService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -41,22 +44,27 @@ public class ClientSearchController {
 	private ApiResponseBuilder apiResponseBuilder;
 	
 	private ClientService clientService;
+	
+	private PagedResourceAssemblerService<ClientDto> pagedResourceAssemblerService;
 
-	public ClientSearchController(ClientService clientService, ApiResponseBuilder apiResponseBuilder) {
+	public ClientSearchController(ClientService clientService, ApiResponseBuilder apiResponseBuilder,
+						PagedResourceAssemblerService<ClientDto> pagedResourceAssemblerService) {
 		this.clientService = clientService;
 		this.apiResponseBuilder = apiResponseBuilder;
+		this.pagedResourceAssemblerService = pagedResourceAssemblerService;
 	}
 	
 	
 	@Operation(summary = "get clients by searchQuery")
 	@GetMapping("/{searchQuery}")
-	public ResponseEntity<ApiResponse<Page<ClientDto>>> getClientsBySearchQuery( @PathVariable @NotBlank String searchQuery,
+	public ResponseEntity<ApiResponse<PagedModel<EntityModel<ClientDto>>>> getClientsBySearchQuery( @PathVariable @NotBlank String searchQuery,
 																					@RequestParam(defaultValue ="0") int page,
 																					@RequestParam(defaultValue ="10") int size){
-		Pageable pageData = PageRequest.of(page, size);
-		Page<ClientDto> clientList = clientService.findClientBySearchQuery(searchQuery, pageData);
-		if(!clientList.isEmpty()) {
-			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, clientList);
+		Pageable pageable = PageRequest.of(page, size);
+		Page<ClientDto> paginatedClients = clientService.findClientBySearchQuery(searchQuery, pageable);
+		if(!paginatedClients.isEmpty()) {
+			PagedModel<EntityModel<ClientDto>> pagedClientModel = pagedResourceAssemblerService.toPagedModel(paginatedClients);
+			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, pagedClientModel);
 		}else {
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.NOT_FOUND, HttpStatus.NOT_FOUND);
 		}
@@ -65,10 +73,14 @@ public class ClientSearchController {
 	
 	@Operation(summary = "get clients by firstName")
 	@GetMapping("/firstName/{firstName}")
-	public ResponseEntity<ApiResponse<List<ClientDto>>> getClientsByFirstName(@PathVariable @NotBlank String firstName){
-		List<ClientDto> clientList = clientService.findClientsByFirstName(firstName);
-		if(!clientList.isEmpty()) {
-			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, clientList);
+	public ResponseEntity<ApiResponse<PagedModel<EntityModel<ClientDto>>>> getClientsByFirstName(@PathVariable @NotBlank String firstName,
+																@RequestParam(defaultValue = "0") int pageNumber,
+																@RequestParam(defaultValue = "10") int pageSize){
+		Pageable pageable = PageRequest.of(pageNumber, pageSize);
+		Page<ClientDto> paginatedclients = clientService.findClientsByFirstName(firstName, pageable);
+		if(!paginatedclients.isEmpty()) {
+			PagedModel<EntityModel<ClientDto>> pagedClientModel = pagedResourceAssemblerService.toPagedModel(paginatedclients);
+			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, pagedClientModel);
 		}else {
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.NOT_FOUND, HttpStatus.NOT_FOUND);
 		}	
@@ -77,10 +89,14 @@ public class ClientSearchController {
 	
 	@Operation(summary = "get clients by lastName")
 	@GetMapping("/lastName/{lastName}")
-	public ResponseEntity<ApiResponse<List<ClientDto>>> getClientsByLastName(@PathVariable @NotBlank String lastName){
-		List<ClientDto> clientList =  clientService.findClientsByLastName(lastName);
-		if(!clientList.isEmpty()) {
-			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, clientList);
+	public ResponseEntity<ApiResponse<PagedModel<EntityModel<ClientDto>>>> getClientsByLastName(@PathVariable @NotBlank String lastName,
+															@RequestParam(defaultValue = "0") int pageNumber,
+															@RequestParam(defaultValue = "10") int pageSize){
+		Pageable pageable = PageRequest.of(pageNumber, pageSize);
+		Page<ClientDto> paginatedClients =  clientService.findClientsByLastName(lastName, pageable);
+		if(!paginatedClients.isEmpty()) {
+			PagedModel<EntityModel<ClientDto>> pagedClientModel = pagedResourceAssemblerService.toPagedModel(paginatedClients);
+			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, pagedClientModel);
 		}else {
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.NOT_FOUND, HttpStatus.NOT_FOUND);
 		}
@@ -89,10 +105,15 @@ public class ClientSearchController {
 	
 	@Operation(summary = "get clients by postalCode")
 	@GetMapping("/postalCode/{postalCode}")
-	public ResponseEntity<ApiResponse<List<ClientDto>>> getClientsByPostalCode(@PathVariable @NotBlank String postalCode){
-		List<ClientDto> clientList = clientService.findClientsByPostalCode(postalCode);	
-		if(!clientList.isEmpty()) {
-			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, clientList);
+	public ResponseEntity<ApiResponse<PagedModel<EntityModel<ClientDto>>>> getClientsByPostalCode(@PathVariable @NotBlank String postalCode,
+															@RequestParam(defaultValue = "0") int pageNumber,
+															@RequestParam(defaultValue = "10") int pageSize){
+		Pageable pageable = PageRequest.of(pageNumber, pageSize);
+		Page<ClientDto> paginatedClients = clientService.findClientsByPostalCode(postalCode, pageable);	
+		if(!paginatedClients.isEmpty()) {
+			//converting paginatedClients to PagedModel to benefit from hateos dependency.
+			PagedModel<EntityModel<ClientDto>> pagedClientModel = pagedResourceAssemblerService.toPagedModel(paginatedClients);
+			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, pagedClientModel);
 		}else {
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.NOT_FOUND, HttpStatus.NOT_FOUND);
 		}

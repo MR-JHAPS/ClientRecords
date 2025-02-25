@@ -5,6 +5,9 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,6 +27,7 @@ import com.jhaps.clientrecords.response.ApiResponse;
 import com.jhaps.clientrecords.response.ApiResponseBuilder;
 import com.jhaps.clientrecords.response.ResponseMessage;
 import com.jhaps.clientrecords.service.ClientService;
+import com.jhaps.clientrecords.service.PagedResourceAssemblerService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -42,22 +46,27 @@ public class ClientController {
 	 */
 	private ApiResponseBuilder apiResponseBuilder;
 	private ClientService clientService;
+	private PagedResourceAssemblerService<ClientDto> pagedResourceAssemblerService;
 
-	public ClientController(ClientService clientService, ApiResponseBuilder apiResponseBuilder) {
+	public ClientController(ClientService clientService, ApiResponseBuilder apiResponseBuilder,
+			PagedResourceAssemblerService<ClientDto> pagedResourceAssemblerService) {
 		this.clientService = clientService;
 		this.apiResponseBuilder = apiResponseBuilder;
+		this.pagedResourceAssemblerService = pagedResourceAssemblerService;
 	}
 //--------------------------------------------------------------------------------------------------------------------------------------------	
 	
 	
 	@Operation(summary = "get all clients")
 	@GetMapping
-	public ResponseEntity<ApiResponse<Page<ClientDto>>> getAllClients( @RequestParam(defaultValue = "0") int page,
+	public ResponseEntity<ApiResponse<PagedModel<EntityModel<ClientDto>>>> getAllClients( @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size){
-		Pageable pageData = PageRequest.of(page, size);
-		Page<ClientDto> clientList = clientService.findAllClients(pageData);
-		if(clientList!=null && !clientList.isEmpty()) {
-			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, clientList);
+		Pageable pageable = PageRequest.of(page, size);
+		Page<ClientDto> paginatedClients = clientService.findAllClients(pageable);
+		if(paginatedClients!=null && !paginatedClients.isEmpty()) {
+			//converting the clientList To PagedClientList
+			PagedModel<EntityModel<ClientDto>> pagedClientModel = pagedResourceAssemblerService.toPagedModel(paginatedClients);
+			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, pagedClientModel);
 		}else {
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.NOT_FOUND, HttpStatus.NOT_FOUND);
 		}

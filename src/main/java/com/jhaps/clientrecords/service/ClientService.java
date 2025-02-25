@@ -27,13 +27,13 @@ public interface ClientService {
 	//THIS IS FOR THE SEARCH QUERY 
 	public Page<ClientDto> findClientBySearchQuery(String searchQuery, Pageable pageable);
 	
-	public List<ClientDto> findClientsByFirstName(String firstName);
+	public Page<ClientDto> findClientsByFirstName(String firstName, Pageable pageable);
 	
-	public List<ClientDto> findClientsByLastName(String lastName);
+	public Page<ClientDto> findClientsByLastName(String lastName, Pageable pageable);
 	
-	public List<ClientDto> findClientsByDateOfBirth(LocalDate dateOfBirth);
+	public Page<ClientDto> findClientsByDateOfBirth(LocalDate dateOfBirth, Pageable pageable);
 	
-	public List<ClientDto> findClientsByPostalCode(String postalCode);
+	public Page<ClientDto> findClientsByPostalCode(String postalCode, Pageable pageable);
 	
 	
 	//THIS IS FOR SORTING CLIENTS

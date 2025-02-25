@@ -6,6 +6,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -55,8 +57,9 @@ public class UserServiceImpl implements UserService{
 
 	
 	@Override
-	public List<UserDto> findAllUsers() {
-		return userRepo.findAll().stream().map(mapper::toUserDto).collect(Collectors.toList());
+	public Page<UserDto> findAllUsers(Pageable pageable) {
+		Page<User> userList = userRepo.findAll(pageable);
+		return userList.map(mapper::toUserDto);
 	}
 	
 	
@@ -75,9 +78,9 @@ public class UserServiceImpl implements UserService{
 
 	
 	@Override
-	public List<UserDto> findUsersByRoleName(String roleName) {
-		return userRepo.findByRole_Name(roleName)
-						.stream().map(mapper::toUserDto).collect(Collectors.toList());
+	public Page<UserDto> findUsersByRoleName(String roleName, Pageable pageable) {
+		Page<User> userList = userRepo.findByRole_Name(roleName, pageable);
+		return userList.map(mapper::toUserDto);
 	}
 	
 	

@@ -8,6 +8,11 @@ import java.util.Optional;
 import javax.naming.AuthenticationException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,6 +26,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jhaps.clientrecords.dto.UserDto;
@@ -29,6 +35,7 @@ import com.jhaps.clientrecords.response.ApiResponse;
 import com.jhaps.clientrecords.response.ApiResponseBuilder;
 import com.jhaps.clientrecords.response.ResponseMessage;
 import com.jhaps.clientrecords.service.JWTServiceImpl;
+import com.jhaps.clientrecords.service.PagedResourceAssemblerService;
 import com.jhaps.clientrecords.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -52,10 +59,14 @@ public class UserController {
 	
 	private ApiResponseBuilder apiResponseBuilder;
 	
+	private PagedResourceAssemblerService<UserDto> pagedResourceAssemblerService;
 	
-	public UserController(UserService userService, ApiResponseBuilder apiResponseBuilder) {
+	
+	public UserController(UserService userService, ApiResponseBuilder apiResponseBuilder,
+			PagedResourceAssemblerService<UserDto> pagedResourceAssemblerService) {
 		this.userService = userService;
 		this.apiResponseBuilder = apiResponseBuilder;
+		this.pagedResourceAssemblerService = pagedResourceAssemblerService;
 	}
 
 
@@ -83,10 +94,13 @@ public class UserController {
 	//THIS SHOULD BE AUTHORIZED ONLY FOR ADMIN WILL CHANGE THIS LATER WHEN I CREATE AN ADMIN CONTROLLER.
 	@Operation(summary = "Get List Of All The Users")
 	@GetMapping("/findAll")
-	public ResponseEntity<ApiResponse<Object>> getAllUsers() {
-		List<UserDto> userList = userService.findAllUsers();
-		if(userList!=null && !userList.isEmpty()) {
-			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, userList);
+	public ResponseEntity<ApiResponse<PagedModel<EntityModel<UserDto>>>> getAllUsers(@RequestParam(defaultValue="0") int pageNumber,
+																						@RequestParam(defaultValue="10") int pageSize) {
+		Pageable pageable = PageRequest.of(pageNumber, pageSize);
+		Page<UserDto> paginatedUsers = userService.findAllUsers(pageable);
+		if(paginatedUsers!=null && !paginatedUsers.isEmpty()) {
+			PagedModel<EntityModel<UserDto>> pagedUserModel = pagedResourceAssemblerService.toPagedModel(paginatedUsers);
+			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, pagedUserModel);
 		}else {
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.NOT_FOUND, HttpStatus.NOT_FOUND);
 		}
@@ -94,7 +108,7 @@ public class UserController {
 	
 	@Operation(summary = "Get User By ID")
 	@GetMapping("/id/{id}")
-	public ResponseEntity<ApiResponse<Object>> getUserById(@PathVariable int id) {
+	public ResponseEntity<ApiResponse<Optional<UserDto>>> getUserById(@PathVariable int id) {
 		Optional<UserDto> userDto = userService.findUserById(id);
 		if(userDto.isPresent()) {
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, userDto);
@@ -107,10 +121,14 @@ public class UserController {
 	//THIS SHOULD BE AUTHORIZED ONLY FOR ADMIN WILL CHANGE THIS LATER WHEN I CREATE AN ADMIN CONTROLLER.
 	@Operation(summary = "Get List Of  Users By Role Name")
 	@GetMapping("/role/{role}")
-	public ResponseEntity<ApiResponse<Object>> getUsersByRole(@PathVariable String role){
-		List<UserDto> userList = userService.findUsersByRoleName(role);
-		if(userList!=null && !userList.isEmpty()) {
-			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, userList);
+	public ResponseEntity<ApiResponse<PagedModel<EntityModel<UserDto>>>> getUsersByRole(@PathVariable String role,
+																				@RequestParam(defaultValue="0") int pageNumber,
+																				@RequestParam(defaultValue="10") int pageSize){
+		Pageable pageable = PageRequest.of(pageNumber, pageSize);
+		Page<UserDto> paginatedUsers = userService.findUsersByRoleName(role, pageable);
+		if(paginatedUsers!=null && !paginatedUsers.isEmpty()) {
+			PagedModel<EntityModel<UserDto>> pagedUserModel = pagedResourceAssemblerService.toPagedModel(paginatedUsers);
+			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, pagedUserModel);
 		}else {
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.NOT_FOUND, HttpStatus.NOT_FOUND);
 		}	

@@ -35,10 +35,10 @@ public interface ClientRepository extends JpaRepository<Client, Integer>{
 	    Page<Client> searchClients(@Param("query") String query, Pageable pageable);
 	 
 	 Page<Client> findAll(Pageable pageable);
-	List<Client> findByFirstName(String firstName);
-	List<Client> findByLastName(String lastName);
-	List<Client> findByDateOfBirth(LocalDate dateOfBirth);
-	List<Client> findByPostalCode(String postalCode);
+	Page<Client> findByFirstName(String firstName, Pageable pageable);
+	Page<Client> findByLastName(String lastName, Pageable pageable);
+	Page<Client> findByDateOfBirth(LocalDate dateOfBirth, Pageable pageable);
+	Page<Client> findByPostalCode(String postalCode, Pageable pageable);
 	
 	
 	
