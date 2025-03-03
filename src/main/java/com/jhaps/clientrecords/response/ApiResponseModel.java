@@ -1,6 +1,6 @@
 package com.jhaps.clientrecords.response;
 
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 
 
 /*THIS CLASS IS TO
@@ -8,24 +8,24 @@ import org.springframework.http.HttpStatus;
  * 							  {status : 'OK'},
  * 							  {data : could be any type(List/Object/String)} ]
 */
-public class ApiResponse<T> {
+public class ApiResponseModel<T> {
 	//Attributes
 	private String message;
-	private HttpStatus status;
+	private int status;
 	private T data;
 	
 	//Constructor
-	public ApiResponse(ResponseMessage responseMessage, HttpStatus status, T data) {
+	public ApiResponseModel(ResponseMessage responseMessage, HttpStatusCode status, T data) {
 		super();
-		this.message = responseMessage.getMesage();
-		this.status = status;
+		this.message = responseMessage.getMessage();
+		this.status = status.value();
 		this.data = data;
 	}
 	
 	//constructor with 2 parameters:
-	public ApiResponse(ResponseMessage responseMessage, HttpStatus status) {
-		this.message = responseMessage.getMesage();
-		this.status = status;
+	public ApiResponseModel(ResponseMessage responseMessage, HttpStatusCode status) {
+		this.message = responseMessage.getMessage();
+		this.status = status.value();
 		this.data = null;
 	}
 	
@@ -35,7 +35,7 @@ public class ApiResponse<T> {
 		return message;
 	}
 	
-	public HttpStatus getStatus() {
+	public int getStatus() {
 		return status;
 	}
 	

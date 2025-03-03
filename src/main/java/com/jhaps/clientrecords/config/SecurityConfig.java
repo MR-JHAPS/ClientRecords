@@ -29,19 +29,19 @@ public class SecurityConfig {
 	private JWTFilter jwtFilter;
 	
 	@Bean
-	public PasswordEncoder passwordEncoder() {
+	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
 	
 	
 	@Bean
-	public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+	AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
 		return config.getAuthenticationManager();
 	}
 	
 	
 	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity security) throws Exception {
+	SecurityFilterChain securityFilterChain(HttpSecurity security) throws Exception {
 		
 		return security
 				.cors(Customizer.withDefaults()) //i have created a custom Cors in "CorsConfig.java".

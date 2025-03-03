@@ -23,7 +23,7 @@ public enum ResponseMessage {
 		this.message = message;
 	}
 	
-	public String getMesage() {
+	public String getMessage() {
 		return this.message;
 	}
 	

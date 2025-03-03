@@ -1,9 +1,12 @@
 package com.jhaps.clientrecords.config;
 
+import java.util.Comparator;
 import java.util.List;
 
+import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.domain.Sort;
 
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.models.Components;
@@ -20,7 +23,7 @@ public class SwaggerConfig {
 
 	
 	@Bean
-	public OpenAPI myCustomConfig() {
+	OpenAPI myCustomConfig() {
 		
 		//This is to set the title and the description of the 
 		return new OpenAPI()
@@ -33,7 +36,7 @@ public class SwaggerConfig {
 							new Server().url("http://localhost:8081").description("live")
 						)
 				)
-				.addTagsItem(new Tag().name("Public Controller"))
+			
 				 
 				.addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
 				.components(new Components().addSecuritySchemes(
@@ -50,11 +53,20 @@ public class SwaggerConfig {
 	
 	
 
+	public OpenApiCustomizer makePublicTagFirst() {
+		return openApi -> {
+			List<Tag> tags = openApi.getTags();
+			if(tags!=null) {
+				tags.sort(Comparator.comparing((Tag tag)->
+					!"Public Controller".equals(tag.getName()))
+						.thenComparing(Tag::getName));
+			}
+		};
+	}
 	
 	
 	
-	
-	
+
 	
 	
 }//ends class

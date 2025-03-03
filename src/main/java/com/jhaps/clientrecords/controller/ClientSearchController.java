@@ -19,11 +19,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jhaps.clientrecords.dto.ClientDto;
 import com.jhaps.clientrecords.entity.Client;
-import com.jhaps.clientrecords.response.ApiResponse;
+import com.jhaps.clientrecords.response.ApiResponseModel;
 import com.jhaps.clientrecords.response.ApiResponseBuilder;
 import com.jhaps.clientrecords.response.ResponseMessage;
 import com.jhaps.clientrecords.service.ClientService;
 import com.jhaps.clientrecords.service.PagedResourceAssemblerService;
+import com.jhaps.clientrecords.util.Variables;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,7 +34,7 @@ import jakarta.validation.constraints.NotBlank;
 @RestController
 @RequestMapping("/api/clients/search")
 @Tag(name = "Client Search Controller", description = "Search Clients by 'AnyQuery', 'FirstName', 'LastName', 'PostalCode'")
-public class ClientSearchController {	
+public class ClientSearchController{	
 	/*In the ApiResponseBuilder.class, responseEntity building method is created
 		to reduce the boilerplate code
 		no need to create :
@@ -57,11 +58,11 @@ public class ClientSearchController {
 	
 	@Operation(summary = "get clients by searchQuery")
 	@GetMapping("/{searchQuery}")
-	public ResponseEntity<ApiResponse<PagedModel<EntityModel<ClientDto>>>> getClientsBySearchQuery( @PathVariable @NotBlank String searchQuery,
+	public ResponseEntity<ApiResponseModel<PagedModel<EntityModel<ClientDto>>>> getClientsBySearchQuery( @PathVariable @NotBlank String searchQuery,
 																					@RequestParam(defaultValue ="0") int page,
 																					@RequestParam(defaultValue ="10") int size){
 		Pageable pageable = PageRequest.of(page, size);
-		Page<ClientDto> paginatedClients = clientService.findClientBySearchQuery(searchQuery, pageable);
+		Page<ClientDto>  paginatedClients= clientService.findClientBySearchQuery(searchQuery, pageable);
 		if(!paginatedClients.isEmpty()) {
 			PagedModel<EntityModel<ClientDto>> pagedClientModel = pagedResourceAssemblerService.toPagedModel(paginatedClients);
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, pagedClientModel);
@@ -73,7 +74,7 @@ public class ClientSearchController {
 	
 	@Operation(summary = "get clients by firstName")
 	@GetMapping("/firstName/{firstName}")
-	public ResponseEntity<ApiResponse<PagedModel<EntityModel<ClientDto>>>> getClientsByFirstName(@PathVariable @NotBlank String firstName,
+	public ResponseEntity<ApiResponseModel<PagedModel<EntityModel<ClientDto>>>> getClientsByFirstName(@PathVariable @NotBlank String firstName,
 																@RequestParam(defaultValue = "0") int pageNumber,
 																@RequestParam(defaultValue = "10") int pageSize){
 		Pageable pageable = PageRequest.of(pageNumber, pageSize);
@@ -89,7 +90,7 @@ public class ClientSearchController {
 	
 	@Operation(summary = "get clients by lastName")
 	@GetMapping("/lastName/{lastName}")
-	public ResponseEntity<ApiResponse<PagedModel<EntityModel<ClientDto>>>> getClientsByLastName(@PathVariable @NotBlank String lastName,
+	public ResponseEntity<ApiResponseModel<PagedModel<EntityModel<ClientDto>>>> getClientsByLastName(@PathVariable @NotBlank String lastName,
 															@RequestParam(defaultValue = "0") int pageNumber,
 															@RequestParam(defaultValue = "10") int pageSize){
 		Pageable pageable = PageRequest.of(pageNumber, pageSize);
@@ -105,7 +106,7 @@ public class ClientSearchController {
 	
 	@Operation(summary = "get clients by postalCode")
 	@GetMapping("/postalCode/{postalCode}")
-	public ResponseEntity<ApiResponse<PagedModel<EntityModel<ClientDto>>>> getClientsByPostalCode(@PathVariable @NotBlank String postalCode,
+	public ResponseEntity<ApiResponseModel<PagedModel<EntityModel<ClientDto>>>> getClientsByPostalCode(@PathVariable @NotBlank String postalCode,
 															@RequestParam(defaultValue = "0") int pageNumber,
 															@RequestParam(defaultValue = "10") int pageSize){
 		Pageable pageable = PageRequest.of(pageNumber, pageSize);

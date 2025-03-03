@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.jhaps.clientrecords.exception.DuplicateDataException;
 import com.jhaps.clientrecords.exception.EntityNotFoundException;
-import com.jhaps.clientrecords.response.ApiResponse;
+import com.jhaps.clientrecords.response.ApiResponseModel;
 import com.jhaps.clientrecords.response.ApiResponseBuilder;
 import com.jhaps.clientrecords.response.ResponseMessage;
 
@@ -42,14 +42,14 @@ public class GlobalExceptionHandler {
 
 	
 	@ExceptionHandler(Exception.class)
-	public ResponseEntity<ApiResponse<Object>> handleGeneralException(Exception e){
+	public ResponseEntity<ApiResponseModel<Object>> handleGeneralException(Exception e){
 		System.out.println(e.getMessage() + e );
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 	
 	@ExceptionHandler(MethodArgumentNotValidException.class)
-	public ResponseEntity<ApiResponse<Object>> handleValidationException(MethodArgumentNotValidException e){
+	public ResponseEntity<ApiResponseModel<Object>> handleValidationException(MethodArgumentNotValidException e){
 		BindingResult bindingResult = e.getBindingResult();
 		List<String> errors = bindingResult.getAllErrors()
 									.stream()
@@ -60,18 +60,18 @@ public class GlobalExceptionHandler {
 	
 	
 	@ExceptionHandler(EntityNotFoundException.class)
-	public ResponseEntity<ApiResponse<Object>> handleEntityNotFoundException(EntityNotFoundException e){
+	public ResponseEntity<ApiResponseModel<Object>> handleEntityNotFoundException(EntityNotFoundException e){
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.NOT_FOUND, HttpStatus.NOT_FOUND);
 	}
 	
 	
 	@ExceptionHandler(DuplicateDataException.class)
-	public ResponseEntity<ApiResponse<Object>> handleDuplicateDataException(DuplicateDataException e){
+	public ResponseEntity<ApiResponseModel<Object>> handleDuplicateDataException(DuplicateDataException e){
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.DUPLICATE_ENTITY, HttpStatus.CONFLICT);
 	}
 	
 	@ExceptionHandler(DataAccessException.class)
-    public ResponseEntity<ApiResponse<Object>> handleDataAccessException(DataAccessException e) {   
+    public ResponseEntity<ApiResponseModel<Object>> handleDataAccessException(DataAccessException e) {   
         return apiResponseBuilder.buildApiResponse(ResponseMessage.DATA_ACCESS_EXCEPTION ,HttpStatus.INTERNAL_SERVER_ERROR);
     }
 	

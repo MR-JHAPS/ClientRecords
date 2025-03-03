@@ -1,11 +1,8 @@
 package com.jhaps.clientrecords.controller;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
@@ -21,9 +18,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jhaps.clientrecords.dto.ClientDto;
-import com.jhaps.clientrecords.entity.Client;
 import com.jhaps.clientrecords.exception.EntityNotFoundException;
-import com.jhaps.clientrecords.response.ApiResponse;
+import com.jhaps.clientrecords.response.ApiResponseModel;
 import com.jhaps.clientrecords.response.ApiResponseBuilder;
 import com.jhaps.clientrecords.response.ResponseMessage;
 import com.jhaps.clientrecords.service.ClientService;
@@ -59,7 +55,7 @@ public class ClientController {
 	
 	@Operation(summary = "get all clients")
 	@GetMapping
-	public ResponseEntity<ApiResponse<PagedModel<EntityModel<ClientDto>>>> getAllClients( @RequestParam(defaultValue = "0") int page,
+	public ResponseEntity<ApiResponseModel<PagedModel<EntityModel<ClientDto>>>> getAllClients( @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size){
 		Pageable pageable = PageRequest.of(page, size);
 		Page<ClientDto> paginatedClients = clientService.findAllClients(pageable);
@@ -75,7 +71,7 @@ public class ClientController {
 	
 	@Operation(summary = "create new client")
 	@PostMapping("/insert")
-	public ResponseEntity<ApiResponse<String>> saveNewClient(@RequestBody ClientDto client){
+	public ResponseEntity<ApiResponseModel<String>> saveNewClient(@RequestBody ClientDto client){
 		try {
 			clientService.saveClient(client);
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.CREATED, "Client Data Created Successfully");
@@ -89,7 +85,7 @@ public class ClientController {
 	//STUDY THIS FURTHER FOR BETTER UNDERSTANDING.
 	@Operation(summary = "delete client by id")
 	@DeleteMapping("/delete/id/{id}")
-	public ResponseEntity<ApiResponse<String>> deleteClientById(@PathVariable int id){
+	public ResponseEntity<ApiResponseModel<String>> deleteClientById(@PathVariable int id){
 		try {
 			clientService.deleteClientById(id);
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.NO_CONTENT);
@@ -101,7 +97,7 @@ public class ClientController {
 	
 	@Operation(summary = "update client by id")
 	@PutMapping("/update/id/{id}")
-	public ResponseEntity<ApiResponse<Object>> updateClientById(@PathVariable int id, @Valid @RequestBody ClientDto clientUpdateInfo){
+	public ResponseEntity<ApiResponseModel<Object>> updateClientById(@PathVariable int id, @Valid @RequestBody ClientDto clientUpdateInfo){
 		try {
 			clientService.updateClientById(id, clientUpdateInfo);
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, "Your Data is updated.");

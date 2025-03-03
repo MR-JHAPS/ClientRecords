@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jhaps.clientrecords.dto.UserDto;
-import com.jhaps.clientrecords.response.ApiResponse;
+import com.jhaps.clientrecords.response.ApiResponseModel;
 import com.jhaps.clientrecords.response.ApiResponseBuilder;
 import com.jhaps.clientrecords.response.ResponseMessage;
 import com.jhaps.clientrecords.service.UserService;
@@ -35,7 +35,7 @@ public class PublicController {
 	//We get the JwtToken from this controller after successful Login.
 	@Operation(summary = "user Login")
 	@PostMapping("/login")
-	public ResponseEntity<ApiResponse<String>> userLogin(@Valid @RequestBody UserDto userDto){
+	public ResponseEntity<ApiResponseModel<String>> userLogin(@Valid @RequestBody UserDto userDto){
 		String token = userService.verifyUser(userDto);
 		if(token!=null) {
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, token);
@@ -47,7 +47,7 @@ public class PublicController {
 	
 	@Operation(summary = "user Signup")
 	@PostMapping("/signup")
-	public ResponseEntity<ApiResponse<Object>> userSignUp(@Valid @RequestBody UserDto userDto){
+	public ResponseEntity<ApiResponseModel<Object>> userSignUp(@Valid @RequestBody UserDto userDto){
 		try {
 			userService.saveUser(userDto);
 				return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.CREATED, "User Created Successfully");
