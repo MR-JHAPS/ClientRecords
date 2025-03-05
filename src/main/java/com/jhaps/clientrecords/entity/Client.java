@@ -10,7 +10,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -41,12 +40,7 @@ public class Client {
 	private LocalDate dateOfBirth;
 	
 	
-//	
-//	public String getFirstName() {
-//		return this.firstName;
-//	}
 	
 	
 	
-	
-}
+}//ends class

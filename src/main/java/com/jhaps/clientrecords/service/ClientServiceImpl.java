@@ -2,75 +2,215 @@ package com.jhaps.clientrecords.service;
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.jhaps.clientrecords.dto.ClientDto;
 import com.jhaps.clientrecords.entity.Client;
+import com.jhaps.clientrecords.exception.EntityNotFoundException;
+import com.jhaps.clientrecords.exception.EntityOperationException;
 import com.jhaps.clientrecords.repository.ClientRepository;
+import com.jhaps.clientrecords.util.ClientMapper;
+import com.jhaps.clientrecords.util.Mapper;
+
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 
 @Service
 public class ClientServiceImpl implements ClientService  {
 
-	@Autowired
 	private ClientRepository clientRepo;
+	
+	private Mapper mapper;
 
+//CONSTRUCTOR	
+	
+	public ClientServiceImpl(ClientRepository clientRepo, Mapper mapper) {
+		this.clientRepo = clientRepo;
+		this.mapper = mapper;
+	}
+	
+	
+	
+//METHODS
+//------------------------------CRUD------------------------------------------------------------------------------------------------
 	@Override
-	public List<Client> findAllClients() {
-		return clientRepo.findAll();
+	public Page<ClientDto> findAllClients(Pageable pageable) {
+		Page<Client> clientList = clientRepo.findAll(pageable);
+		return clientList.map(mapper::toClientDto);
 	}
 
+	
+	
 	@Override
-	public Optional<Client> findClientById(int id) {
-		//Here I need to implement logger
-		
-		return clientRepo.findById(id);
+	public Optional<ClientDto> findClientById(int id) {		
+		try {
+			return clientRepo.findById(id).map(mapper::toClientDto);
+		}catch(DataAccessException e) {
+			throw new EntityNotFoundException("client", id, e );
+		}
+	}
+	
+	
+	@Override
+	public void saveClient(ClientDto clientDto) {
+		try{
+			clientRepo.save(mapper.toClientEntity(clientDto));
+		}catch(DataAccessException e) { 
+			throw new EntityOperationException("save", "client", e);				
+		}
 	}
 
-	@Override
-	public List<Client> findClientsByFirstName(String firstName) {
-		return clientRepo.findByFirstName(firstName);
-	}
-
-	@Override
-	public List<Client> findClientsByLastName(String lastName) {
-		return clientRepo.findByLastName(lastName);
-	}
-
-	@Override
-	public List<Client> findClientsByDateOfBirth(LocalDate dateOfBirth) {
-		return clientRepo.findByDateOfBirth(dateOfBirth);
-	}
-
-	@Override
-	public List<Client> findClientsByPostalCode(String postalCode) {
-		return clientRepo.findByPostalCode(postalCode);
-	}
-
-	@Override
-	public void saveClient(Client client) {
-		// TODO Auto-generated method stub
-		
-	}
-
+	
 	@Override
 	public void deleteClientById(int id) {
-		// TODO Auto-generated method stub
+		try {
+			clientRepo.deleteById(id);
+		}catch(DataAccessException e) {
+			throw new EntityOperationException("Delete", "Client", e);
+		}
+	}
+
+	
+	@Transactional
+	@Override
+	public void updateClientById(int id, @Valid ClientDto clientUpdateInfo) {
+		try {
+			Client client = clientRepo.findById(id).orElseThrow(
+								()-> new EntityNotFoundException("Client", id));
+			client.setFirstName(clientUpdateInfo.getFirstName());
+			client.setLastName(clientUpdateInfo.getLastName());
+			client.setDateOfBirth(clientUpdateInfo.getDateOfBirth());
+			client.setPostalCode(clientUpdateInfo.getPostalCode());
+			clientRepo.save(client);	
+		}catch(DataAccessException e) {
+			throw new EntityOperationException("Update", "Client", e);
+		}
+	}
+
+//--------------------SEARCHING----------------------------------------------------------------------------------------------------------	
+	@Override
+	public Page<ClientDto> findClientBySearchQuery(String searchQuery, Pageable pageable) {
+		try {
+			Page<Client> clientList = clientRepo.searchClients(searchQuery, pageable);
+			return clientList.map(mapper::toClientDto);
+		}catch (DataAccessException e) {
+			throw new EntityOperationException("Searching", "client", e);
+		}
+	}
+
+	
+	@Override
+	public Page<ClientDto> findClientsByFirstName(String firstName, Pageable pageable) {
+		try {
+			Page<Client> clientList = clientRepo.findByFirstNameStartingWithIgnoreCase(firstName, pageable);
+			return clientList.map(mapper::toClientDto);
+		}catch (DataAccessException e) {
+			throw new EntityOperationException("Searching By FirstName", "client", e);
+		}	
+	}
+
+	
+	@Override
+	public Page<ClientDto> findClientsByLastName(String lastName, Pageable pageable) {
+		try {
+			Page<Client> clientList = clientRepo.findByLastNameStartingWithIgnoreCase(lastName, pageable);
+			return clientList.map(mapper::toClientDto); /* OR using Lambda : return clientList.map(list -> mapper.toClientDto(list));*/
+		}catch (DataAccessException e) {
+			throw new EntityOperationException("Searching By LastName", "client", e);
+		}	
+	}
+
+	
+	@Override
+	public Page<ClientDto> findClientsByDateOfBirth(LocalDate dateOfBirth, Pageable pageable) {
+		try {
+			Page<Client> clientList = clientRepo.findByDateOfBirth(dateOfBirth, pageable);
+			return clientList.map(mapper::toClientDto);
+		}catch (DataAccessException e) {
+			throw new EntityOperationException("Searching By DateOfBirth", "client", e);
+		}	
 		
 	}
 
+	
 	@Override
-	public void updateClientById(int id) {
-		// TODO Auto-generated method stub
-		
+	public Page<ClientDto> findClientsByPostalCode(String postalCode, Pageable pageable) {
+		try {
+			Page<Client> clientList = clientRepo.findByPostalCodeStartingWithIgnoreCase(postalCode, pageable);
+			return clientList.map(mapper::toClientDto);
+		}catch (DataAccessException e) {
+			throw new EntityOperationException("Searching By PostalCode", "client", e);
+		}	
 	}
+
 	
-	
-	
-	
-	
+//-------------------------------SORTING-----------------------------------------------------------------------------------------------	
+
+	@Override
+	public List<Client> sortClientByFirstNameAscending(List<Client> clientList) {
+		clientList.sort(Comparator.comparing(Client::getFirstName, String::compareToIgnoreCase));
+		return clientList;
+	}
+
+
+	@Override
+	public List<Client> sortClientByFirstNameDescending(List<Client> clientList) {
+		clientList.sort(Comparator.comparing(Client::getFirstName, String::compareToIgnoreCase).reversed());
+		return clientList;
+	}
+
+
+	@Override
+	public List<Client> sortClientByLastNameAscending(List<Client> clientList) {
+		clientList.sort(Comparator.comparing(Client::getLastName, String::compareToIgnoreCase));
+		return clientList;
+	}
+
+
+	@Override
+	public List<Client> sortClientByLastNameDescending(List<Client> clientList) {
+		clientList.sort(Comparator.comparing(Client::getLastName, String::compareToIgnoreCase).reversed());
+		return clientList;
+	}
+
+
+	@Override
+	public List<Client> sortClientByDateOfBirthAscending(List<Client> clientList) {
+		clientList.sort(Comparator.comparing(Client::getDateOfBirth));
+		return clientList;
+	}
+
+
+	@Override
+	public List<Client> sortClientByDateOfBirthDescending(List<Client> clientList) {
+		clientList.sort(Comparator.comparing(Client::getDateOfBirth).reversed());
+		return clientList;
+	}
+
+
+	@Override
+	public List<Client> sortClientByPostalCodeAscending(List<Client> clientList) {
+		clientList.sort(Comparator.comparing(Client::getPostalCode, String::compareToIgnoreCase));
+		return clientList;
+	}
+
+
+	@Override
+	public List<Client> sortClientByPostalCodeDescending(List<Client> clientList) {
+		clientList.sort(Comparator.comparing(Client::getPostalCode, String::compareToIgnoreCase).reversed());
+		return clientList;
+	}
+
+
 	
 	
 	
