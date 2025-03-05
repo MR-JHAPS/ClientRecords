@@ -1,5 +1,7 @@
 package com.jhaps.clientrecords.controller;
 
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -66,6 +68,16 @@ public class ClientController {
 		}else {
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.NOT_FOUND, HttpStatus.NOT_FOUND);
 		}
+	}
+	
+	@Operation(summary = "get clients by id")
+	@GetMapping("/id/{id}")
+	public ResponseEntity<ApiResponseModel<Optional<ClientDto>>> getClientById( @PathVariable int id){
+		Optional<ClientDto> client = clientService.findClientById(id);
+		if(client.isPresent()) {
+			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, client);
+		}
+		return apiResponseBuilder.buildApiResponse(ResponseMessage.NOT_FOUND, HttpStatus.NOT_FOUND);
 	}
 	
 	
