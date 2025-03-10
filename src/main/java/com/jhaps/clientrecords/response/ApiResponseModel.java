@@ -1,5 +1,8 @@
 package com.jhaps.clientrecords.response;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 import org.springframework.http.HttpStatusCode;
 
 
@@ -10,13 +13,16 @@ import org.springframework.http.HttpStatusCode;
 */
 public class ApiResponseModel<T> {
 	//Attributes
+	private LocalDateTime timestamp;
 	private String message;
 	private int status;
 	private T data;
 	
+	
 	//Constructor
 	public ApiResponseModel(ResponseMessage responseMessage, HttpStatusCode status, T data) {
 		super();
+		this.timestamp = LocalDateTime.now();//timestamp.
 		this.message = responseMessage.getMessage();
 		this.status = status.value();
 		this.data = data;
@@ -24,6 +30,7 @@ public class ApiResponseModel<T> {
 	
 	//constructor with 2 parameters:
 	public ApiResponseModel(ResponseMessage responseMessage, HttpStatusCode status) {
+		this.timestamp = LocalDateTime.now(); //timestamp.
 		this.message = responseMessage.getMessage();
 		this.status = status.value();
 		this.data = null;
@@ -42,6 +49,11 @@ public class ApiResponseModel<T> {
 	public T getData() {
 		return this.data;
 	}
+
+	public String getTimestamp() {
+		return timestamp.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME); //timestamp in string format.
+	}
+
 	
 	
 	
