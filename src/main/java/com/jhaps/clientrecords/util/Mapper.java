@@ -23,6 +23,18 @@ public class Mapper {
 	}
 	
 	
+//	//CLIENT---> CLIENT-DTO STATIC
+//		public static ClientDto toClientDtoStatic(Client clientEntity) {
+//			ClientDto dto = new ClientDto();
+//			dto.setId(clientEntity.getId());
+//			dto.setFirstName(clientEntity.getFirstName());
+//			dto.setLastName(clientEntity.getLastName());
+//			dto.setPostalCode(clientEntity.getPostalCode());
+//			dto.setDateOfBirth(clientEntity.getDateOfBirth());
+//			return dto;
+//		}
+	
+	
 	//CLIENT-DTO ------> CLIENT
 	public  Client toClientEntity(ClientDto clientDto) {
 		Client client = new Client();

@@ -16,7 +16,7 @@ public interface ClientService {
 	//CRUD OPERATIONS
 	public Page<ClientDto> findAllClients(Pageable pageable);
 	
-	public Optional<ClientDto> findClientById(int id);
+	public ClientDto findClientById(int id);
 
 	public void saveClient(ClientDto clientDto);
 	
