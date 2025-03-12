@@ -1,12 +1,16 @@
 package com.jhaps.clientrecords.service;
 
+import java.nio.file.AccessDeniedException;
+import java.security.Principal;
 import java.util.Arrays;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -153,12 +157,20 @@ public class UserServiceImpl implements UserService{
 	
 	
 	
-	@Transactional
-	@Override
-	public void deleteUserById(int id) {
-		User user = findUserById(id); //findUserById() is a method written above.
-		userRepo.delete(user);
-	}//ends method.
+//	@Transactional
+//	@Override
+//	//Auth contains the login Info of the active user.
+//	public void deleteUserById(int id, Authentication auth) { 
+//		UserDetails activeEmail = (UserDetails)auth.getPrincipal().
+//		User user = findUserById(id); //findUserById() is a method written above.
+//		if(user.getEmail().equals(auth.) || auth.getAuthorities().contains(RoleNames.ADMIN.getRole())) {
+//			userRepo.delete(user);
+//		}else {
+//			throw new AccessDeniedException("You don't have permission required to perform the operation");
+//		}
+//		
+////		userRepo.delete(user);
+//	}//ends method.
 	
 	
 	

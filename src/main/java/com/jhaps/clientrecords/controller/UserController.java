@@ -1,5 +1,6 @@
 package com.jhaps.clientrecords.controller;
 
+import java.security.Principal;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -15,12 +16,15 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -48,12 +52,6 @@ import jakarta.validation.Valid;
 @RequestMapping("/user")
 @Tag(name = "User Controller")
 public class UserController {
-
-//	private JWTServiceImpl jwtService;
-//	
-//	private AuthenticationManager authManager;
-//	
-//	private PasswordEncoder passwordEncoder;
 	
 	private UserService userService;
 	
@@ -69,38 +67,8 @@ public class UserController {
 		this.pagedResourceAssemblerService = pagedResourceAssemblerService;
 	}
 
+	
 
-//	//we are trying to print the bearer/JWT token in postman console so return type is String
-//	@PostMapping("/login")
-//	public ResponseEntity<ApiResponse<String>> userLogin(@Valid @RequestBody User user){
-//		String token = userService.verifyUser(user);
-//		if(token!=null) {
-//			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, token);
-//		}else {
-//			return apiResponseBuilder.buildApiResponse(ResponseMessage.UNAUTHORIZED, HttpStatus.NOT_FOUND);
-//		}
-//
-//	}
-//	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	//THIS SHOULD BE AUTHORIZED ONLY FOR ADMIN WILL CHANGE THIS LATER WHEN I CREATE AN ADMIN CONTROLLER.
-	@Operation(summary = "Get List Of All The Users")
-	@GetMapping("/findAll")
-	public ResponseEntity<ApiResponseModel<PagedModel<EntityModel<UserDto>>>> getAllUsers(@RequestParam(defaultValue="0") int pageNumber,
-																						@RequestParam(defaultValue="10") int pageSize) {
-		Pageable pageable = PageRequest.of(pageNumber, pageSize);
-		Page<UserDto> paginatedUsers = userService.findAllUsers(pageable);
-		PagedModel<EntityModel<UserDto>> pagedUserModel = pagedResourceAssemblerService.toPagedModel(paginatedUsers);
-		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, pagedUserModel);
-	}
 	
 	@Operation(summary = "Get User By ID")
 	@GetMapping("/id/{id}")
@@ -110,17 +78,18 @@ public class UserController {
 	}
 	
 	
-	//THIS SHOULD BE AUTHORIZED ONLY FOR ADMIN WILL CHANGE THIS LATER WHEN I CREATE AN ADMIN CONTROLLER.
-	@Operation(summary = "Get List Of  Users By Role Name")
-	@GetMapping("/role/{role}")
-	public ResponseEntity<ApiResponseModel<PagedModel<EntityModel<UserDto>>>> getUsersByRole(@PathVariable String role,
-																				@RequestParam(defaultValue="0") int pageNumber,
-																				@RequestParam(defaultValue="10") int pageSize){
-		Pageable pageable = PageRequest.of(pageNumber, pageSize);
-		Page<UserDto> paginatedUsers = userService.findUsersByRoleName(role, pageable);
-		PagedModel<EntityModel<UserDto>> pagedUserModel = pagedResourceAssemblerService.toPagedModel(paginatedUsers);
-		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, pagedUserModel);
+	@DeleteMapping("/delete/{id}")
+	@PreAuthorize("#id==principal.id")
+	public ResponseEntity<ApiResponseModel<String>> deleteUserById(@PathVariable int id ){
+		UserDetails userDetails = SecurityContextHolder.getContext().getAuthentication();
+//		System.out.println(principal.getName());
+//		System.out.println("The role of the current user is : " + auth.getAuthorities());
+		
+		//userService.deleteUserById(id, principal); //getting user Email from Principal (SpringSecurity).
+		return apiResponseBuilder.buildApiResponse(ResponseMessage.USER_DELETED, HttpStatus.NO_CONTENT, "User with Id " + id + " deleted Succesfully" );
 	}
+	
+	
 	
 	
 	

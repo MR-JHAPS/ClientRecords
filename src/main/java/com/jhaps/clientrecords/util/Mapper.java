@@ -45,6 +45,7 @@ public class Mapper {
 	//USER ---> USER-DTO
 	public UserDto toUserDto(User user) {
 		UserDto dto = new UserDto();
+				dto.setId(user.getId());
 				dto.setEmail(user.getEmail());
 				dto.setPassword(user.getPassword());
 		return dto;

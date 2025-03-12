@@ -1,9 +1,12 @@
 package com.jhaps.clientrecords.exceptionHandler;
 
+
 import java.util.HashMap;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -47,7 +50,7 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ApiResponseModel<Object>> handleGeneralException(Exception e){
 		System.out.println(e.getMessage() + e );
-		//logger
+		//logger here
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
@@ -56,6 +59,7 @@ public class GlobalExceptionHandler {
 	/*there may be more than one field validation error so we map each of the validationError*/
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<ApiResponseModel<Object>> handleArgumentNotValidException(MethodArgumentNotValidException e){
+		//logger here
 		HashMap<String, String> validationErrors = new HashMap<>();
 		BindingResult bindingResult = e.getBindingResult();  //binding result contains field Errors etc. 
 		bindingResult.getFieldErrors().forEach(ex ->
@@ -64,6 +68,22 @@ public class GlobalExceptionHandler {
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.VALIDATION_FAILED, HttpStatus.BAD_REQUEST, validationErrors);
 	}
 		
+	@ExceptionHandler(BadCredentialsException.class)
+	public ResponseEntity<ApiResponseModel<String>> handleBadCredentialsException(BadCredentialsException e){
+		//logger here
+		return apiResponseBuilder.buildApiResponse(ResponseMessage.BAD_CREDENTIALS, HttpStatus.UNAUTHORIZED);
+	}
+	
+	@ExceptionHandler(UsernameNotFoundException.class)
+	public ResponseEntity<ApiResponseModel<String>> handleUsernameNotFoundException(UsernameNotFoundException e){
+		return apiResponseBuilder.buildApiResponse(ResponseMessage.BAD_CREDENTIALS, HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(AccessDeniedException.class)
+	public ResponseEntity<ApiResponseModel<String>> handleAccessDeniedException(AccessDeniedException e){
+		//logger here
+		return apiResponseBuilder.buildApiResponse(ResponseMessage.ACCESS_DENIED, HttpStatus.FORBIDDEN);
+	}
 	
 	@ExceptionHandler(DuplicateDataException.class)
 	public ResponseEntity<ApiResponseModel<String>> handleDuplicateDataException(DuplicateDataException e){
@@ -92,10 +112,6 @@ public class GlobalExceptionHandler {
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.INVALID_ROLE, HttpStatus.BAD_REQUEST);
 	}
 	
-	@ExceptionHandler(BadCredentialsException.class)
-	public ResponseEntity<ApiResponseModel<String>> handleBadCredentialsException(BadCredentialsException e){
-		return apiResponseBuilder.buildApiResponse(ResponseMessage.BAD_CREDENTIALS, HttpStatus.UNAUTHORIZED);
-	}
 	
 	
 }//ends class

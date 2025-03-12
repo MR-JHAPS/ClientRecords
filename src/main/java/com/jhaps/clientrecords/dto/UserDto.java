@@ -10,7 +10,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDto {
-
+	private int id;
+	
 	@NotBlank(message = "Email cannot be empty")
 	@Email(message ="Email Format is not correct")
 	private String email;
