@@ -3,17 +3,19 @@ package com.jhaps.clientrecords.exceptionHandler;
 import java.util.HashMap;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.jhaps.clientrecords.enums.ResponseMessage;
 import com.jhaps.clientrecords.exception.ClientNotFoundException;
 import com.jhaps.clientrecords.exception.DuplicateDataException;
+import com.jhaps.clientrecords.exception.RoleNotFoundException;
 import com.jhaps.clientrecords.exception.UserNotFoundException;
 import com.jhaps.clientrecords.response.ApiResponseModel;
 import com.jhaps.clientrecords.response.ApiResponseBuilder;
-import com.jhaps.clientrecords.response.ResponseMessage;
 
 //LOGGING IS NOT DONE YET.
 
@@ -83,7 +85,17 @@ public class GlobalExceptionHandler {
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
 	}
 	
+	//This is for the case the roleName is not found in the Database.
+	@ExceptionHandler(RoleNotFoundException.class)
+	public ResponseEntity<ApiResponseModel<String>> handleRoleNotFoundException(RoleNotFoundException e){
+		//logger here
+		return apiResponseBuilder.buildApiResponse(ResponseMessage.INVALID_ROLE, HttpStatus.BAD_REQUEST);
+	}
 	
+	@ExceptionHandler(BadCredentialsException.class)
+	public ResponseEntity<ApiResponseModel<String>> handleBadCredentialsException(BadCredentialsException e){
+		return apiResponseBuilder.buildApiResponse(ResponseMessage.BAD_CREDENTIALS, HttpStatus.UNAUTHORIZED);
+	}
 	
 	
 }//ends class

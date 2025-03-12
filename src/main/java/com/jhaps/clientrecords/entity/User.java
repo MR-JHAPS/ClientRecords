@@ -28,6 +28,11 @@ public class User {
 	@Column(name="password", nullable=false)
 	private String password;
 	
+//	@Column(name="telephone")
+//	private String telephone;
+	
+//*******I will add a address, city and country here as well.*******
+	
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name="role_id", nullable = false)
 	private Role role;

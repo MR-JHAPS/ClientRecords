@@ -5,6 +5,8 @@ import java.time.format.DateTimeFormatter;
 
 import org.springframework.http.HttpStatusCode;
 
+import com.jhaps.clientrecords.enums.ResponseMessage;
+
 
 /*THIS CLASS IS TO
  * Create An API RESPONSE as [{message : 'message'},

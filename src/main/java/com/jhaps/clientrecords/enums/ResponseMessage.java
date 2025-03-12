@@ -1,4 +1,4 @@
-package com.jhaps.clientrecords.response;
+package com.jhaps.clientrecords.enums;
 
 public enum ResponseMessage {
 
@@ -15,6 +15,7 @@ public enum ResponseMessage {
 	DATA_ACCESS_EXCEPTION("database Exception"),
 	
 	CLIENT_NOT_FOUND("Client Not Found"),
+	INVALID_ROLE("ROLE NOT FOUND"),
 	USER_NOT_FOUND("User Not Found"),
 	DUPLICATE_DATA("Data with provided name already exists");
 	

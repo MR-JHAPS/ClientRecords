@@ -31,9 +31,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jhaps.clientrecords.dto.UserDto;
 import com.jhaps.clientrecords.entity.User;
+import com.jhaps.clientrecords.enums.ResponseMessage;
 import com.jhaps.clientrecords.response.ApiResponseModel;
 import com.jhaps.clientrecords.response.ApiResponseBuilder;
-import com.jhaps.clientrecords.response.ResponseMessage;
 import com.jhaps.clientrecords.service.JWTServiceImpl;
 import com.jhaps.clientrecords.service.PagedResourceAssemblerService;
 import com.jhaps.clientrecords.service.UserService;
@@ -98,23 +98,15 @@ public class UserController {
 																						@RequestParam(defaultValue="10") int pageSize) {
 		Pageable pageable = PageRequest.of(pageNumber, pageSize);
 		Page<UserDto> paginatedUsers = userService.findAllUsers(pageable);
-		if(paginatedUsers!=null && !paginatedUsers.isEmpty()) {
-			PagedModel<EntityModel<UserDto>> pagedUserModel = pagedResourceAssemblerService.toPagedModel(paginatedUsers);
-			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, pagedUserModel);
-		}else {
-			return apiResponseBuilder.buildApiResponse(ResponseMessage.NOT_FOUND, HttpStatus.NOT_FOUND);
-		}
+		PagedModel<EntityModel<UserDto>> pagedUserModel = pagedResourceAssemblerService.toPagedModel(paginatedUsers);
+		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, pagedUserModel);
 	}
 	
 	@Operation(summary = "Get User By ID")
 	@GetMapping("/id/{id}")
-	public ResponseEntity<ApiResponseModel<Optional<UserDto>>> getUserById(@PathVariable int id) {
-		Optional<UserDto> userDto = userService.findUserById(id);
-		if(userDto.isPresent()) {
-			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, userDto);
-		}else {
-			return apiResponseBuilder.buildApiResponse(ResponseMessage.NOT_FOUND, HttpStatus.NOT_FOUND);
-		}
+	public ResponseEntity<ApiResponseModel<UserDto>> getUserById(@PathVariable int id) {
+		UserDto userDto = userService.findUserDtoById(id);
+		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, userDto);
 	}
 	
 	
@@ -126,12 +118,8 @@ public class UserController {
 																				@RequestParam(defaultValue="10") int pageSize){
 		Pageable pageable = PageRequest.of(pageNumber, pageSize);
 		Page<UserDto> paginatedUsers = userService.findUsersByRoleName(role, pageable);
-		if(paginatedUsers!=null && !paginatedUsers.isEmpty()) {
-			PagedModel<EntityModel<UserDto>> pagedUserModel = pagedResourceAssemblerService.toPagedModel(paginatedUsers);
-			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, pagedUserModel);
-		}else {
-			return apiResponseBuilder.buildApiResponse(ResponseMessage.NOT_FOUND, HttpStatus.NOT_FOUND);
-		}	
+		PagedModel<EntityModel<UserDto>> pagedUserModel = pagedResourceAssemblerService.toPagedModel(paginatedUsers);
+		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, pagedUserModel);
 	}
 	
 	

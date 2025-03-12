@@ -11,6 +11,9 @@ import com.jhaps.clientrecords.entity.User;
 public class Mapper {
 
 	
+	
+	
+	
 	//CLIENT---> CLIENT-DTO
 	public  ClientDto toClientDto(Client clientEntity) {
 		ClientDto dto = new ClientDto();
@@ -21,18 +24,6 @@ public class Mapper {
 		dto.setDateOfBirth(clientEntity.getDateOfBirth());
 		return dto;
 	}
-	
-	
-//	//CLIENT---> CLIENT-DTO STATIC
-//		public static ClientDto toClientDtoStatic(Client clientEntity) {
-//			ClientDto dto = new ClientDto();
-//			dto.setId(clientEntity.getId());
-//			dto.setFirstName(clientEntity.getFirstName());
-//			dto.setLastName(clientEntity.getLastName());
-//			dto.setPostalCode(clientEntity.getPostalCode());
-//			dto.setDateOfBirth(clientEntity.getDateOfBirth());
-//			return dto;
-//		}
 	
 	
 	//CLIENT-DTO ------> CLIENT
@@ -48,6 +39,8 @@ public class Mapper {
 	}
 	
 	
+	
+/*-----------------------USER---------------------------------------------------------------------------------------------------------------*/
 	
 	//USER ---> USER-DTO
 	public UserDto toUserDto(User user) {

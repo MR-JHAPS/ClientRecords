@@ -4,27 +4,17 @@ package com.jhaps.clientrecords.service;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.jhaps.clientrecords.dto.ClientDto;
 import com.jhaps.clientrecords.entity.Client;
 import com.jhaps.clientrecords.exception.ClientNotFoundException;
-import com.jhaps.clientrecords.exception.EntityNotFoundException;
-import com.jhaps.clientrecords.exception.EntityOperationException;
 import com.jhaps.clientrecords.repository.ClientRepository;
-import com.jhaps.clientrecords.util.ClientMapper;
 import com.jhaps.clientrecords.util.Mapper;
 
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 
 @Service
 public class ClientServiceImpl implements ClientService  {
@@ -41,9 +31,9 @@ public class ClientServiceImpl implements ClientService  {
 	
 	
 	
-/* METHODS */
+// METHODS 
+/*	------------------------------CRUD------------------------------------------------------------------------------------------------*/	
 	
-//------------------------------CRUD------------------------------------------------------------------------------------------------
 	/* Because the return type is Page<ClientDto>
 	   if we try to stream like normal :
 		**** clientList.stream().map(mapper::toClientDto).collect(Collectors.toList()).

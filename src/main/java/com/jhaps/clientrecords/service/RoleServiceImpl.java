@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.jhaps.clientrecords.entity.Role;
+import com.jhaps.clientrecords.enums.RoleNames;
 import com.jhaps.clientrecords.repository.RoleRepository;
 
 @Service
@@ -23,7 +24,7 @@ public class RoleServiceImpl implements RoleService {
 	}
 
 	@Override
-	public Optional<Role> findRoleByName(String roleName) {
+	public Optional<Role> findRoleByName(RoleNames roleName) {
 		return roleRepo.findByName(roleName);
 	}
 	

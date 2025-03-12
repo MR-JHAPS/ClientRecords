@@ -5,6 +5,8 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import com.jhaps.clientrecords.enums.ResponseMessage;
+
 
 /*This class helps build ResponseEntity*/
 
