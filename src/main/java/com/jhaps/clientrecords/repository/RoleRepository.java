@@ -11,7 +11,7 @@ import com.jhaps.clientrecords.enums.RoleNames;
 @Repository
 public interface RoleRepository extends JpaRepository<Role, Integer>{
 
-	Optional<Role> findByName(RoleNames roleName);
+	Optional<Role> findByName(String roleName);
 	
 	
 	

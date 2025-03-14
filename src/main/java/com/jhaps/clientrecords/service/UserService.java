@@ -1,7 +1,10 @@
 package com.jhaps.clientrecords.service;
 
+
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 
 import com.jhaps.clientrecords.dto.UserDto;
@@ -23,7 +26,7 @@ public interface UserService {
 	
 	public void saveUser(UserDto userDto);
 	
-	public void deleteUserById(int id, Authentication auth);
+	public void deleteUserById(int id) throws AccessDeniedException;
 	
 	public void updateUserById(int id, UserDto userUpdateInfo);
 

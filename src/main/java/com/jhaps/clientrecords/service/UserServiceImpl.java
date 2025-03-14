@@ -1,20 +1,24 @@
 package com.jhaps.clientrecords.service;
 
-import java.nio.file.AccessDeniedException;
-import java.security.Principal;
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.jhaps.clientrecords.dto.UserDto;
+import com.jhaps.clientrecords.entity.CustomUserDetails;
 import com.jhaps.clientrecords.entity.Role;
 import com.jhaps.clientrecords.entity.User;
 import com.jhaps.clientrecords.enums.RoleNames;
@@ -147,11 +151,11 @@ public class UserServiceImpl implements UserService{
 			throw new DuplicateDataException("Unable to save user, User with email : " + userDto.getEmail() + " already exists.");
 		}
 		User user = mapper.toUserEntity(userDto); //changing dto to entity
-		Role defaultRole = roleService.findRoleByName(RoleNames.USER).orElseThrow(()->
+		Role defaultRole = roleService.findRoleByName(RoleNames.USER.getRole()).orElseThrow(()->
 							new RoleNotFoundException("Unable to find the Role :"+ RoleNames.USER));//Setting the defaultRole as 'user'.
 		String encodedPassword = passwordEncoder.encode(user.getPassword()); //encrypting/encoding Password
 		user.setPassword(encodedPassword);
-		user.setRole(defaultRole);	
+		user.setRole(Collections.singleton(defaultRole));	
 		userRepo.save(user);	
 	}
 	
@@ -171,6 +175,53 @@ public class UserServiceImpl implements UserService{
 //		
 ////		userRepo.delete(user);
 //	}//ends method.
+	
+	
+//	//Auth contains the login Info of the active user.
+//	@Transactional
+//	@Override
+//	public void deleteUserById(int id, Authentication auth) throws AccessDeniedException { 
+//		
+//		CustomUserDetails customUserDetails = (CustomUserDetails)auth.getPrincipal();
+//		String loggedInUser = customUserDetails.getUsername();
+//		
+//		Collection<? extends GrantedAuthority> roles = (Collection<? extends GrantedAuthority>) customUserDetails.getAuthorities(); 
+//		List<String> rolesList = roles.stream().map(role-> role.toString()).collect(Collectors.toList());
+//		
+//		User user = findUserById(id); //findUserById() is a method written above.
+//		if(user.getEmail().equals(loggedInUser) || rolesList.contains(RoleNames.ADMIN.getRole())) {
+//			userRepo.delete(user);
+//		}else {
+//			throw new AccessDeniedException("You don't have permission required to perform the operation");
+//		}
+//	}//ends method.
+	
+	
+	//Auth contains the login Info of the active user.
+	@Transactional
+	@Override
+	public void deleteUserById(int id) throws AccessDeniedException { 
+		//Getting AuthenticationDetails of Logged in User from "SecurityContextHolder".
+		CustomUserDetails customUserDetails = (CustomUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String loggedInUser = customUserDetails.getUsername();
+		Set<String> roles = customUserDetails.getAuthorities()
+										.stream()
+										.map(GrantedAuthority::getAuthority) //converting To String from Collections.
+										//OR .map(role->role.toString())
+										.collect(Collectors.toSet());
+		
+		User user = findUserById(id); //findUserById() is a method written above.
+		if(user.getEmail().equals(loggedInUser) || roles.contains(RoleNames.ADMIN.getRole())) {
+			userRepo.delete(user);
+		}else {
+			throw new AccessDeniedException("You don't have permission required to perform the operation");
+		}
+	}//ends method.
+	
+	
+	
+	
+	
 	
 	
 	

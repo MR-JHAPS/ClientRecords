@@ -9,6 +9,6 @@ public interface RoleService {
 
 	public Optional<Role> findRoleById(int id);
 	
-	public Optional<Role> findRoleByName(RoleNames roleName);
+	public Optional<Role> findRoleByName(String roleName);
 	
 }
