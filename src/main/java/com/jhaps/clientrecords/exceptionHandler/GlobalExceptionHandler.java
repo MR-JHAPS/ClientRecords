@@ -18,6 +18,9 @@ import com.jhaps.clientrecords.exception.DuplicateDataException;
 import com.jhaps.clientrecords.exception.RoleNotFoundException;
 import com.jhaps.clientrecords.exception.UserNotFoundException;
 import com.jhaps.clientrecords.response.ApiResponseModel;
+
+import lombok.extern.slf4j.Slf4j;
+
 import com.jhaps.clientrecords.response.ApiResponseBuilder;
 
 //LOGGING IS NOT DONE YET.
@@ -30,7 +33,9 @@ import com.jhaps.clientrecords.response.ApiResponseBuilder;
  * 						created accordingly.
 */
 
+
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 	/*
 	 * ApiResponseBuilder creates a " ResponseEntity<ApiResponseModel<T>> ".
@@ -50,7 +55,7 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ApiResponseModel<Object>> handleGeneralException(Exception e){
 		System.out.println(e.getMessage() + e );
-		//logger here
+		log.error("General Exception occured ", e);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	

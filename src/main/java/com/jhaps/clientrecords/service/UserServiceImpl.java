@@ -1,5 +1,7 @@
 package com.jhaps.clientrecords.service;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -51,16 +53,6 @@ public class UserServiceImpl implements UserService{
 		this.passwordEncoder = passwordEncoder;
 	}
 
-	
-	//FOR VERIFICATION -- USER LOGIN:
-//	@Override
-//	public String verifyUser(UserDto userDto) {
-//		Authentication auth = authManager.authenticate(new UsernamePasswordAuthenticationToken(userDto.getEmail(), userDto.getPassword()));
-//		if(auth.isAuthenticated()) {
-//			return jwtServiceImpl.generateJWTToken(userDto.getEmail());
-//		}
-//		return "failed to authenticate";
-//	}
 
 	
 	@Override
@@ -111,6 +103,7 @@ public class UserServiceImpl implements UserService{
 		return mapper.toUserDto(user);					
 	}
 
+	//Checking if the role exists in the RoleNames.enum.
 	public boolean isRoleValid(String roleName) {
 		boolean isFound = false;
 		for(RoleNames role : RoleNames.values()) {
@@ -122,12 +115,15 @@ public class UserServiceImpl implements UserService{
 		return isFound;
 	}
 	
-//	public boolean isRoleValid(String roleName) {
-//		return Arrays.stream(RoleNames.values())
-//					 .anyMatch(role->
-//					 			role.getRole().equals(roleName));
+//	public boolean isRoleValidStream(String roleName) {
+//		return Arrays
+//					.stream(RoleNames.values())
+//					.anyMatch(role->
+//						role.getRole()
+//						.equalsIgnoreCase(roleName)
+//						);	
 //	}
-
+	
 	
 	@Transactional
 	@Override
@@ -152,49 +148,13 @@ public class UserServiceImpl implements UserService{
 		}
 		User user = mapper.toUserEntity(userDto); //changing dto to entity
 		Role defaultRole = roleService.findRoleByName(RoleNames.USER.getRole()).orElseThrow(()->
-							new RoleNotFoundException("Unable to find the Role :"+ RoleNames.USER));//Setting the defaultRole as 'user'.
+									new RoleNotFoundException("Unable to find the Role :"+ RoleNames.USER + "RoleNames.ADMIN"));//Setting the defaultRole as 'user'.
 		String encodedPassword = passwordEncoder.encode(user.getPassword()); //encrypting/encoding Password
 		user.setPassword(encodedPassword);
-		user.setRole(Collections.singleton(defaultRole));	
+		user.setRole(Set.of(defaultRole));	//since the Role of user is of type Set<Role> setting the default value as set.of('user')
 		userRepo.save(user);	
 	}
-	
-	
-	
-//	@Transactional
-//	@Override
-//	//Auth contains the login Info of the active user.
-//	public void deleteUserById(int id, Authentication auth) { 
-//		UserDetails activeEmail = (UserDetails)auth.getPrincipal().
-//		User user = findUserById(id); //findUserById() is a method written above.
-//		if(user.getEmail().equals(auth.) || auth.getAuthorities().contains(RoleNames.ADMIN.getRole())) {
-//			userRepo.delete(user);
-//		}else {
-//			throw new AccessDeniedException("You don't have permission required to perform the operation");
-//		}
-//		
-////		userRepo.delete(user);
-//	}//ends method.
-	
-	
-//	//Auth contains the login Info of the active user.
-//	@Transactional
-//	@Override
-//	public void deleteUserById(int id, Authentication auth) throws AccessDeniedException { 
-//		
-//		CustomUserDetails customUserDetails = (CustomUserDetails)auth.getPrincipal();
-//		String loggedInUser = customUserDetails.getUsername();
-//		
-//		Collection<? extends GrantedAuthority> roles = (Collection<? extends GrantedAuthority>) customUserDetails.getAuthorities(); 
-//		List<String> rolesList = roles.stream().map(role-> role.toString()).collect(Collectors.toList());
-//		
-//		User user = findUserById(id); //findUserById() is a method written above.
-//		if(user.getEmail().equals(loggedInUser) || rolesList.contains(RoleNames.ADMIN.getRole())) {
-//			userRepo.delete(user);
-//		}else {
-//			throw new AccessDeniedException("You don't have permission required to perform the operation");
-//		}
-//	}//ends method.
+
 	
 	
 	//Auth contains the login Info of the active user.

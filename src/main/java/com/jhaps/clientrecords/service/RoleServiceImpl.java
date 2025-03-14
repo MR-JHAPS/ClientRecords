@@ -1,6 +1,7 @@
 package com.jhaps.clientrecords.service;
 
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,8 +25,13 @@ public class RoleServiceImpl implements RoleService {
 	}
 
 	@Override
-	public Optional<Role> findRoleByName(String roleName) {
-		return roleRepo.findByName(roleName);
+	public Optional<Set<Role>> findRoleByName(Set<String> roleNames) {
+		return roleRepo.findByNameIn(roleNames);
+	}
+
+	@Override
+	public Optional<Role> findRoleByName(String name) {
+		return roleRepo.findByName(name);
 	}
 	
 	

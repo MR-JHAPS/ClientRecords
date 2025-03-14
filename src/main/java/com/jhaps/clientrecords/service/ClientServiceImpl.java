@@ -1,6 +1,4 @@
 package com.jhaps.clientrecords.service;
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
