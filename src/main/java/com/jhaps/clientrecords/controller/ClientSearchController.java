@@ -3,6 +3,7 @@ package com.jhaps.clientrecords.controller;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,8 @@ import com.jhaps.clientrecords.response.ApiResponseModel;
 import com.jhaps.clientrecords.response.ApiResponseBuilder;
 import com.jhaps.clientrecords.service.ClientService;
 import com.jhaps.clientrecords.service.PagedResourceAssemblerService;
+import com.jhaps.clientrecords.util.SortBuilder;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
@@ -53,10 +56,17 @@ public class ClientSearchController{
 	
 	@Operation(summary = "get clients by searchQuery")
 	@GetMapping("/{searchQuery}")
-	public ResponseEntity<ApiResponseModel<PagedModel<EntityModel<ClientDto>>>> getClientsBySearchQuery( @PathVariable @NotBlank String searchQuery,
-																					@RequestParam(defaultValue ="0") int page,
-																					@RequestParam(defaultValue ="10") int size){
-		Pageable pageable = PageRequest.of(page, size);
+	public ResponseEntity<ApiResponseModel<PagedModel<EntityModel<ClientDto>>>> getClientsBySearchQuery(
+								@PathVariable @NotBlank String searchQuery,
+								@RequestParam(defaultValue ="0") int pageNumber,
+								@RequestParam(defaultValue ="10") int pageSize,
+								@RequestParam(required = false) String sortBy,
+								@RequestParam(required = false) String direction
+								){
+		//if "sortBy" and "Direction" parameters is null then "Sort sort" will return null.
+		Sort sort = SortBuilder.createSorting(direction, sortBy);		
+		//if sort returns null, don't apply sorting in PageRequest/pageable.
+		Pageable pageable = (sort==null)? PageRequest.of(pageNumber, pageSize) : PageRequest.of(pageNumber, pageSize, sort);
 		Page<ClientDto>  paginatedClients= clientService.findClientBySearchQuery(searchQuery, pageable);
 		PagedModel<EntityModel<ClientDto>> pagedClientModel = pagedResourceAssemblerService.toPagedModel(paginatedClients);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, pagedClientModel);
@@ -67,9 +77,15 @@ public class ClientSearchController{
 	@Operation(summary = "get clients by firstName")
 	@GetMapping("/firstName/{firstName}")
 	public ResponseEntity<ApiResponseModel<PagedModel<EntityModel<ClientDto>>>> getClientsByFirstName(@PathVariable @NotBlank String firstName,
-																@RequestParam(defaultValue = "0") int pageNumber,
-																@RequestParam(defaultValue = "10") int pageSize){
-		Pageable pageable = PageRequest.of(pageNumber, pageSize);
+									@RequestParam(defaultValue = "0") int pageNumber,
+									@RequestParam(defaultValue = "10") int pageSize,
+									@RequestParam(required = false) String sortBy,
+									@RequestParam(required = false) String direction
+									){
+		//if "sortBy" and "Direction" parameters is null then "Sort sort" will return null.
+		Sort sort = SortBuilder.createSorting(direction, sortBy);		
+		//if sort returns null, don't apply sorting in PageRequest/pageable.
+		Pageable pageable = (sort==null)? PageRequest.of(pageNumber, pageSize) : PageRequest.of(pageNumber, pageSize, sort);
 		Page<ClientDto> paginatedclients = clientService.findClientsByFirstName(firstName, pageable);
 		PagedModel<EntityModel<ClientDto>> pagedClientModel = pagedResourceAssemblerService.toPagedModel(paginatedclients);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, pagedClientModel);
@@ -80,9 +96,15 @@ public class ClientSearchController{
 	@Operation(summary = "get clients by lastName")
 	@GetMapping("/lastName/{lastName}")
 	public ResponseEntity<ApiResponseModel<PagedModel<EntityModel<ClientDto>>>> getClientsByLastName(@PathVariable @NotBlank String lastName,
-															@RequestParam(defaultValue = "0") int pageNumber,
-															@RequestParam(defaultValue = "10") int pageSize){
-		Pageable pageable = PageRequest.of(pageNumber, pageSize);
+									@RequestParam(defaultValue = "0") int pageNumber,
+									@RequestParam(defaultValue = "10") int pageSize,
+									@RequestParam(required = false) String sortBy,
+									@RequestParam(required = false) String direction
+									){
+		//if "sortBy" and "Direction" parameters is null then "Sort sort" will return null.
+		Sort sort = SortBuilder.createSorting(direction, sortBy);		
+		//if sort returns null, don't apply sorting in PageRequest/pageable.
+		Pageable pageable = (sort==null)? PageRequest.of(pageNumber, pageSize) : PageRequest.of(pageNumber, pageSize, sort);
 		Page<ClientDto> paginatedClients =  clientService.findClientsByLastName(lastName, pageable);
 		PagedModel<EntityModel<ClientDto>> pagedClientModel = pagedResourceAssemblerService.toPagedModel(paginatedClients);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, pagedClientModel);
@@ -93,9 +115,15 @@ public class ClientSearchController{
 	@Operation(summary = "get clients by postalCode")
 	@GetMapping("/postalCode/{postalCode}")
 	public ResponseEntity<ApiResponseModel<PagedModel<EntityModel<ClientDto>>>> getClientsByPostalCode(@PathVariable @NotBlank String postalCode,
-															@RequestParam(defaultValue = "0") int pageNumber,
-															@RequestParam(defaultValue = "10") int pageSize){
-		Pageable pageable = PageRequest.of(pageNumber, pageSize);
+									@RequestParam(defaultValue = "0") int pageNumber,
+									@RequestParam(defaultValue = "10") int pageSize,
+									@RequestParam(required = false) String sortBy,
+									@RequestParam(required = false) String direction
+									){
+		//if "sortBy" and "Direction" parameters is null then "Sort sort" will return null.
+		Sort sort = SortBuilder.createSorting(direction, sortBy);		
+		//if sort returns null, don't apply sorting in PageRequest/pageable.
+		Pageable pageable = (sort==null)? PageRequest.of(pageNumber, pageSize) : PageRequest.of(pageNumber, pageSize, sort);
 		Page<ClientDto> paginatedClients = clientService.findClientsByPostalCode(postalCode, pageable);	
 		PagedModel<EntityModel<ClientDto>> pagedClientModel = pagedResourceAssemblerService.toPagedModel(paginatedClients);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, pagedClientModel);

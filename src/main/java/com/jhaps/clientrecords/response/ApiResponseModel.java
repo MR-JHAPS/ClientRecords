@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 
 import com.jhaps.clientrecords.enums.ResponseMessage;
 

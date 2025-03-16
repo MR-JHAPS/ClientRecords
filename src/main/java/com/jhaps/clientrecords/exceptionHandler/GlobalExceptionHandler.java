@@ -64,7 +64,7 @@ public class GlobalExceptionHandler {
 	/*there may be more than one field validation error so we map each of the validationError*/
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<ApiResponseModel<Object>> handleArgumentNotValidException(MethodArgumentNotValidException e){
-		//logger here
+		log.error("Method Argument Not Valid Exception | Probably @Validation Error occured : {}",e.getMessage(), e);
 		HashMap<String, String> validationErrors = new HashMap<>();
 		BindingResult bindingResult = e.getBindingResult();  //binding result contains field Errors etc. 
 		bindingResult.getFieldErrors().forEach(ex ->
@@ -75,45 +75,47 @@ public class GlobalExceptionHandler {
 		
 	@ExceptionHandler(BadCredentialsException.class)
 	public ResponseEntity<ApiResponseModel<String>> handleBadCredentialsException(BadCredentialsException e){
-		//logger here
+		log.error("Bad Credentials Exception Occured : {} ",e.getMessage(), e);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.BAD_CREDENTIALS, HttpStatus.UNAUTHORIZED);
 	}
 	
 	@ExceptionHandler(UsernameNotFoundException.class)
 	public ResponseEntity<ApiResponseModel<String>> handleUsernameNotFoundException(UsernameNotFoundException e){
+		log.error("Username Not Found Exception Occured : {} ",e.getMessage(), e);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.BAD_CREDENTIALS, HttpStatus.BAD_REQUEST);
 	}
 	
 	@ExceptionHandler(AccessDeniedException.class)
 	public ResponseEntity<ApiResponseModel<String>> handleAccessDeniedException(AccessDeniedException e){
-		//logger here
+		log.error("Access Denied Exception Occured : {} ",e.getMessage(), e);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.ACCESS_DENIED, HttpStatus.FORBIDDEN);
 	}
 	
+	
 	@ExceptionHandler(DuplicateDataException.class)
 	public ResponseEntity<ApiResponseModel<String>> handleDuplicateDataException(DuplicateDataException e){
-		//logger here
+		log.error("Duplicate Data Exception Occured : {} ",e.getMessage(), e);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.DUPLICATE_DATA, HttpStatus.CONFLICT);
 	}
 	
 	
 	@ExceptionHandler(ClientNotFoundException.class)
 	public ResponseEntity<ApiResponseModel<String>> handleClientNotFoundException(ClientNotFoundException e){
-		//logger here
+		log.error("Client Not Found Exception Occured : {} ",e.getMessage(), e);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.CLIENT_NOT_FOUND, HttpStatus.NOT_FOUND);
 	}
 	
 	
 	@ExceptionHandler(UserNotFoundException.class)
 	public ResponseEntity<ApiResponseModel<String>> handleUserNotFoundException(UserNotFoundException e){
-		//logger here
+		log.error("User Not Found Exception Occured : {} ",e.getMessage(), e);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
 	}
 	
 	//This is for the case the roleName is not found in the Database.
 	@ExceptionHandler(RoleNotFoundException.class)
 	public ResponseEntity<ApiResponseModel<String>> handleRoleNotFoundException(RoleNotFoundException e){
-		//logger here
+		log.error("Role Not Found Exception Occured : {} ",e.getMessage(), e);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.INVALID_ROLE, HttpStatus.BAD_REQUEST);
 	}
 	

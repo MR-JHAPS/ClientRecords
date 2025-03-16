@@ -20,8 +20,8 @@ public interface UserRepository extends JpaRepository<User, Integer>{
 	Optional<User> findByEmail(String email);
 	
 	//In findByRole_Name "_" it is used for nested property like 'User.Role.Name' OR 'User-->Role-->Name'
-	Page<User> findByRole_Name(String roleName, Pageable pageable);
+	Page<User> findByRoles_Name(String roleName, Pageable pageable);
 	
-	Page<User> findByRole_Name(Set<String> roleName, Pageable pageable);//finding using mulitple roleNames
+	Page<User> findByRoles_Name(Set<String> roleName, Pageable pageable);//finding using mulitple roleNames
 	
 }

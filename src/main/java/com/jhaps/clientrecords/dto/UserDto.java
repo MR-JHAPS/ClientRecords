@@ -19,6 +19,9 @@ public class UserDto {
 	@NotBlank(message = "Password cannot be empty")
 	private String password;
 	
+	private int attempts; // this is to know the number of attempts made to log in .(after certain time the id will be blocked).
+	
+	private String oldPassword; // this is for the verification before updating the user
 	
 	
 	

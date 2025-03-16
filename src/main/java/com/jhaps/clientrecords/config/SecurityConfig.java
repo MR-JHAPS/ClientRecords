@@ -44,7 +44,7 @@ public class SecurityConfig {
 	SecurityFilterChain securityFilterChain(HttpSecurity security) throws Exception {
 		
 		return security
-				.cors(Customizer.withDefaults()) //i have created a custom Cors in "CorsConfig.java".
+				.cors(Customizer.withDefaults()) //I have created a custom Cors in "CorsConfig.java".
 				.csrf(csrf->csrf.disable())	
 				.httpBasic(Customizer.withDefaults())//this is for the API's user like Postman.
 				.userDetailsService(userDetailsServiceImpl)

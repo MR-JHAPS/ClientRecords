@@ -21,7 +21,8 @@ public interface ClientRepository extends JpaRepository<Client, Integer>{
 	 Page<Client> findAll(Pageable pageable);
 	
 	 @Query("SELECT c FROM Client c WHERE " +
-	           "(:query IS NULL OR LOWER(c.firstName) LIKE LOWER(CONCAT(:query, '%')) OR " +
+	           "(:query IS NULL OR"+
+	           " LOWER(c.firstName) LIKE LOWER(CONCAT(:query, '%')) OR " +
 	           " LOWER(c.lastName) LIKE LOWER(CONCAT(:query, '%')) OR " +
 	           " c.postalCode =:query OR " +
 	           " LOWER(c.postalCode) LIKE LOWER(CONCAT(:query, '%')) OR " +

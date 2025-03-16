@@ -25,24 +25,24 @@ public class CustomUserDetails implements UserDetails {
 		return user;
 	}
 	
+	
 	//For single Role.
-//	@Override
-//	public Collection<? extends GrantedAuthority> getAuthorities() {
-//		
-//		return Collections.singletonList(new SimpleGrantedAuthority(user.getRole().getName()) );
-//		
-//		
-//	}
+	//	@Override
+	//	public Collection<? extends GrantedAuthority> getAuthorities() {
+	//		
+	//		return Collections.singletonList(new SimpleGrantedAuthority(user.getRole().getName()) );
+	//		
+	//		
+	//	}
 	
 	
 	//For Multiple Roles
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		
-		return user.getRole()
+		return user.getRoles()
 					.stream()
 					.map(role ->new SimpleGrantedAuthority(role.getName()))
-					.collect(Collectors.toSet());
+					.collect(Collectors.toSet()); //collecting in a "Set" instead of "List".
 	}
 
 

@@ -12,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,6 +25,7 @@ import com.jhaps.clientrecords.service.PagedResourceAssemblerService;
 import com.jhaps.clientrecords.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 //@CrossOrigin(origins = "http://localhost:4209") // Allow Angular frontend
@@ -59,32 +61,22 @@ public class UserController {
 	}
 	
 	
+	@Operation(summary = "Delete User By ID")
 	@DeleteMapping("/delete/{id}")
-	@PreAuthorize("#id==principal.id")
-	public ResponseEntity<ApiResponseModel<String>> deleteUserById(@PathVariable int id ){
-
-//		
-//		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-//		CustomUserDetails customUserDetails = (CustomUserDetails)auth.getPrincipal();
-//		
-//		String loggedInUser = customUserDetails.getUsername();
-//		Set<String> rolesList = customUserDetails.getAuthorities()
-//										.stream()
-//										.map(GrantedAuthority::getAuthority)
-//										.collect(Collectors.toSet());
-		
-//		System.out.println("This is currently logged in user " + loggedInUser);
-//		System.out.println("This are the roles of the current active user : " + rolesList);
-//		System.out.println(principal.getName());
-//		System.out.println("The role of the current user is : " + auth.getAuthorities());
-		
-		userService.deleteUserById(id); //getting user Email from Principal (SpringSecurity).
+	@PreAuthorize("#id==principal.id") //comparing the pathVariable id with principal.id(Logged in user id stored in spring security)
+	public ResponseEntity<ApiResponseModel<String>> deleteUserById(@PathVariable int id ){		
+		userService.deleteUserById(id);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.USER_DELETED, HttpStatus.NO_CONTENT, "User with Id " + id + " deleted Succesfully" );
 	}
 	
 	
-	
-	
+	@Operation(summary = "Update User By ID")
+	@PutMapping("/update/{id}")
+	@PreAuthorize("#id==principal.id")
+	public ResponseEntity<ApiResponseModel<String>> updateUserById(@PathVariable int id, @RequestBody UserDto userDto ){
+		userService.updateUserById(id, userDto);
+		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, "User with id" + id + " updated Successfully");
+	}
 	
 	
 	

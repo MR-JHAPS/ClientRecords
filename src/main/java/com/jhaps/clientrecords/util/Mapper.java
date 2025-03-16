@@ -1,10 +1,18 @@
 package com.jhaps.clientrecords.util;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Component;
 
 import com.jhaps.clientrecords.dto.ClientDto;
+import com.jhaps.clientrecords.dto.RoleDto;
 import com.jhaps.clientrecords.dto.UserDto;
 import com.jhaps.clientrecords.entity.Client;
+import com.jhaps.clientrecords.entity.Role;
 import com.jhaps.clientrecords.entity.User;
 
 @Component
@@ -48,6 +56,7 @@ public class Mapper {
 				dto.setId(user.getId());
 				dto.setEmail(user.getEmail());
 				dto.setPassword(user.getPassword());
+				dto.setAttempts(user.getAttempts() != null ? user.getAttempts() : 0);
 		return dto;
 	}
 	
@@ -57,13 +66,35 @@ public class Mapper {
 		User user = new User();
 			 user.setEmail(userDto.getEmail());
 			 user.setPassword(userDto.getPassword());
+			 user.setAttempts(userDto.getAttempts());
 		return user;	 
 	}
 	
 	
+
 	
-	
-	
+/*-----------------------ROLE---------------------------------------------------------------------------------------------------------------*/
+//
+//	//ROLE-DTO ----> ROLE-ENTITY
+//	public Set<Role> toRoleEntity(RoleDto roleDto) {
+//		Role role = new Role();
+//		return roleDto.getRoleNames()
+//				.stream()
+//				.map(roleName-> role.setName(roleName)).collect(Collectors.toSet());
+//
+//	}
+//	
+//	
+//	//ROLE-ENTITY ------> ROLE-DTO
+//	public RoleDto toRoleDto(Role role) {
+//		RoleDto roleDto = new RoleDto();
+//			roleDto.setId(role.getId());
+////			roleDto.setRoleName(role.getName());
+//			rol
+//			
+//			
+//	}
+//	
 	
 	
 	

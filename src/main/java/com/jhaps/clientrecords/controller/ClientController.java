@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,7 @@ import com.jhaps.clientrecords.response.ApiResponseModel;
 import com.jhaps.clientrecords.response.ApiResponseBuilder;
 import com.jhaps.clientrecords.service.ClientService;
 import com.jhaps.clientrecords.service.PagedResourceAssemblerService;
+import com.jhaps.clientrecords.util.SortBuilder;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -58,9 +60,17 @@ public class ClientController {
 	
 	@Operation(summary = "get all clients")
 	@GetMapping
-	public ResponseEntity<ApiResponseModel<PagedModel<EntityModel<ClientDto>>>> getAllClients( @RequestParam(defaultValue = "0") int page,
-																							@RequestParam(defaultValue = "10") int size){
-		Pageable pageable = PageRequest.of(page, size);
+	public ResponseEntity<ApiResponseModel<PagedModel<EntityModel<ClientDto>>>> getAllClients(
+					@RequestParam(defaultValue = "0") int page,
+					@RequestParam(defaultValue = "10") int size,
+					@RequestParam(required = false) String sortBy,
+					@RequestParam(required = false) String direction){
+			
+		//if "sortBy" and "Direction" parameters is null then "Sort sort" will return null.
+		Sort sort = SortBuilder.createSorting(direction, sortBy);		
+		//if sort returns null, don't apply sorting in PageRequest.
+		Pageable pageable = (sort==null)? PageRequest.of(page, size) : PageRequest.of(page, size, sort);
+		
 		Page<ClientDto> paginatedClients = clientService.findAllClients(pageable);
 		//converting the clientList To PagedClientList
 		PagedModel<EntityModel<ClientDto>> pagedClientModel = pagedResourceAssemblerService.toPagedModel(paginatedClients);
