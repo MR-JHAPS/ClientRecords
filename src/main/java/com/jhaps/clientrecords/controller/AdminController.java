@@ -10,15 +10,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jhaps.clientrecords.dto.RoleDto;
 import com.jhaps.clientrecords.dto.UserDto;
-import com.jhaps.clientrecords.entity.Role;
 import com.jhaps.clientrecords.enums.ResponseMessage;
 import com.jhaps.clientrecords.response.ApiResponseBuilder;
 import com.jhaps.clientrecords.response.ApiResponseModel;
@@ -27,7 +26,6 @@ import com.jhaps.clientrecords.service.UserService;
 import com.jhaps.clientrecords.util.SortBuilder;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 @Slf4j
@@ -84,33 +82,17 @@ public class AdminController {
 	
 	
 	
-	//THIS IS NOT WORKING THE JSON FROM POSTMAN RETURNS NULL.
 	@Operation(summary = "Update Role Of User By UserId : ADMIN ONLY")
 	@PutMapping("/updateUserRole/{id}")
 	public ResponseEntity<ApiResponseModel<String>> updateRoleByUserId(@PathVariable int id, @RequestBody @Valid RoleDto roleDto){
-		  
-		System.out.println("ROLEDTO : " + roleDto);
-		    log.info("this is the roleDto from postman : {}", roleDto);
 
-		    if (roleDto.getRoleNames() != null) {
-		        roleDto.getRoleNames().forEach(roleName -> System.out.println("Role Name: " + roleName));
-		    } else {
-		        System.out.println("roleNames is null");
-		    }
-		
-		
-		System.out.println("ROLEDTO : " + roleDto );
 		log.info("this is the roleDto from postman :{}", roleDto);
 		userService.updateUserRoleById(id, roleDto);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, "User Role Updated Successfully");
 	}
 	
 	
-	@PostMapping("/testRoleDto")
-	public ResponseEntity<String> testRoleDto(@RequestBody  UserDto userDto) {
-	    System.out.println("ROLEDTO : " + userDto);
-	    return ResponseEntity.ok("RoleDto received successfully");
-	}
+	
 	
 	
 	

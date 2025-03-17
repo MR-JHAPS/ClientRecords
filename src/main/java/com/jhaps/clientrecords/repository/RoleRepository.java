@@ -12,7 +12,7 @@ import com.jhaps.clientrecords.enums.RoleNames;
 @Repository
 public interface RoleRepository extends JpaRepository<Role, Integer>{
 
-	Optional<Set<Role>> findByNameIn(Set<String> roleNames);//for multiple Role
+	Optional<Set<Role>> findByNameIn(Set<String> roleNames);//for multiple Role findByNameIn (In) is necessary.
 	
 	Optional<Role> findByName(String roleName); //for single role
 	
