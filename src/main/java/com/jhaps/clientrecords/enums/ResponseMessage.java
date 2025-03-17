@@ -1,10 +1,13 @@
-package com.jhaps.clientrecords.response;
+package com.jhaps.clientrecords.enums;
 
 public enum ResponseMessage {
 
 	
 	SUCCESS("Successfully Executed"),
-	DUPLICATE_ENTITY("Entity with provided name already exists"),
+	ROLE_OBTAINED("Roles Obtained Successfully"),
+	ROLE_SAVED("New Role Saved Successfully"),
+	ROLE_DELETED("Role Deleted Successfully"),
+	
     CLIENT_ALREADY_EXISTS("Client already exists"),
     CLIENT_SAVE_FAILED("Failed to save the Client"),
     UNAUTHORIZED("Unauthorized access"),
@@ -12,7 +15,14 @@ public enum ResponseMessage {
     INTERNAL_SERVER_ERROR("Internal server error"),
 	VALIDATION_FAILED("Validation error"),
 	BAD_CREDENTIALS("Credentials wrong"),
-	DATA_ACCESS_EXCEPTION("database Exception");
+	
+	ACCESS_DENIED("You do not have the required authorization"),
+	CLIENT_NOT_FOUND("Client Not Found"),
+	CLIENT_DELETED("Client Deleted Successfully"),
+	INVALID_ROLE("ROLE NOT FOUND"),
+	USER_NOT_FOUND("User Not Found"),
+	USER_DELETED("User Deleted Successfully"),
+	DUPLICATE_DATA("Data with provided name already exists");
 	
 	
 	

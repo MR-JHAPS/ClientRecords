@@ -1,0 +1,39 @@
+<configuration>
+	<!-- 	This is for the console -->
+    <appender name = "myConsoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+			<!--     This is for the display pattern/style of the log -->
+            <pattern>
+                %d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg %n
+            </pattern>
+        </encoder>
+    </appender>
+	
+	
+	<!-- 	This is for the file -->
+    <appender name = "myFileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<!--        This file/fileName should be before the rollingPolicy probably to give the name that fileNamePattern can refer to -->
+        <file>
+            clientRecords.log
+        </file>
+		<!--         Generates new log files with given criteria below -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>clientRecords-%d{yy-MM-dd_HH-mm}.%i.log</fileNamePattern>
+            <maxFileSize>5MB</maxFileSize>
+            <maxHistory>10</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>
+                %d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg %n
+            </pattern>
+        </encoder>
+    </appender>
+
+
+	<!-- 	To mention above which severity of the log should be displayed EG:[trace,debug, info, warn, error] -->
+    <root level="INFO">
+        <appender-ref ref="myConsoleAppender" />
+        <appender-ref ref="myFileAppender" />
+    </root>
+
+</configuration>

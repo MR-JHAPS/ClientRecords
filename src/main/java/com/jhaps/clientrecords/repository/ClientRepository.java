@@ -14,22 +14,15 @@ import com.jhaps.clientrecords.entity.Client;
 
 @Repository
 public interface ClientRepository extends JpaRepository<Client, Integer>{
-//	@Query("SELECT c FROM Client c WHERE " +
-//	           "(:firstName IS NULL OR LOWER(c.firstName) LIKE LOWER(CONCAT('%', :firstName, '%'))) AND " +
-//	           "(:lastName IS NULL OR LOWER(c.lastName) LIKE LOWER(CONCAT('%', :lastName, '%'))) AND " +
-//	           "(:dateOfBirth IS NULL OR c.dateOfBirth = :dateOfBirth) AND " +
-//	           "(:postalCode IS NULL OR c.postalCode = :postalCode)")
-//	    List<Client> searchClients(
-//	            @Param("firstName") String firstName,
-//	            @Param("lastName") String lastName,
-//	            @Param("dateOfBirth") LocalDate dateOfBirth,
-//	            @Param("postalCode") String postalCode
-//	    );
+
+	
+//	boolean existsByEmail(String email);
 	
 	 Page<Client> findAll(Pageable pageable);
 	
 	 @Query("SELECT c FROM Client c WHERE " +
-	           "(:query IS NULL OR LOWER(c.firstName) LIKE LOWER(CONCAT(:query, '%')) OR " +
+	           "(:query IS NULL OR"+
+	           " LOWER(c.firstName) LIKE LOWER(CONCAT(:query, '%')) OR " +
 	           " LOWER(c.lastName) LIKE LOWER(CONCAT(:query, '%')) OR " +
 	           " c.postalCode =:query OR " +
 	           " LOWER(c.postalCode) LIKE LOWER(CONCAT(:query, '%')) OR " +
