@@ -44,13 +44,14 @@ public class SecurityConfig {
 	SecurityFilterChain securityFilterChain(HttpSecurity security) throws Exception {
 		
 		return security
-				.cors(Customizer.withDefaults()) //i have created a custom Cors in "CorsConfig.java".
+				.cors(Customizer.withDefaults()) //I have created a custom Cors in "CorsConfig.java".
 				.csrf(csrf->csrf.disable())	
 				.httpBasic(Customizer.withDefaults())//this is for the API's user like Postman.
 				.userDetailsService(userDetailsServiceImpl)
 				.authorizeHttpRequests(auth->auth
 						.requestMatchers("/public/login", "/public/signup").permitAll() //for userLogin
-						.requestMatchers("/swagger-ui/**", "/v3/api-docs/**",  "/swagger-ui.html", "/swagger-ui/index.html").permitAll() //for Swagger	                   
+						.requestMatchers("/swagger-ui/**", "/v3/api-docs/**",  "/swagger-ui.html", "/swagger-ui/index.html").permitAll() //for Swagger	 
+						.requestMatchers("/api/roles").hasAuthority("admin")
 						.anyRequest().authenticated() 
 				)
 				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class) 

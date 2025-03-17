@@ -1,29 +1,39 @@
 package com.jhaps.clientrecords.service;
 
-import java.util.Optional;
+
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
 
+import com.jhaps.clientrecords.dto.RoleDto;
 import com.jhaps.clientrecords.dto.UserDto;
+import com.jhaps.clientrecords.entity.User;
 
 public interface UserService {
 
+	public String verifyUser(UserDto userDto);
+	
 	public Page<UserDto> findAllUsers(Pageable pageable);
 	
-	public Optional<UserDto> findUserById(int id);
+	public UserDto findUserDtoById(int id); //this is for controller and public uses
 	
-	public Optional<UserDto> findUserByEmail(String email);
+//	public User findUserById(int id); //this is for the internal use of service
+	
+	public UserDto findUserByEmail(String email);
 	
 	public Page<UserDto> findUsersByRoleName(String roleName, Pageable pageable);
 	
 	public void saveUser(UserDto userDto);
 	
-	public void deleteUserById(int id);
+	public void deleteUserById(int id) throws AccessDeniedException;
 	
-	public void updateUserById(int id);
-
-	public String verifyUser(UserDto userDto);
+	public void updateUserById(int id, UserDto userUpdateInfo);
+	
+	public void updateUserRoleById(int id, RoleDto roleDto); //we have the id of user and the roleDto that contains the name of the roles.
+	
+//	public boolean isRoleValid(String roleName);
 	
 	
 	

@@ -16,7 +16,7 @@ public interface ClientService {
 	//CRUD OPERATIONS
 	public Page<ClientDto> findAllClients(Pageable pageable);
 	
-	public Optional<ClientDto> findClientById(int id);
+	public ClientDto findClientById(int id);
 
 	public void saveClient(ClientDto clientDto);
 	
@@ -36,22 +36,22 @@ public interface ClientService {
 	public Page<ClientDto> findClientsByPostalCode(String postalCode, Pageable pageable);
 	
 	
-	//THIS IS FOR SORTING CLIENTS
-	public List<Client> sortClientByFirstNameAscending(List<Client> clientList);
-	
-	public List<Client> sortClientByFirstNameDescending(List<Client> clientList);
-	
-	public List<Client> sortClientByLastNameAscending(List<Client> clientList);
-	
-	public List<Client> sortClientByLastNameDescending(List<Client> clientList);
-	
-	public List<Client> sortClientByDateOfBirthAscending(List<Client> clientList);
-	
-	public List<Client> sortClientByDateOfBirthDescending(List<Client> clientList);
-	
-	public List<Client> sortClientByPostalCodeAscending(List<Client> clientList);
-	
-	public List<Client> sortClientByPostalCodeDescending(List<Client> clientList);
+//	//THIS IS FOR SORTING CLIENTS
+//	public List<ClientDto> sortClientByFirstNameAscending(List<ClientDto> clientList);
+//	
+//	public List<Client> sortClientByFirstNameDescending(List<Client> clientList);
+//	
+//	public List<Client> sortClientByLastNameAscending(List<Client> clientList);
+//	
+//	public List<Client> sortClientByLastNameDescending(List<Client> clientList);
+//	
+//	public List<Client> sortClientByDateOfBirthAscending(List<Client> clientList);
+//	
+//	public List<Client> sortClientByDateOfBirthDescending(List<Client> clientList);
+//	
+//	public List<Client> sortClientByPostalCodeAscending(List<Client> clientList);
+//	
+//	public List<Client> sortClientByPostalCodeDescending(List<Client> clientList);
 	
 	
 	
