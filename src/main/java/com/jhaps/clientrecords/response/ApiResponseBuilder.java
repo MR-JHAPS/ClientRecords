@@ -14,8 +14,6 @@ import com.jhaps.clientrecords.enums.ResponseMessage;
 public class ApiResponseBuilder {
 
 	
-	
-	
 	//Method Without Data Field:
 	public <T> ResponseEntity<ApiResponseModel<T>> buildApiResponse(ResponseMessage responseMessage, HttpStatusCode status){
 		ApiResponseModel<T> response = new ApiResponseModel<>(responseMessage, status);

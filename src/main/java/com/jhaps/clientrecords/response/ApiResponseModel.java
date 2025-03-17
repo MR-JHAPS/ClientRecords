@@ -31,7 +31,7 @@ public class ApiResponseModel<T> {
 		this.data = data;
 	}
 	
-	//constructor with 2 parameters:
+	//constructor without Body 2 parameters:
 	public ApiResponseModel(ResponseMessage responseMessage, HttpStatusCode status) {
 		this.timestamp = LocalDateTime.now(); //timestamp.
 		this.message = responseMessage.getMessage();

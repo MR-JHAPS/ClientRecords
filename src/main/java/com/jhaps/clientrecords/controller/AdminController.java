@@ -8,6 +8,7 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -69,8 +70,9 @@ public class AdminController {
 	
 
 	
-	@Operation(summary = "Get List Of  Users By Role Name")
+	@Operation(summary = "Get List Of Users By Role Name")
 	@GetMapping("/role/{role}")
+	@PreAuthorize("hasAuthority('admin')")
 	public ResponseEntity<ApiResponseModel<PagedModel<EntityModel<UserDto>>>> getUsersByRole(@PathVariable String role,
 																				@RequestParam(defaultValue="0") int pageNumber,
 																				@RequestParam(defaultValue="10") int pageSize){

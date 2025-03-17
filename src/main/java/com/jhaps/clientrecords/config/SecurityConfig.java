@@ -50,7 +50,8 @@ public class SecurityConfig {
 				.userDetailsService(userDetailsServiceImpl)
 				.authorizeHttpRequests(auth->auth
 						.requestMatchers("/public/login", "/public/signup").permitAll() //for userLogin
-						.requestMatchers("/swagger-ui/**", "/v3/api-docs/**",  "/swagger-ui.html", "/swagger-ui/index.html").permitAll() //for Swagger	                   
+						.requestMatchers("/swagger-ui/**", "/v3/api-docs/**",  "/swagger-ui.html", "/swagger-ui/index.html").permitAll() //for Swagger	 
+						.requestMatchers("/api/roles").hasAuthority("admin")
 						.anyRequest().authenticated() 
 				)
 				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class) 

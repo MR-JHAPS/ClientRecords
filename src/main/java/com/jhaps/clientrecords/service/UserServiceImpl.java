@@ -1,6 +1,7 @@
 package com.jhaps.clientrecords.service;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -118,6 +119,12 @@ public class UserServiceImpl implements UserService{
 		if(!auth.isAuthenticated()) {
 			throw new BadCredentialsException( "Wrong authentication/credentials Details in Email : " + userDto.getEmail() );
 		}
+		//Checking if the user Role is Empty while logging in.
+		Collection<? extends GrantedAuthority> roles = auth.getAuthorities();
+		if(roles.isEmpty()) {
+			throw new AccessDeniedException(userDto.getEmail() + " You don't have required role to login");
+		}
+		
 		log.info("User Verified in userServiceImpl for email: {}", userDto.getEmail());
 		return jwtServiceImpl.generateJWTToken(userDto.getEmail());
 	}
@@ -152,8 +159,10 @@ public class UserServiceImpl implements UserService{
 			throw new DuplicateDataException("Unable to save user, User with email : " + userDto.getEmail() + " already exists.");
 		}
 		User user = mapper.toUserEntity(userDto); //changing dto to entity
-		Role defaultRole = roleService.findRoleByName(RoleNames.USER.getRole()).orElseThrow(()->
-									new RoleNotFoundException("Unable to find the Role :"+ RoleNames.USER + "RoleNames.ADMIN"));//Setting the defaultRole as 'user'.
+		
+		log.info("Saving new User with default Role: {}", RoleNames.USER.getRole());
+		
+		Role defaultRole = roleService.findRoleByName(RoleNames.USER.getRole());
 		String encodedPassword = passwordEncoder.encode(user.getPassword()); //encrypting/encoding Password
 		user.setPassword(encodedPassword);
 		user.setRoles(Set.of(defaultRole));	//since the Role of user is of type Set<Role> setting the default value as set.of('user')
@@ -172,6 +181,7 @@ public class UserServiceImpl implements UserService{
 			log.info("Current user roles are : {}", roles);
 		User user = findUserById(id); //findUserById() is a method written above.
 		
+		//Only the owner of the Account or Admin will be able to delete the userAccount.
 		if(user.getEmail().equals(loggedInUser) || roles.contains(RoleNames.ADMIN.getRole())) {
 			userRepo.delete(user);
 		}else {
@@ -214,7 +224,8 @@ public class UserServiceImpl implements UserService{
 //			throw new RoleNotFoundException("Unable to find the Role " + roleNamesFromDto);
 //		}
 		//getting the Set of roles from the Database. 
-		Set<Role> roles = roleService.findRoleByName(roleNamesFromDto).orElseThrow(()-> new RoleNotFoundException("Unable to find the Role " + roleNamesFromDto));
+		log.info("updating role of User with id: {} with roles :{}", id, roleDto.getRoleNames());
+		Set<Role> roles = roleService.findRoleByNames(roleNamesFromDto);
 		user.getRoles().clear();
 		user.setRoles(roles);
 		userRepo.save(user);

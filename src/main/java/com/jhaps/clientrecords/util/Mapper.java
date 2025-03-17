@@ -3,6 +3,7 @@ package com.jhaps.clientrecords.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -74,28 +75,29 @@ public class Mapper {
 
 	
 /*-----------------------ROLE---------------------------------------------------------------------------------------------------------------*/
-//
-//	//ROLE-DTO ----> ROLE-ENTITY
-//	public Set<Role> toRoleEntity(RoleDto roleDto) {
-//		Role role = new Role();
-//		return roleDto.getRoleNames()
-//				.stream()
-//				.map(roleName-> role.setName(roleName)).collect(Collectors.toSet());
-//
-//	}
-//	
-//	
-//	//ROLE-ENTITY ------> ROLE-DTO
-//	public RoleDto toRoleDto(Role role) {
-//		RoleDto roleDto = new RoleDto();
-//			roleDto.setId(role.getId());
-////			roleDto.setRoleName(role.getName());
-//			rol
-//			
-//			
-//	}
-//	
 	
+	//Converting Set<Roles> to RoleDto.   **RoleDto-->RoleNames is of type Set<String>
+	public RoleDto toRoleDtoFromRoleSet(Set<Role> roleList) {
+		RoleDto dto = new RoleDto();
+		//collecting/extracting roles of Set<Role> roleList to Set<String>
+		Set<String> roles  = roleList.stream()
+								.map(role -> role.getName())
+								.collect(Collectors.toSet());
+		dto.setRoleNames(roles);
+		return dto;
+	}
+	
+	
+	
+	//Converting Single Role to RoleDto
+	public RoleDto toRoleDtoFromSingleRole(Role role) {
+		RoleDto dto = new RoleDto();
+		Set<String> roleSet = new HashSet<>();
+		
+		roleSet.add(role.getName());
+		dto.setRoleNames(roleSet);
+		return dto;
+	}
 	
 	
 	

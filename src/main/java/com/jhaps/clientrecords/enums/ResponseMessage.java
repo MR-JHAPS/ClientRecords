@@ -4,6 +4,9 @@ public enum ResponseMessage {
 
 	
 	SUCCESS("Successfully Executed"),
+	ROLE_OBTAINED("Roles Obtained Successfully"),
+	ROLE_SAVED("New Role Saved Successfully"),
+	ROLE_DELETED("Role Deleted Successfully"),
 	
     CLIENT_ALREADY_EXISTS("Client already exists"),
     CLIENT_SAVE_FAILED("Failed to save the Client"),
