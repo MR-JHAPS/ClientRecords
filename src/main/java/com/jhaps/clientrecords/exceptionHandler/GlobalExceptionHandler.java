@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -73,6 +74,12 @@ public class GlobalExceptionHandler {
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.VALIDATION_FAILED, HttpStatus.BAD_REQUEST, validationErrors);
 	}
 		
+	@ExceptionHandler(LockedException.class)
+	public ResponseEntity<ApiResponseModel<String>> handleLockedException(LockedException e){
+		log.error("Locked Exception Occured : {} ",e.getMessage(), e);
+		return apiResponseBuilder.buildApiResponse(ResponseMessage.LOCKED, HttpStatus.LOCKED);
+	}
+	
 	@ExceptionHandler(BadCredentialsException.class)
 	public ResponseEntity<ApiResponseModel<String>> handleBadCredentialsException(BadCredentialsException e){
 		log.error("Bad Credentials Exception Occured : {} ",e.getMessage(), e);

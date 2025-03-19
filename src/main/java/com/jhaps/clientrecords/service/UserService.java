@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 
+import com.jhaps.clientrecords.dto.LoginAttempts;
 import com.jhaps.clientrecords.dto.RoleDto;
 import com.jhaps.clientrecords.dto.UserDto;
 import com.jhaps.clientrecords.entity.User;
@@ -18,8 +19,6 @@ public interface UserService {
 	public Page<UserDto> findAllUsers(Pageable pageable);
 	
 	public UserDto findUserDtoById(int id); //this is for controller and public uses
-	
-//	public User findUserById(int id); //this is for the internal use of service
 	
 	public UserDto findUserByEmail(String email);
 	
@@ -33,7 +32,11 @@ public interface UserService {
 	
 	public void updateUserRoleById(int id, RoleDto roleDto); //we have the id of user and the roleDto that contains the name of the roles.
 	
-//	public boolean isRoleValid(String roleName);
+	public void updateLoginAttempts(LoginAttempts loginAttempts);
+	
+	public void resetLoginAttempts(LoginAttempts loginAttempts);
+	
+	public boolean unlockAfterGivenTime(User user);
 	
 	
 	

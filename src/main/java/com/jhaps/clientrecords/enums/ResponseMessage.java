@@ -22,7 +22,8 @@ public enum ResponseMessage {
 	INVALID_ROLE("ROLE NOT FOUND"),
 	USER_NOT_FOUND("User Not Found"),
 	USER_DELETED("User Deleted Successfully"),
-	DUPLICATE_DATA("Data with provided name already exists");
+	DUPLICATE_DATA("Data with provided name already exists"),
+	LOCKED("Your Account is locked");
 	
 	
 	

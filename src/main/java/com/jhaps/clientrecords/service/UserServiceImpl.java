@@ -1,5 +1,6 @@
 package com.jhaps.clientrecords.service;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
@@ -17,6 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.jhaps.clientrecords.dto.LoginAttempts;
 import com.jhaps.clientrecords.dto.RoleDto;
 import com.jhaps.clientrecords.dto.UserDto;
 import com.jhaps.clientrecords.entity.CustomUserDetails;
@@ -259,6 +261,54 @@ public class UserServiceImpl implements UserService{
 			throw new UserNotFoundException("No users found in Database with given Role");
 		}
 		return userList.map(mapper::toUserDto);
+	}
+
+
+	
+/*---------------------------------------- LOGIN ATTEMPTS --------------------------------------------------------------------------------*/	
+	
+	/*THIS IS TO UPDATE THE USER LOGIN ATTEMPTS*/
+	@Override
+	public void updateLoginAttempts(LoginAttempts loginAttempts) {
+		String email = loginAttempts.getEmail();
+		int attempts = loginAttempts.getAttempts();
+		User user = userRepo.findByEmail(email)
+					.orElseThrow(()-> new UserNotFoundException("Unable to find User with Email : " + email));
+		user.setAttempts(attempts);
+		if(attempts >= 3) {
+			user.setAccountLocked(true);
+			user.setLockTime(LocalDateTime.now());
+		}
+		userRepo.save(user);
+	}
+	
+	@Override
+	public boolean unlockAfterGivenTime(User user) {
+		if(user.isAccountLocked() && user.getLockTime()!=null) {
+			LocalDateTime unlockTime = user.getLockTime().plusMinutes(15);
+			if(LocalDateTime.now().isAfter(unlockTime)) {  // if current time is 15 minutes after user.getLockTime
+				user.setAttempts(0);
+				user.setAccountLocked(false);
+				user.setLockTime(null);
+				userRepo.save(user);
+				return true;
+			}
+		}
+		return false;	
+	}
+	
+	
+	
+	
+	@Override
+	public void resetLoginAttempts(LoginAttempts loginAttempts) {
+		String email = loginAttempts.getEmail();
+		int attempts = loginAttempts.getAttempts();
+		User user = userRepo.findByEmail(email)
+				.orElseThrow(()-> new UserNotFoundException("Unable to find User with Email : " + email));
+		
+		user.setAttempts(0);
+		userRepo.save(user);
 	}
 
 	

@@ -7,6 +7,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -20,6 +21,7 @@ import com.jhaps.clientrecords.service.UserDetailsServiceImpl;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
 	@Autowired
@@ -51,7 +53,7 @@ public class SecurityConfig {
 				.authorizeHttpRequests(auth->auth
 						.requestMatchers("/public/login", "/public/signup").permitAll() //for userLogin
 						.requestMatchers("/swagger-ui/**", "/v3/api-docs/**",  "/swagger-ui.html", "/swagger-ui/index.html").permitAll() //for Swagger	 
-						.requestMatchers("/api/roles").hasAuthority("admin")
+						.requestMatchers("/api/roles/**", "/api/admin/**").hasAuthority("admin")
 						.anyRequest().authenticated() 
 				)
 				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class) 

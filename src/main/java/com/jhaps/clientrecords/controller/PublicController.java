@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.jhaps.clientrecords.dto.LoginAttempts;
 import com.jhaps.clientrecords.dto.UserDto;
 import com.jhaps.clientrecords.enums.ResponseMessage;
 import com.jhaps.clientrecords.response.ApiResponseModel;
@@ -18,8 +19,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/public")
-//@Validated //this is the method validation so that i can use it on pathvariable.
+@RequestMapping("/api/public")
 @Tag(name = "Public Controller" , description = "Log-In, Sign-Up API's") // this is for the swagger
 public class PublicController {
 
@@ -49,6 +49,12 @@ public class PublicController {
 	}
 	
 	
+	@PostMapping("/saveLoginAttempts")
+	public ResponseEntity<ApiResponseModel<String>> saveLoginAttempts(@RequestBody LoginAttempts loginAttempts){
+		
+		
+		return
+	}
 	
 	
 	

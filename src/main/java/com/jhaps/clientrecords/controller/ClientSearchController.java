@@ -131,6 +131,10 @@ public class ClientSearchController{
 	
 	
 	
+	
+	//LASTLY BY SEARCH BY DATE OF BIRTH:
+	
+	
 //	@GetMapping("/dateOfBirth/{dateOfBirth}")
 //	public ResponseEntity<List<Client>> getClientsByDateOfBirth(@PathVariable String dateOfBirth){
 //		//Converting string date to LocalDate because service Layer parameter is LocalDate.

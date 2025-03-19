@@ -1,6 +1,6 @@
 package com.jhaps.clientrecords.entity;
 
-import java.util.List;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 import jakarta.persistence.Column;
@@ -12,9 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 
 //@Column(name="telephone")
@@ -39,9 +37,14 @@ public class User {
 	@Column(name="password", nullable=false)
 	private String password;
 	
-	@Column(name = "wrong_password_attempts", nullable = true )
-	private Integer attempts;
-
+	@Column(name = "wrong_password_attempts", nullable = false )
+	private int attempts;
+	
+	@Column(name="account_locked")
+	private boolean isAccountLocked;	
+	
+	@Column(name = "lock_time")
+	private LocalDateTime lockTime;		//time when the account was locked.
 	
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(
@@ -56,13 +59,15 @@ public class User {
 //	private Role role;
 	
 	
-	public User(int id, String email, String password, Integer attempts, Set<Role> roles) {
+	public User(int id, String email, String password, int attempts, Set<Role> roles, boolean isAccountLocked, LocalDateTime lockTime) {
 		super();
 		this.id = id;
 		this.email = email;
 		this.password = password;
 		this.attempts = attempts;
 		this.roles = roles;
+		this.isAccountLocked = isAccountLocked;
+		this.lockTime = lockTime;
 	}
 	
 	
@@ -96,12 +101,12 @@ public class User {
 	}
 
 
-	public Integer getAttempts() {
+	public int getAttempts() {
 		return attempts;
 	}
 
 
-	public void setAttempts(Integer attempts) {
+	public void setAttempts(int attempts) {
 		this.attempts = attempts;
 	}
 
@@ -113,6 +118,26 @@ public class User {
 
 	public void setRoles(Set<Role> roles) {
 		this.roles = roles;
+	}
+
+
+	public boolean isAccountLocked() {
+		return isAccountLocked;
+	}
+
+
+	public void setAccountLocked(boolean isAccountLocked) {
+		this.isAccountLocked = isAccountLocked;
+	}
+
+
+	public LocalDateTime getLockTime() {
+		return lockTime;
+	}
+
+
+	public void setLockTime(LocalDateTime lockTime) {
+		this.lockTime = lockTime;
 	}
 
 

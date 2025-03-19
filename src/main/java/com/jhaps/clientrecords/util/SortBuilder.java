@@ -8,6 +8,7 @@ public class SortBuilder {
 	
 	public static Sort createSorting(String direction, String sortBy) {
 		
+		//if either direction or sortBy is null then return Sort as null.
 		if(sortBy==null || direction == null) {
 			return null;
 		}

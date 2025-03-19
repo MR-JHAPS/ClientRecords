@@ -31,7 +31,7 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestController
-@RequestMapping("/admin")
+@RequestMapping("/api/admin")
 public class AdminController {
 
 	private UserService userService;
@@ -53,6 +53,7 @@ public class AdminController {
 	
 	@Operation(summary = "Get List Of All The Users")
 	@GetMapping("/findAll")
+	@PreAuthorize("hasAuthority('admin')")
 	public ResponseEntity<ApiResponseModel<PagedModel<EntityModel<UserDto>>>> getAllUsers(
 								@RequestParam(defaultValue="0") int pageNumber,
 								@RequestParam(defaultValue="10") int pageSize,
@@ -86,6 +87,7 @@ public class AdminController {
 	
 	@Operation(summary = "Update Role Of User By UserId : ADMIN ONLY")
 	@PutMapping("/updateUserRole/{id}")
+	@PreAuthorize("hasAuthority('admin')")
 	public ResponseEntity<ApiResponseModel<String>> updateRoleByUserId(@PathVariable int id, @RequestBody @Valid RoleDto roleDto){
 
 		log.info("this is the roleDto from postman :{}", roleDto);

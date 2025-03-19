@@ -1,7 +1,5 @@
 package com.jhaps.clientrecords.controller;
 
-import java.util.Optional;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -32,6 +30,7 @@ import com.jhaps.clientrecords.util.SortBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 
 @Validated // this is so that "@NotBlank" can be used in @pathVariable
 @RestController
@@ -43,7 +42,7 @@ public class ClientController {
 	no need to create :
 					ApiResponse<List<Client>> response = new ApiResponse<>(ResponseMessage.SUCCESS, HttpStatus.OK, clientList);
 					return ResponseEntity.ok(response);
-					for each (if/Else).
+					for each Controller-method.
 	 */
 	private ApiResponseBuilder apiResponseBuilder;
 	private ClientService clientService;
@@ -79,7 +78,7 @@ public class ClientController {
 	
 	@Operation(summary = "get clients by id")
 	@GetMapping("/id/{id}")
-	public ResponseEntity<ApiResponseModel<ClientDto>> getClientById( @PathVariable int id){
+	public ResponseEntity<ApiResponseModel<ClientDto>> getClientById( @PathVariable @Positive(message = "Id must be a positive number") int id){
 		ClientDto client = clientService.findClientById(id);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, client);
 	}
@@ -95,7 +94,7 @@ public class ClientController {
 	
 	@Operation(summary = "delete client by id")
 	@DeleteMapping("/delete/id/{id}")
-	public ResponseEntity<ApiResponseModel<String>> deleteClientById(@PathVariable int id){
+	public ResponseEntity<ApiResponseModel<String>> deleteClientById(@PathVariable @Positive(message = "Id must be a positive number") int id){
 			clientService.deleteClientById(id);
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.NO_CONTENT);
 	}
@@ -103,7 +102,8 @@ public class ClientController {
 	
 	@Operation(summary = "update client by id")
 	@PutMapping("/update/id/{id}")
-	public ResponseEntity<ApiResponseModel<Object>> updateClientById( @PathVariable int id, @RequestBody @Valid ClientDto clientUpdateInfo){
+	public ResponseEntity<ApiResponseModel<Object>> updateClientById( @PathVariable @Positive(message = "Id must be a positive number") int id,
+									@RequestBody @Valid ClientDto clientUpdateInfo){
 			clientService.updateClientById(id, clientUpdateInfo);
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, "Your Data is updated.");	
 	}

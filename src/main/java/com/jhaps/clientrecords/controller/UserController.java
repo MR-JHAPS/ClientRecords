@@ -37,15 +37,12 @@ public class UserController {
 	private UserService userService;
 	
 	private ApiResponseBuilder apiResponseBuilder;
+
 	
-	private PagedResourceAssemblerService<UserDto> pagedResourceAssemblerService;
 	
-	
-	public UserController(UserService userService, ApiResponseBuilder apiResponseBuilder,
-			PagedResourceAssemblerService<UserDto> pagedResourceAssemblerService) {
+	public UserController(UserService userService, ApiResponseBuilder apiResponseBuilder) {
 		this.userService = userService;
 		this.apiResponseBuilder = apiResponseBuilder;
-		this.pagedResourceAssemblerService = pagedResourceAssemblerService;
 	}
 
 	

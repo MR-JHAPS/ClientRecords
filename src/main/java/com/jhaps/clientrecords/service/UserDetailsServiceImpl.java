@@ -1,6 +1,6 @@
 package com.jhaps.clientrecords.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -13,26 +13,46 @@ import com.jhaps.clientrecords.repository.UserRepository;
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-	@Autowired
 	private UserRepository userRepo;
+	private UserService userService;
+	
+	public UserDetailsServiceImpl(UserRepository userRepo, UserService userService) {
+		this.userRepo = userRepo;
+		this.userService = userService;
+	}
 	
 	
 	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		
-//		System.out.println(username + " ---->  before return ");
-		
 		User user = userRepo.findByEmail(username)
 				.orElseThrow(()-> new UsernameNotFoundException("Sorry username " + username +" not found in the Database"));
+		
+		
+		//checking if the account is locked.
+		if(user.isAccountLocked()) {
+			//if the account is locked and it's been 15 minutes unlock account.
+			if(userService.unlockAfterGivenTime(user)) {
+				return new CustomUserDetails(user);
+			} else {
+				//if it has not been 15 minutes then still locked.
+				throw new LockedException("You account with email : " + username + " is locked");
+			}
+		}
 		return new CustomUserDetails(user);
-		
-		
-		
+
 	}//ends method
 
 	
 }//ends class
+
+
+
+
+
+
+
+//without CusomUserDetails Class.
 
 //		return userRepo.findByEmail(username)
 //				.map(userObj->

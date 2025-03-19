@@ -1,10 +1,10 @@
 package com.jhaps.clientrecords.controller;
 
-import java.util.List;
 import java.util.Set;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -44,6 +44,7 @@ public class RoleController {
 	
 	@Operation(summary = "Get all roles")
 	@GetMapping
+	@PreAuthorize("hasAuthority('admin')")
 	public ResponseEntity<ApiResponseModel<RoleDto>> getAllRoles(){
 		Set<Role> role = roleService.findAllRoles();
 		RoleDto roleDto = mapper.toRoleDtoFromRoleSet(role); //converting Set<Role> to RoleDto.
@@ -54,6 +55,7 @@ public class RoleController {
 	
 	@Operation(summary = "Save new role")
 	@PostMapping("/save")
+	@PreAuthorize("hasAuthority('admin')")
 	public ResponseEntity<ApiResponseModel<String>> saveNewRole(@RequestBody @Valid RoleDto roleDto){
 		roleService.saveNewRole(roleDto);
 		return apiResponseBuilder
@@ -63,6 +65,7 @@ public class RoleController {
 	
 	@Operation(summary = "Delete role")
 	@DeleteMapping("/delete/{id}")
+	@PreAuthorize("hasAuthority('admin')")
 	public ResponseEntity<?> deleteRole(@PathVariable int id){
 		roleService.deleteRole(id);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build(); //no custom response because no content does not send Response body.
