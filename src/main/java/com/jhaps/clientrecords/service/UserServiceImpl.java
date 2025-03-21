@@ -267,35 +267,35 @@ public class UserServiceImpl implements UserService{
 	
 /*---------------------------------------- LOGIN ATTEMPTS --------------------------------------------------------------------------------*/	
 	
-	/*THIS IS TO UPDATE THE USER LOGIN ATTEMPTS*/
-	@Override
-	public void updateLoginAttempts(LoginAttempts loginAttempts) {
-		String email = loginAttempts.getEmail();
-		int attempts = loginAttempts.getAttempts();
-		User user = userRepo.findByEmail(email)
-					.orElseThrow(()-> new UserNotFoundException("Unable to find User with Email : " + email));
-		user.setAttempts(attempts);
-		if(attempts >= 3) {
-			user.setAccountLocked(true);
-			user.setLockTime(LocalDateTime.now());
-		}
-		userRepo.save(user);
-	}
-	
-	@Override
-	public boolean unlockAfterGivenTime(User user) {
-		if(user.isAccountLocked() && user.getLockTime()!=null) {
-			LocalDateTime unlockTime = user.getLockTime().plusMinutes(15);
-			if(LocalDateTime.now().isAfter(unlockTime)) {  // if current time is 15 minutes after user.getLockTime
-				user.setAttempts(0);
-				user.setAccountLocked(false);
-				user.setLockTime(null);
-				userRepo.save(user);
-				return true;
-			}
-		}
-		return false;	
-	}
+//	/*THIS IS TO UPDATE THE USER LOGIN ATTEMPTS*/
+//	@Override
+//	public void updateLoginAttempts(LoginAttempts loginAttempts) {
+//		String email = loginAttempts.getEmail();
+//		int attempts = loginAttempts.getAttempts();
+//		User user = userRepo.findByEmail(email)
+//					.orElseThrow(()-> new UserNotFoundException("Unable to find User with Email : " + email));
+//		user.setAttempts(attempts);
+//		if(attempts >= 3) {
+//			user.setAccountLocked(true);
+//			user.setLockTime(LocalDateTime.now());
+//		}
+//		userRepo.save(user);
+//	}
+//	
+//	@Override
+//	public boolean unlockAfterGivenTime(User user) {
+//		if(user.isAccountLocked() && user.getLockTime()!=null) {
+//			LocalDateTime unlockTime = user.getLockTime().plusMinutes(15);
+//			if(LocalDateTime.now().isAfter(unlockTime)) {  // if current time is 15 minutes after user.getLockTime
+//				user.setAttempts(0);
+//				user.setAccountLocked(false);
+//				user.setLockTime(null);
+//				userRepo.save(user);
+//				return true;
+//			}
+//		}
+//		return false;	
+//	}
 	
 	
 	

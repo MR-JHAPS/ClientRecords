@@ -16,6 +16,7 @@ public enum ResponseMessage {
 	VALIDATION_FAILED("Validation error"),
 	BAD_CREDENTIALS("Credentials wrong"),
 	
+	UNAUTHORIZED_REQUEST("Not Authorized"),
 	ACCESS_DENIED("You do not have the required authorization"),
 	CLIENT_NOT_FOUND("Client Not Found"),
 	CLIENT_DELETED("Client Deleted Successfully"),

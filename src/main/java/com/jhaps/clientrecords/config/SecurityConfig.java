@@ -21,7 +21,7 @@ import com.jhaps.clientrecords.service.UserDetailsServiceImpl;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity
+//@EnableMethodSecurity
 public class SecurityConfig {
 
 	@Autowired
@@ -51,7 +51,7 @@ public class SecurityConfig {
 				.httpBasic(Customizer.withDefaults())//this is for the API's user like Postman.
 				.userDetailsService(userDetailsServiceImpl)
 				.authorizeHttpRequests(auth->auth
-						.requestMatchers("/public/login", "/public/signup").permitAll() //for userLogin
+						.requestMatchers("/api/public/**", "api/public/login").permitAll() //for userLogin
 						.requestMatchers("/swagger-ui/**", "/v3/api-docs/**",  "/swagger-ui.html", "/swagger-ui/index.html").permitAll() //for Swagger	 
 						.requestMatchers("/api/roles/**", "/api/admin/**").hasAuthority("admin")
 						.anyRequest().authenticated() 

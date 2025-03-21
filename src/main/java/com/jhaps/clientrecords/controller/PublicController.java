@@ -2,6 +2,7 @@ package com.jhaps.clientrecords.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,7 +18,9 @@ import com.jhaps.clientrecords.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/public")
 @Tag(name = "Public Controller" , description = "Log-In, Sign-Up API's") // this is for the swagger
@@ -35,8 +38,12 @@ public class PublicController {
 	//We get the JwtToken from this controller after successful Login.
 	@Operation(summary = "user Login")
 	@PostMapping("/login")
+//	@PreAuthorize("permitAll()")
 	public ResponseEntity<ApiResponseModel<String>> userLogin(@Valid @RequestBody UserDto userDto){
+		log.info("inside the userLogin controller");
+		System.out.println("i am inside public controller");
 		String token = userService.verifyUser(userDto);
+		log.info("inside the userLogin controller after token generation : {}", token);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, token);
 	}
 	
@@ -49,13 +56,13 @@ public class PublicController {
 	}
 	
 	
-	@PostMapping("/saveLoginAttempts")
-	public ResponseEntity<ApiResponseModel<String>> saveLoginAttempts(@RequestBody LoginAttempts loginAttempts){
-		
-		
-		return
-	}
-	
+//	@PostMapping("/saveLoginAttempts")
+//	public ResponseEntity<ApiResponseModel<String>> saveLoginAttempts(@RequestBody LoginAttempts loginAttempts){
+//		
+//		
+//		return
+//	}
+//	
 	
 	
 	

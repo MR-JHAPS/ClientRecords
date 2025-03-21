@@ -32,11 +32,11 @@ public interface UserService {
 	
 	public void updateUserRoleById(int id, RoleDto roleDto); //we have the id of user and the roleDto that contains the name of the roles.
 	
-	public void updateLoginAttempts(LoginAttempts loginAttempts);
+//	public void updateLoginAttempts(LoginAttempts loginAttempts);
 	
 	public void resetLoginAttempts(LoginAttempts loginAttempts);
 	
-	public boolean unlockAfterGivenTime(User user);
+//	public boolean unlockAfterGivenTime(User user);
 	
 	
 	

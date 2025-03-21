@@ -30,8 +30,8 @@ public class JWTFilter extends OncePerRequestFilter{
 	@Override
 	protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
 	String req = request.getServletPath(); 
-	return req.equals("/public/login") || 
-			req.equals("/public/signup") ||
+	return req.equals("/api/public/login") || 
+			req.equals("/api/public/signup") ||
            req.contains("swagger-ui")||
            req.contains("api-docs");
 	}

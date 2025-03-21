@@ -1,6 +1,10 @@
 <configuration>
 	<!-- 	This is for the console -->
     <appender name = "myConsoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+<!--        <root level="TRACE"> -->
+<!--        	 <appender-ref ref="CONSOLE" /> -->
+<!--    	   </root> -->
+        
         <encoder>
 			<!--     This is for the display pattern/style of the log -->
             <pattern>

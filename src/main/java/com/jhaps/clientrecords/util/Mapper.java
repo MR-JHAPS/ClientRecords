@@ -57,7 +57,7 @@ public class Mapper {
 				dto.setId(user.getId());
 				dto.setEmail(user.getEmail());
 				dto.setPassword(user.getPassword());
-				dto.setAttempts(user.getAttempts() != null ? user.getAttempts() : 0);
+//				dto.setAttempts(user.getAttempts() != null ? user.getAttempts() : 0);
 		return dto;
 	}
 	
@@ -67,7 +67,7 @@ public class Mapper {
 		User user = new User();
 			 user.setEmail(userDto.getEmail());
 			 user.setPassword(userDto.getPassword());
-			 user.setAttempts(userDto.getAttempts());
+//			 user.setAttempts(userDto.getAttempts());
 		return user;	 
 	}
 	

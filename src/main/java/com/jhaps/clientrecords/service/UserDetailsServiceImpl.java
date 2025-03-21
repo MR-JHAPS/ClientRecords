@@ -1,6 +1,5 @@
 package com.jhaps.clientrecords.service;
 
-import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -14,37 +13,51 @@ import com.jhaps.clientrecords.repository.UserRepository;
 public class UserDetailsServiceImpl implements UserDetailsService {
 
 	private UserRepository userRepo;
-	private UserService userService;
+//	private UserService userService;
 	
-	public UserDetailsServiceImpl(UserRepository userRepo, UserService userService) {
+//	public UserDetailsServiceImpl(UserRepository userRepo/*, UserService userService*/) {
+//		this.userRepo = userRepo;
+////		this.userService = userService;
+//	}
+	public UserDetailsServiceImpl(UserRepository userRepo) {
 		this.userRepo = userRepo;
-		this.userService = userService;
 	}
-	
-	
-	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		User user = userRepo.findByEmail(username)
+		User user = userRepo.findByEmail("nerazole@gmail.com")
 				.orElseThrow(()-> new UsernameNotFoundException("Sorry username " + username +" not found in the Database"));
-		
-		
-		//checking if the account is locked.
-		if(user.isAccountLocked()) {
-			//if the account is locked and it's been 15 minutes unlock account.
-			if(userService.unlockAfterGivenTime(user)) {
-				return new CustomUserDetails(user);
-			} else {
-				//if it has not been 15 minutes then still locked.
-				throw new LockedException("You account with email : " + username + " is locked");
-			}
-		}
 		return new CustomUserDetails(user);
-
-	}//ends method
-
-	
+	}//ends method	
 }//ends class
+	
+
+
+
+
+
+
+//	@Override
+//	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+//		User user = userRepo.findByEmail(username)
+//				.orElseThrow(()-> new UsernameNotFoundException("Sorry username " + username +" not found in the Database"));
+//		
+//		
+////		//checking if the account is locked.
+////		if(user.isAccountLocked()) {
+////			//if the account is locked and it's been 15 minutes unlock account.
+////			if(userService.unlockAfterGivenTime(user)) {
+////				return new CustomUserDetails(user);
+////			} else {
+////				//if it has not been 15 minutes then still locked.
+////				throw new LockedException("You account with email : " + username + " is locked");
+////			}
+////		}
+//		return new CustomUserDetails(user);
+//
+//	}//ends method
+//
+//	
+//}//ends class
 
 
 

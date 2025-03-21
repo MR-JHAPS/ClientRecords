@@ -37,14 +37,14 @@ public class User {
 	@Column(name="password", nullable=false)
 	private String password;
 	
-	@Column(name = "wrong_password_attempts", nullable = false )
-	private int attempts;
+	@Column(name = "wrong_password_attempts", nullable = true )
+	private Integer attempts;
 	
-	@Column(name="account_locked")
-	private boolean isAccountLocked;	
-	
-	@Column(name = "lock_time")
-	private LocalDateTime lockTime;		//time when the account was locked.
+//	@Column(name="account_locked")
+//	private boolean isAccountLocked;	
+//	
+//	@Column(name = "lock_time")
+//	private LocalDateTime lockTime;		//time when the account was locked.
 	
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(
@@ -59,17 +59,26 @@ public class User {
 //	private Role role;
 	
 	
-	public User(int id, String email, String password, int attempts, Set<Role> roles, boolean isAccountLocked, LocalDateTime lockTime) {
+//	public User(int id, String email, String password, int attempts, Set<Role> roles, boolean isAccountLocked, LocalDateTime lockTime) {
+//		super();
+//		this.id = id;
+//		this.email = email;
+//		this.password = password;
+//		this.attempts = attempts;
+//		this.roles = roles;
+//		this.isAccountLocked = isAccountLocked;
+//		this.lockTime = lockTime;
+//	}
+	
+	
+	public User(int id, String email, String password, Integer attempts, Set<Role> roles) {
 		super();
 		this.id = id;
 		this.email = email;
 		this.password = password;
 		this.attempts = attempts;
 		this.roles = roles;
-		this.isAccountLocked = isAccountLocked;
-		this.lockTime = lockTime;
 	}
-	
 	
 	public int getId() {
 		return id;
@@ -101,13 +110,13 @@ public class User {
 	}
 
 
-	public int getAttempts() {
+	public Integer getAttempts() {
 		return attempts;
 	}
 
 
-	public void setAttempts(int attempts) {
-		this.attempts = attempts;
+	public void setAttempts(Integer attempts) {
+		this.attempts = (this.attempts!=null)?attempts:0;
 	}
 
 
@@ -121,24 +130,24 @@ public class User {
 	}
 
 
-	public boolean isAccountLocked() {
-		return isAccountLocked;
-	}
-
-
-	public void setAccountLocked(boolean isAccountLocked) {
-		this.isAccountLocked = isAccountLocked;
-	}
-
-
-	public LocalDateTime getLockTime() {
-		return lockTime;
-	}
-
-
-	public void setLockTime(LocalDateTime lockTime) {
-		this.lockTime = lockTime;
-	}
+//	public boolean isAccountLocked() {
+//		return isAccountLocked;
+//	}
+//
+//
+//	public void setAccountLocked(boolean isAccountLocked) {
+//		this.isAccountLocked = isAccountLocked;
+//	}
+//
+//
+//	public LocalDateTime getLockTime() {
+//		return lockTime;
+//	}
+//
+//
+//	public void setLockTime(LocalDateTime lockTime) {
+//		this.lockTime = lockTime;
+//	}
 
 
 	

@@ -12,6 +12,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.HttpClientErrorException.Unauthorized;
 
 import com.jhaps.clientrecords.enums.ResponseMessage;
 import com.jhaps.clientrecords.exception.ClientNotFoundException;
@@ -91,6 +92,18 @@ public class GlobalExceptionHandler {
 		log.error("Username Not Found Exception Occured : {} ",e.getMessage(), e);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.BAD_CREDENTIALS, HttpStatus.BAD_REQUEST);
 	}
+	
+	@ExceptionHandler(Unauthorized.class)
+	public ResponseEntity<ApiResponseModel<String>> handleUnauthorizedException(Unauthorized e){
+		log.error("Access Denied Exception Occured : {} ",e.getMessage(), e);
+		return apiResponseBuilder.buildApiResponse(ResponseMessage.ACCESS_DENIED, HttpStatus.UNAUTHORIZED);
+	}
+	
+//	@ExceptionHandler(UsernameNotFoundException.class)
+//	public ResponseEntity<ApiResponseModel<String>> handleUsernameNotFoundException(UsernameNotFoundException e){
+//		log.error("Username Not Found Exception Occured : {} ",e.getMessage(), e);
+//		return apiResponseBuilder.buildApiResponse(ResponseMessage.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
+//	}
 	
 	@ExceptionHandler(AccessDeniedException.class)
 	public ResponseEntity<ApiResponseModel<String>> handleAccessDeniedException(AccessDeniedException e){
