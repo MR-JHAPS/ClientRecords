@@ -1,17 +1,22 @@
 package com.jhaps.clientrecords.service;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import com.jhaps.clientrecords.dto.RoleDto;
 import com.jhaps.clientrecords.entity.Role;
+import com.jhaps.clientrecords.entity.User;
+import com.jhaps.clientrecords.enums.RoleNames;
 import com.jhaps.clientrecords.exception.RoleNotFoundException;
 import com.jhaps.clientrecords.repository.RoleRepository;
 import com.jhaps.clientrecords.util.Mapper;
+import com.jhaps.clientrecords.util.SecurityUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,11 +26,14 @@ public class RoleServiceImpl implements RoleService {
 
 	private RoleRepository roleRepo;
 	
+//	private UserService userService;
+	
 	private Mapper mapper;
 
 	public RoleServiceImpl(RoleRepository roleRepo, Mapper mapper) {
 		this.roleRepo = roleRepo;
 		this.mapper = mapper;
+//		this.userService = userService;
 	}
 	
 	
@@ -96,6 +104,58 @@ public class RoleServiceImpl implements RoleService {
 		log.info("Role with Id: {} deleted Successfully");
 		roleRepo.delete(role);
 	}
+	
+	
+
+	
+	
+	/* This is for the validation of Set<String> roles. (Multiple Roles at once) */
+	public boolean isRoleValid(Set<String> roleNames) {
+		Set<String> validRoles = Arrays.stream(RoleNames.values())
+								.map(RoleNames::getRole)
+								.collect(Collectors.toSet());
+		
+		return roleNames.stream()
+						.allMatch(r->validRoles.contains(r));
+	}
+	
+	/* Checking if the role exists in the RoleNames.enum.(Single Role) */
+	public boolean isRoleValid(String roleName) {
+		boolean isFound = false;
+		for(RoleNames role : RoleNames.values()) {
+			if(roleName.equals(role.getRole())) {
+				 isFound=true;
+				 break;
+			}
+		}//ends for-Loop.
+		return isFound;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	

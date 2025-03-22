@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
@@ -30,6 +31,7 @@ import com.jhaps.clientrecords.exception.RoleNotFoundException;
 import com.jhaps.clientrecords.exception.UserNotFoundException;
 import com.jhaps.clientrecords.repository.UserRepository;
 import com.jhaps.clientrecords.util.Mapper;
+import com.jhaps.clientrecords.util.SecurityUtils;
 
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -60,7 +62,6 @@ public class UserServiceImpl implements UserService{
 
 	
 //-------------------------------LOGIN VERIFICATION----------------------------------------------------------------------------------------------------------	
-	
 	@Override
 	public String verifyUser(UserDto userDto) {
 		Authentication auth = authManager.authenticate(new UsernamePasswordAuthenticationToken(userDto.getEmail(), userDto.getPassword()));
@@ -79,8 +80,6 @@ public class UserServiceImpl implements UserService{
 
 	
 //-------------------------------THESE ARE CRUD----------------------------------------------------------------------------------------------------------	
-	
-	
 	@Override
 	public Page<UserDto> findAllUsers(Pageable pageable) {
 		Page<User> userList = userRepo.findAll(pageable);
@@ -92,7 +91,7 @@ public class UserServiceImpl implements UserService{
 	}
 	
 	
-	//returns UserDto and for global use.
+	/* Returns "UserDto" specially used for Controller.*/
 	@Override			
 	public UserDto findUserDtoById(int id) {
 		User user = userRepo.findById(id).orElseThrow( ()->
@@ -101,20 +100,36 @@ public class UserServiceImpl implements UserService{
 	}
 	
 	
+	/* Return type is "User" | It is used for internal business logic --( Service classes )--*/
 	@Override
-	public void saveUser(UserDto userDto) {
+	public User findUserById(int id) {
+		User user = userRepo.findById(id)
+				.orElseThrow( ()->new UserNotFoundException("Unable to find the user with ID : " + id) );
+		return user;	
+	}
+	
+	
+	/* No Logic just saving the user that is ready. */
+	@Override
+	public void saveUser(User user) {
+		userRepo.save(user);
+	}
+	
+	
+	/* Saving/registering new user with logic. */
+	@Override
+	public void saveNewUser(UserDto userDto) {
 		if(userRepo.existsByEmail(userDto.getEmail())) {
 			throw new DuplicateDataException("Unable to save user, User with email : " + userDto.getEmail() + " already exists.");
 		}
 		User user = mapper.toUserEntity(userDto); //changing dto to entity
 		
 		log.info("Saving new User with default Role: {}", RoleNames.USER.getRole());
-		
-		Role defaultRole = roleService.findRoleByName(RoleNames.USER.getRole());
+		Role defaultRole = roleService.findRoleByName(RoleNames.USER.getRole()); //error is handled in roleService.
 		String encodedPassword = passwordEncoder.encode(user.getPassword()); //encrypting/encoding Password
 		user.setPassword(encodedPassword);
 		user.setRoles(Set.of(defaultRole));	//since the Role of user is of type Set<Role> setting the default value as set.of('user')
-		userRepo.save(user);	
+		saveUser(user);	
 	}
 	
 	
@@ -123,12 +138,11 @@ public class UserServiceImpl implements UserService{
 	@Transactional
 	@Override
 	public void deleteUserById(int id) throws AccessDeniedException { 
-		String loggedInUser = getEmailFromCustomUserDetails(); //this is the private method written above.
+		String loggedInUser = SecurityUtils.getEmailFromCustomUserDetails(); //this is the private method written above.
 			log.info("user Email extracted from the userServiceImpl is {}",loggedInUser);
-		Set<String> roles = getAuthoritiesFromCustomUserDetails(); //this is the private method written above.
+		Set<String> roles = SecurityUtils.getAuthoritiesFromCustomUserDetails(); //this is the private method written above.
 			log.info("Current user roles are : {}", roles);
 		User user = findUserById(id); //findUserById() is a method written above.
-		
 		//Only the owner of the Account or Admin will be able to delete the userAccount.
 		if(user.getEmail().equals(loggedInUser) || roles.contains(RoleNames.ADMIN.getRole())) {
 			userRepo.delete(user);
@@ -145,7 +159,7 @@ public class UserServiceImpl implements UserService{
 	public void updateUserById(int id, UserDto userUpdateInfo) {
 		User user = findUserById(id);   //findUserById() is a method written above.
 		//This update permission is for the logged in user.(No permission to change the role)
-		String loggedInUser = getEmailFromCustomUserDetails(); //getting logged in email from private method above.
+		String loggedInUser = SecurityUtils.getEmailFromCustomUserDetails(); //getting logged in email from private method above.
 
 		if(!loggedInUser.equalsIgnoreCase(user.getEmail())) {
 			throw new AccessDeniedException("You are not authorized to update this account of id "+ id);
@@ -161,7 +175,7 @@ public class UserServiceImpl implements UserService{
 	@Override
 	public void updateUserRoleById(int id, RoleDto roleDto) {
 		User user = findUserById(id); //this is the private method written above.
-		Set<String> activeUserRoles = getAuthoritiesFromCustomUserDetails(); //getting the roles of the logged in user.
+		Set<String> activeUserRoles = SecurityUtils.getAuthoritiesFromCustomUserDetails(); //getting the roles of the logged in user.
 		
 		if(!activeUserRoles.contains(RoleNames.ADMIN.getRole())) {
 			throw new AccessDeniedException("You do not have authorization to update the role");
@@ -198,7 +212,7 @@ public class UserServiceImpl implements UserService{
 	@Override
 	public Page<UserDto> findUsersByRoleName(String roleName, Pageable pageable) {
 		//checking if the argument roleName is valid before proceeding to Database.
-		boolean isRoleFound = isRoleValid(roleName); //using isRoleValid() method written above to see if role is valid in RoleNames.enum
+		boolean isRoleFound = roleService.isRoleValid(roleName); //using isRoleValid() method written above to see if role is valid in RoleNames.enum
 		if(!isRoleFound) {
 			throw new RoleNotFoundException("Unable to find Role with name : " + roleName);	
 		}
@@ -263,58 +277,31 @@ public class UserServiceImpl implements UserService{
 
 	//-------------------------------THESE ARE PRIVATE Methods----------------------------------------------------------------------------------------------------------
 	
-		//Extracts CustomUserDetails From SecurityContextHolder.
-		private CustomUserDetails getCustomUserDetailsFromSecurityContext() {
-			return (CustomUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		}
 		
 		
-		//Extracting user Email from the CustomUserDetails.
-		private String getEmailFromCustomUserDetails() {
-			CustomUserDetails customUserDetails = getCustomUserDetailsFromSecurityContext();
-			return customUserDetails.getUsername();
-		}
 		
 		
-		//Extracting Authorities fromt he CustomUserDetails.
-		private Set<String> getAuthoritiesFromCustomUserDetails(){
-			CustomUserDetails customUserDetails = getCustomUserDetailsFromSecurityContext();
-			Set<String> roles = customUserDetails.getAuthorities()
-								.stream()
-								.map(GrantedAuthority::getAuthority)
-								.collect(Collectors.toSet());
-			return roles;
-		}
-		
-		
-		//returns type is User | It is used only in this service class.
-		private User findUserById(int id) {
-			User user = userRepo.findById(id).orElseThrow( ()->
-		 					new UserNotFoundException("Unable to find the user with ID : " + id) );
-			return user;	
-		}
-		
-		//Checking if the role exists in the RoleNames.enum.(Single Role)
-			private boolean isRoleValid(String roleName) {
-				boolean isFound = false;
-				for(RoleNames role : RoleNames.values()) {
-					if(roleName.equals(role.getRole())) {
-						 isFound=true;
-						 break;
-					}
-				}//ends for-Loop.
-				return isFound;
-			}
+//		//Checking if the role exists in the RoleNames.enum.(Single Role)
+//			private boolean isRoleValid(String roleName) {
+//				boolean isFound = false;
+//				for(RoleNames role : RoleNames.values()) {
+//					if(roleName.equals(role.getRole())) {
+//						 isFound=true;
+//						 break;
+//					}
+//				}//ends for-Loop.
+//				return isFound;
+//			}
 
-			//this is for the validation of Set<String> roles. (Multiple Roles at once)
-			private boolean isRoleValid(Set<String> roleNames) {
-				Set<String> validRoles = Arrays.stream(RoleNames.values())
-										.map(RoleNames::getRole)
-										.collect(Collectors.toSet());
-				
-				return roleNames.stream()
-								.allMatch(r->validRoles.contains(r));
-			}
+//			//this is for the validation of Set<String> roles. (Multiple Roles at once)
+//			private boolean isRoleValid(Set<String> roleNames) {
+//				Set<String> validRoles = Arrays.stream(RoleNames.values())
+//										.map(RoleNames::getRole)
+//										.collect(Collectors.toSet());
+//				
+//				return roleNames.stream()
+//								.allMatch(r->validRoles.contains(r));
+//			}
 			
 
 

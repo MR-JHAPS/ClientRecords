@@ -18,19 +18,23 @@ public interface UserService {
 	
 	public Page<UserDto> findAllUsers(Pageable pageable);
 	
-	public UserDto findUserDtoById(int id); //this is for controller and public uses
+	public User findUserById(int id); /* Return type is "User" | It is used for internal business logic --( Service classes )--*/ 
+	
+	public UserDto findUserDtoById(int id); /* Returns "UserDto" specially used for Controller.*/
 	
 	public UserDto findUserByEmail(String email);
 	
 	public Page<UserDto> findUsersByRoleName(String roleName, Pageable pageable);
 	
-	public void saveUser(UserDto userDto);
+	public void saveUser(User user); /* No Logic just saving the user that is ready. */
+	
+	public void saveNewUser(UserDto userDto); /* Saving/registering new user with logic. */
 	
 	public void deleteUserById(int id) throws AccessDeniedException;
 	
 	public void updateUserById(int id, UserDto userUpdateInfo);
 	
-	public void updateUserRoleById(int id, RoleDto roleDto); //we have the id of user and the roleDto that contains the name of the roles.
+	public void updateUserRoleById(int id, RoleDto roleDto); /* We have the "id" of user and the "RoleDto" that contains the name of the roles.*/
 	
 //	public void updateLoginAttempts(LoginAttempts loginAttempts);
 	

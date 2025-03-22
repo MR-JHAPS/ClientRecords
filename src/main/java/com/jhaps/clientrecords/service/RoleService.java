@@ -7,6 +7,10 @@ import com.jhaps.clientrecords.entity.Role;
 
 public interface RoleService {
 
+	public boolean isRoleValid(Set<String> roleNames); /* (Multiple Roles at once) - Checking if the  Set<String> roles exists in the RoleNames.enum.  */
+	
+	public boolean isRoleValid(String roleName); /* (Single Role) - Checking if the role exists in the RoleNames.enum. */
+	
 	public Role findRoleById(int id);
 	
 	public Role findRoleByName(String name); //for single role.

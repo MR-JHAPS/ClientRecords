@@ -11,6 +11,7 @@ import com.jhaps.clientrecords.dto.UserDto;
 import com.jhaps.clientrecords.enums.ResponseMessage;
 import com.jhaps.clientrecords.response.ApiResponseModel;
 import com.jhaps.clientrecords.response.ApiResponseBuilder;
+import com.jhaps.clientrecords.service.RoleService;
 import com.jhaps.clientrecords.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -48,7 +49,7 @@ public class PublicController {
 	@Operation(summary = "user Signup")
 	@PostMapping("/signup")
 	public ResponseEntity<ApiResponseModel<String>> userSignUp(@Valid @RequestBody UserDto userDto){
-		userService.saveUser(userDto);
+		userService.saveNewUser(userDto);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.CREATED, "User Created Successfully");
 	}
 	

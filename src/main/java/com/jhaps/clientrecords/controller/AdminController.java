@@ -23,6 +23,7 @@ import com.jhaps.clientrecords.enums.ResponseMessage;
 import com.jhaps.clientrecords.response.ApiResponseBuilder;
 import com.jhaps.clientrecords.response.ApiResponseModel;
 import com.jhaps.clientrecords.service.PagedResourceAssemblerService;
+import com.jhaps.clientrecords.service.RoleService;
 import com.jhaps.clientrecords.service.UserService;
 import com.jhaps.clientrecords.util.SortBuilder;
 
@@ -38,14 +39,17 @@ public class AdminController {
 	
 	private ApiResponseBuilder apiResponseBuilder;
 	
+	private RoleService roleService;
+	
 	private PagedResourceAssemblerService<UserDto> pagedResourceAssemblerService;
 	
 	
 	public AdminController(UserService userService, ApiResponseBuilder apiResponseBuilder,
-			PagedResourceAssemblerService<UserDto> pagedResourceAssemblerService) {
+			PagedResourceAssemblerService<UserDto> pagedResourceAssemblerService, RoleService roleService) {
 		this.userService = userService;
 		this.apiResponseBuilder = apiResponseBuilder;
 		this.pagedResourceAssemblerService = pagedResourceAssemblerService;
+		this.roleService = roleService;
 	}
 	
 	//CONTROLLERS------------------------------------
