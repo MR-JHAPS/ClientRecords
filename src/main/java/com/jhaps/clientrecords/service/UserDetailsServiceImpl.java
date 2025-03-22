@@ -1,5 +1,6 @@
 package com.jhaps.clientrecords.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -11,7 +12,7 @@ import com.jhaps.clientrecords.repository.UserRepository;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
-
+	@Autowired
 	private UserRepository userRepo;
 //	private UserService userService;
 	
@@ -19,13 +20,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 //		this.userRepo = userRepo;
 ////		this.userService = userService;
 //	}
-	public UserDetailsServiceImpl(UserRepository userRepo) {
-		this.userRepo = userRepo;
-	}
+//	public UserDetailsServiceImpl(UserRepository userRepo) {
+//		this.userRepo = userRepo;
+//	}
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		User user = userRepo.findByEmail("nerazole@gmail.com")
-				.orElseThrow(()-> new UsernameNotFoundException("Sorry username " + username +" not found in the Database"));
+		User user = userRepo.findByEmail(username)
+				.orElseThrow(()-> new UsernameNotFoundException("Sorry username : " + username +" not found in the Database"));
 		return new CustomUserDetails(user);
 	}//ends method	
 }//ends class

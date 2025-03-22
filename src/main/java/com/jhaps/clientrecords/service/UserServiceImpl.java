@@ -57,61 +57,7 @@ public class UserServiceImpl implements UserService{
 	}
 
 
-//-------------------------------THESE ARE PRIVATE----------------------------------------------------------------------------------------------------------
-	
-	//Extracts CustomUserDetails From SecurityContextHolder.
-	private CustomUserDetails getCustomUserDetailsFromSecurityContext() {
-		return (CustomUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-	}
-	
-	
-	//Extracting user Email from the CustomUserDetails.
-	private String getEmailFromCustomUserDetails() {
-		CustomUserDetails customUserDetails = getCustomUserDetailsFromSecurityContext();
-		return customUserDetails.getUsername();
-	}
-	
-	
-	//Extracting Authorities fromt he CustomUserDetails.
-	private Set<String> getAuthoritiesFromCustomUserDetails(){
-		CustomUserDetails customUserDetails = getCustomUserDetailsFromSecurityContext();
-		Set<String> roles = customUserDetails.getAuthorities()
-							.stream()
-							.map(GrantedAuthority::getAuthority)
-							.collect(Collectors.toSet());
-		return roles;
-	}
-	
-	
-	//returns type is User | It is used only in this service class.
-	private User findUserById(int id) {
-		User user = userRepo.findById(id).orElseThrow( ()->
-	 					new UserNotFoundException("Unable to find the user with ID : " + id) );
-		return user;	
-	}
-	
-	//Checking if the role exists in the RoleNames.enum.(Single Role)
-		private boolean isRoleValid(String roleName) {
-			boolean isFound = false;
-			for(RoleNames role : RoleNames.values()) {
-				if(roleName.equals(role.getRole())) {
-					 isFound=true;
-					 break;
-				}
-			}//ends for-Loop.
-			return isFound;
-		}
 
-		//this is for the validation of Set<String> roles. (Multiple Roles at once)
-		private boolean isRoleValid(Set<String> roleNames) {
-			Set<String> validRoles = Arrays.stream(RoleNames.values())
-									.map(RoleNames::getRole)
-									.collect(Collectors.toSet());
-			
-			return roleNames.stream()
-							.allMatch(r->validRoles.contains(r));
-		}
-		
 	
 //-------------------------------LOGIN VERIFICATION----------------------------------------------------------------------------------------------------------	
 	
@@ -315,7 +261,61 @@ public class UserServiceImpl implements UserService{
 	
 
 
+	//-------------------------------THESE ARE PRIVATE Methods----------------------------------------------------------------------------------------------------------
+	
+		//Extracts CustomUserDetails From SecurityContextHolder.
+		private CustomUserDetails getCustomUserDetailsFromSecurityContext() {
+			return (CustomUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		}
+		
+		
+		//Extracting user Email from the CustomUserDetails.
+		private String getEmailFromCustomUserDetails() {
+			CustomUserDetails customUserDetails = getCustomUserDetailsFromSecurityContext();
+			return customUserDetails.getUsername();
+		}
+		
+		
+		//Extracting Authorities fromt he CustomUserDetails.
+		private Set<String> getAuthoritiesFromCustomUserDetails(){
+			CustomUserDetails customUserDetails = getCustomUserDetailsFromSecurityContext();
+			Set<String> roles = customUserDetails.getAuthorities()
+								.stream()
+								.map(GrantedAuthority::getAuthority)
+								.collect(Collectors.toSet());
+			return roles;
+		}
+		
+		
+		//returns type is User | It is used only in this service class.
+		private User findUserById(int id) {
+			User user = userRepo.findById(id).orElseThrow( ()->
+		 					new UserNotFoundException("Unable to find the user with ID : " + id) );
+			return user;	
+		}
+		
+		//Checking if the role exists in the RoleNames.enum.(Single Role)
+			private boolean isRoleValid(String roleName) {
+				boolean isFound = false;
+				for(RoleNames role : RoleNames.values()) {
+					if(roleName.equals(role.getRole())) {
+						 isFound=true;
+						 break;
+					}
+				}//ends for-Loop.
+				return isFound;
+			}
 
+			//this is for the validation of Set<String> roles. (Multiple Roles at once)
+			private boolean isRoleValid(Set<String> roleNames) {
+				Set<String> validRoles = Arrays.stream(RoleNames.values())
+										.map(RoleNames::getRole)
+										.collect(Collectors.toSet());
+				
+				return roleNames.stream()
+								.allMatch(r->validRoles.contains(r));
+			}
+			
 
 
 

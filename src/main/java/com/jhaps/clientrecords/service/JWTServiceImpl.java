@@ -61,6 +61,7 @@ private String secretKey ;
 	
 	//Extracting All Claims from token
 	private Claims extractAllClaims(String token) {
+		System.out.println("I am inside the extract all claims token : " + token);
         return Jwts.parser()
                 .verifyWith(generateKeyForTokenSignature())
                 .build()
