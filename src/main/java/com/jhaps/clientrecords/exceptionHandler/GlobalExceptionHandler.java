@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
@@ -75,11 +76,19 @@ public class GlobalExceptionHandler {
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.VALIDATION_FAILED, HttpStatus.BAD_REQUEST, validationErrors);
 	}
 		
-	@ExceptionHandler(LockedException.class)
-	public ResponseEntity<ApiResponseModel<String>> handleLockedException(LockedException e){
-		log.error("Locked Exception Occured : {} ",e.getMessage(), e);
+	
+	/* For Locked Account and InternalAuthenticationServiceException */
+	@ExceptionHandler(InternalAuthenticationServiceException.class)
+	public ResponseEntity<ApiResponseModel<String>> handleLockedException(InternalAuthenticationServiceException e){
+		if(e.getCause() instanceof LockedException) {
+		log.error("InternalAuthenticationServiceException ---> Locked Exception Occured : {} ",e.getMessage(), e);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.LOCKED, HttpStatus.LOCKED);
+		}
+		log.error("InternalAuthenticationServiceException Occured  : {} ",e.getMessage(), e);
+		return apiResponseBuilder.buildApiResponse(ResponseMessage.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
+	
+	
 	
 	@ExceptionHandler(BadCredentialsException.class)
 	public ResponseEntity<ApiResponseModel<String>> handleBadCredentialsException(BadCredentialsException e){

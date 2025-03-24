@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
+/* This DTO Class is used to save the wrong password attempts by given user . */
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

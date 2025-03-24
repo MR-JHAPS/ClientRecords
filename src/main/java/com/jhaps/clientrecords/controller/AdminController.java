@@ -9,6 +9,7 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -100,7 +101,13 @@ public class AdminController {
 	}
 	
 	
-	
+	@Operation(summary = " Delete User By Id ")
+	@DeleteMapping("/delete/{id}")
+	@PreAuthorize("hasAuthority('admin')")
+	public ResponseEntity<ApiResponseModel<String>> deleteUserById(@PathVariable int id){
+		userService.deleteUserById(id);
+		return apiResponseBuilder.buildApiResponse(ResponseMessage.USER_DELETED, HttpStatus.NO_CONTENT);
+	}
 	
 	
 	

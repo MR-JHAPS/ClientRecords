@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -42,42 +43,39 @@ public class UserServiceImpl implements UserService{
 
 	private UserRepository userRepo;
 	private RoleService roleService;
-	private JWTServiceImpl jwtServiceImpl;
-	private AuthenticationManager authManager;	//custom Authentication manager from securityConfig.
 	private PasswordEncoder passwordEncoder;
 	private Mapper mapper;
 	
 	public UserServiceImpl(UserRepository userRepo, RoleService roleService, 
-							JWTServiceImpl jwtServiceImpl, AuthenticationManager authManager,
 							Mapper mapper, PasswordEncoder passwordEncoder) {
 		this.userRepo = userRepo;
 		this.roleService = roleService;
-		this.jwtServiceImpl = jwtServiceImpl;
-		this.authManager = authManager;
 		this.mapper = mapper;
 		this.passwordEncoder = passwordEncoder;
 	}
 
-
-
 	
 //-------------------------------LOGIN VERIFICATION----------------------------------------------------------------------------------------------------------	
-	@Override
-	public String verifyUser(UserDto userDto) {
-		Authentication auth = authManager.authenticate(new UsernamePasswordAuthenticationToken(userDto.getEmail(), userDto.getPassword()));
-		if(!auth.isAuthenticated()) {
-			throw new BadCredentialsException( "Wrong authentication/credentials Details in Email : " + userDto.getEmail() );
-		}
-		//Checking if the user Role is Empty while logging in.
-		Collection<? extends GrantedAuthority> roles = auth.getAuthorities();
-		if(roles.isEmpty()) {
-			throw new AccessDeniedException(userDto.getEmail() + " You don't have required role to login");
-		}
-		
-		log.info("User Verified in userServiceImpl for email: {}", userDto.getEmail());
-		return jwtServiceImpl.generateJWTToken(userDto.getEmail());
-	}
 
+	
+	/*THIS IS TO UPDATE THE USER LOGIN ATTEMPTS*/
+	@Override
+	public void updateLoginAttempts(UserDto userDto) {
+		String email = userDto.getEmail(); //email of user who made wrong password attempt
+		User user = userRepo.findByEmail(email)
+					.orElseThrow(()-> new UserNotFoundException("Unable to find User with Email : " + email));
+		int previousAttempts = user.getAttempts(); /* Getting the user wrong password attempts from the Database if exists */
+		int currentAttempts = previousAttempts + 1 ;  /* current wrong password attempts*/
+		user.setAttempts(currentAttempts);		/* Saving the current wrong password attempts in the user Database.*/
+		if(currentAttempts >= 3) {				/* If the wrong attempts equals 3 or more than 3 attempts the account will be locked along with TimeStamp*/
+			user.setAccountLocked(true); 
+			user.setLockTime(LocalDateTime.now());
+			throw new LockedException("Your Account is locked. Wait 15 minutes.");
+		}
+		userRepo.save(user);
+	}
+	
+	
 	
 //-------------------------------THESE ARE CRUD----------------------------------------------------------------------------------------------------------	
 	@Override
@@ -114,7 +112,7 @@ public class UserServiceImpl implements UserService{
 	public void saveUser(User user) {
 		userRepo.save(user);
 	}
-	
+
 	
 	/* Saving/registering new user with logic. */
 	@Override
@@ -129,12 +127,14 @@ public class UserServiceImpl implements UserService{
 		String encodedPassword = passwordEncoder.encode(user.getPassword()); //encrypting/encoding Password
 		user.setPassword(encodedPassword);
 		user.setRoles(Set.of(defaultRole));	//since the Role of user is of type Set<Role> setting the default value as set.of('user')
+		user.setAccountLocked(false);
+		user.setAttempts(0);
 		saveUser(user);	
 	}
 	
 	
 	
-	//Auth contains the login Info of the active user.
+	/* --'SecurityUtils'-- contains the login Info of the active user. */
 	@Transactional
 	@Override
 	public void deleteUserById(int id) throws AccessDeniedException { 
@@ -162,7 +162,7 @@ public class UserServiceImpl implements UserService{
 		String loggedInUser = SecurityUtils.getEmailFromCustomUserDetails(); //getting logged in email from private method above.
 
 		if(!loggedInUser.equalsIgnoreCase(user.getEmail())) {
-			throw new AccessDeniedException("You are not authorized to update this account of id "+ id);
+			throw new AccessDeniedException("You are not authorized to update this account of id " + id);
 		}
 		user.setEmail(userUpdateInfo.getEmail());
 		user.setPassword(passwordEncoder.encode(userUpdateInfo.getPassword())); //encoding and setting new password.
@@ -227,35 +227,22 @@ public class UserServiceImpl implements UserService{
 	
 /*---------------------------------------- LOGIN ATTEMPTS --------------------------------------------------------------------------------*/	
 	
-//	/*THIS IS TO UPDATE THE USER LOGIN ATTEMPTS*/
-//	@Override
-//	public void updateLoginAttempts(LoginAttempts loginAttempts) {
-//		String email = loginAttempts.getEmail();
-//		int attempts = loginAttempts.getAttempts();
-//		User user = userRepo.findByEmail(email)
-//					.orElseThrow(()-> new UserNotFoundException("Unable to find User with Email : " + email));
-//		user.setAttempts(attempts);
-//		if(attempts >= 3) {
-//			user.setAccountLocked(true);
-//			user.setLockTime(LocalDateTime.now());
-//		}
-//		userRepo.save(user);
-//	}
-//	
-//	@Override
-//	public boolean unlockAfterGivenTime(User user) {
-//		if(user.isAccountLocked() && user.getLockTime()!=null) {
-//			LocalDateTime unlockTime = user.getLockTime().plusMinutes(15);
-//			if(LocalDateTime.now().isAfter(unlockTime)) {  // if current time is 15 minutes after user.getLockTime
-//				user.setAttempts(0);
-//				user.setAccountLocked(false);
-//				user.setLockTime(null);
-//				userRepo.save(user);
-//				return true;
-//			}
-//		}
-//		return false;	
-//	}
+
+	
+	@Override
+	public boolean unlockAfterGivenTime(User user) {
+		if(user.isAccountLocked() && user.getLockTime()!=null) {
+			LocalDateTime unlockTime = user.getLockTime().plusMinutes(15);
+			if(LocalDateTime.now().isAfter(unlockTime)) {  // if current time is 15 minutes after user.getLockTime
+				user.setAttempts(0);
+				user.setAccountLocked(false);
+				user.setLockTime(null);
+				userRepo.save(user);
+				return true;
+			}
+		}
+		return false;	
+	}
 	
 	
 	
@@ -269,6 +256,26 @@ public class UserServiceImpl implements UserService{
 		
 		user.setAttempts(0);
 		userRepo.save(user);
+	}
+
+
+
+	/* Unlock the locked User Account */
+	@Override
+	public void unlockAccount(int id) {
+		User user = findUserById(id);
+		user.setAccountLocked(false);
+		saveUser(user);
+	}
+
+
+
+	/* Lock the User Account */
+	@Override
+	public void lockAccount(int id) {
+		User user = findUserById(id);
+		user.setAccountLocked(true);
+		saveUser(user);
 	}
 
 	

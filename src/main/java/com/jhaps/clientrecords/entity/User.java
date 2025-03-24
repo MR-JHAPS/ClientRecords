@@ -1,7 +1,11 @@
 package com.jhaps.clientrecords.entity;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
+
+import com.jhaps.clientrecords.enums.RoleNames;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -22,7 +26,7 @@ import lombok.NoArgsConstructor;
 
 
 
-@NoArgsConstructor
+//@NoArgsConstructor
 @Entity
 @Table(name="users")
 public class User {
@@ -37,14 +41,14 @@ public class User {
 	@Column(name="password", nullable=false)
 	private String password;
 	
-	@Column(name = "wrong_password_attempts", nullable = true )
-	private Integer attempts;
+	@Column(name = "wrong_password_attempts", nullable = false )
+	private int attempts;
 	
-//	@Column(name="account_locked")
-//	private boolean isAccountLocked;	
-//	
-//	@Column(name = "lock_time")
-//	private LocalDateTime lockTime;		//time when the account was locked.
+	@Column(name="account_locked", nullable= false)
+	private boolean isAccountLocked;	
+	
+	@Column(name = "lock_time")
+	private LocalDateTime lockTime;		//time when the account was locked.
 	
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(
@@ -59,26 +63,41 @@ public class User {
 //	private Role role;
 	
 	
-//	public User(int id, String email, String password, int attempts, Set<Role> roles, boolean isAccountLocked, LocalDateTime lockTime) {
-//		super();
-//		this.id = id;
-//		this.email = email;
-//		this.password = password;
-//		this.attempts = attempts;
-//		this.roles = roles;
-//		this.isAccountLocked = isAccountLocked;
-//		this.lockTime = lockTime;
-//	}
-	
-	
-	public User(int id, String email, String password, Integer attempts, Set<Role> roles) {
+	public User(int id, String email, String password, int attempts, Set<Role> roles, boolean isAccountLocked, LocalDateTime lockTime) {
 		super();
 		this.id = id;
 		this.email = email;
 		this.password = password;
 		this.attempts = attempts;
 		this.roles = roles;
+		this.isAccountLocked = isAccountLocked;
+		this.lockTime = lockTime;
 	}
+	
+	public User() {
+		super();
+		this.id = 0;
+		this.email = "";
+		this.password = "";
+		this.attempts = 0;
+		this.roles = new HashSet<>();
+		this.isAccountLocked = false;
+		this.lockTime = null;
+	}
+	
+	
+	
+	
+	
+	
+//	public User(int id, String email, String password, Integer attempts, Set<Role> roles) {
+//		super();
+//		this.id = id;
+//		this.email = email;
+//		this.password = password;
+//		this.attempts = attempts;
+//		this.roles = roles;
+//	}
 	
 	public int getId() {
 		return id;
@@ -110,13 +129,13 @@ public class User {
 	}
 
 
-	public Integer getAttempts() {
+	public int getAttempts() {
 		return attempts;
 	}
 
 
-	public void setAttempts(Integer attempts) {
-		this.attempts = (this.attempts!=null)?attempts:0;
+	public void setAttempts(int attempts) {
+		this.attempts = attempts;
 	}
 
 
@@ -130,24 +149,24 @@ public class User {
 	}
 
 
-//	public boolean isAccountLocked() {
-//		return isAccountLocked;
-//	}
-//
-//
-//	public void setAccountLocked(boolean isAccountLocked) {
-//		this.isAccountLocked = isAccountLocked;
-//	}
-//
-//
-//	public LocalDateTime getLockTime() {
-//		return lockTime;
-//	}
-//
-//
-//	public void setLockTime(LocalDateTime lockTime) {
-//		this.lockTime = lockTime;
-//	}
+	public boolean isAccountLocked() {
+		return isAccountLocked;
+	}
+
+
+	public void setAccountLocked(boolean isAccountLocked) {
+		this.isAccountLocked = isAccountLocked;
+	}
+
+
+	public LocalDateTime getLockTime() {
+		return lockTime;
+	}
+
+
+	public void setLockTime(LocalDateTime lockTime) {
+		this.lockTime = lockTime;
+	}
 
 
 	
