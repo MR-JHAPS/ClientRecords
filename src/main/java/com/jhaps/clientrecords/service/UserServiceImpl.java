@@ -59,22 +59,22 @@ public class UserServiceImpl implements UserService{
 
 	
 	/*THIS IS TO UPDATE THE USER LOGIN ATTEMPTS*/
-	@Override
-	public void updateLoginAttempts(UserDto userDto) {
-		String email = userDto.getEmail(); //email of user who made wrong password attempt
-		User user = userRepo.findByEmail(email)
-					.orElseThrow(()-> new UserNotFoundException("Unable to find User with Email : " + email));
-		int previousAttempts = user.getAttempts(); /* Getting the user wrong password attempts from the Database if exists */
-		int currentAttempts = previousAttempts + 1 ;  /* current wrong password attempts*/
-		user.setAttempts(currentAttempts);		/* Saving the current wrong password attempts in the user Database.*/
-		if(currentAttempts >= 3) {				/* If the wrong attempts equals 3 or more than 3 attempts the account will be locked along with TimeStamp*/
-			user.setAccountLocked(true); 
-			user.setLockTime(LocalDateTime.now());
-			throw new LockedException("Your Account is locked. Wait 15 minutes.");
-		}
-		userRepo.save(user);
-	}
-	
+//	@Override
+//	public void updateLoginAttempts(UserDto userDto) {
+//		String email = userDto.getEmail(); //email of user who made wrong password attempt
+//		User user = userRepo.findByEmail(email)
+//					.orElseThrow(()-> new UserNotFoundException("Unable to find User with Email : " + email));
+//		int previousAttempts = user.getAttempts(); /* Getting the user wrong password attempts from the Database if exists */
+//		int currentAttempts = previousAttempts + 1 ;  /* current wrong password attempts*/
+//		user.setAttempts(currentAttempts);		/* Saving the current wrong password attempts in the user Database.*/
+//		if(currentAttempts >= 3) {				/* If the wrong attempts equals 3 or more than 3 attempts the account will be locked along with TimeStamp*/
+//			user.setAccountLocked(true); 
+//			user.setLockTime(LocalDateTime.now());
+//			throw new LockedException("Your Account is locked. Wait 15 minutes.");
+//		}
+//		userRepo.save(user);
+//	}
+//	
 	
 	
 //-------------------------------THESE ARE CRUD----------------------------------------------------------------------------------------------------------	
@@ -229,54 +229,54 @@ public class UserServiceImpl implements UserService{
 	
 
 	
-	@Override
-	public boolean unlockAfterGivenTime(User user) {
-		if(user.isAccountLocked() && user.getLockTime()!=null) {
-			LocalDateTime unlockTime = user.getLockTime().plusMinutes(15);
-			if(LocalDateTime.now().isAfter(unlockTime)) {  // if current time is 15 minutes after user.getLockTime
-				user.setAttempts(0);
-				user.setAccountLocked(false);
-				user.setLockTime(null);
-				userRepo.save(user);
-				return true;
-			}
-		}
-		return false;	
-	}
-	
-	
-	
-	
-	@Override
-	public void resetLoginAttempts(LoginAttempts loginAttempts) {
-		String email = loginAttempts.getEmail();
-		int attempts = loginAttempts.getAttempts();
-		User user = userRepo.findByEmail(email)
-				.orElseThrow(()-> new UserNotFoundException("Unable to find User with Email : " + email));
-		
-		user.setAttempts(0);
-		userRepo.save(user);
-	}
-
-
-
-	/* Unlock the locked User Account */
-	@Override
-	public void unlockAccount(int id) {
-		User user = findUserById(id);
-		user.setAccountLocked(false);
-		saveUser(user);
-	}
-
-
-
-	/* Lock the User Account */
-	@Override
-	public void lockAccount(int id) {
-		User user = findUserById(id);
-		user.setAccountLocked(true);
-		saveUser(user);
-	}
+//	@Override
+//	public boolean unlockAfterGivenTime(User user) {
+//		if(user.isAccountLocked() && user.getLockTime()!=null) {
+//			LocalDateTime unlockTime = user.getLockTime().plusMinutes(15);
+//			if(LocalDateTime.now().isAfter(unlockTime)) {  // if current time is 15 minutes after user.getLockTime
+//				user.setAttempts(0);
+//				user.setAccountLocked(false);
+//				user.setLockTime(null);
+//				userRepo.save(user);
+//				return true;
+//			}
+//		}
+//		return false;	
+//	}
+//	
+//	
+//	
+//	
+//	@Override
+//	public void resetLoginAttempts(LoginAttempts loginAttempts) {
+//		String email = loginAttempts.getEmail();
+//		int attempts = loginAttempts.getAttempts();
+//		User user = userRepo.findByEmail(email)
+//				.orElseThrow(()-> new UserNotFoundException("Unable to find User with Email : " + email));
+//		
+//		user.setAttempts(0);
+//		userRepo.save(user);
+//	}
+//
+//
+//
+//	/* Unlock the locked User Account */
+//	@Override
+//	public void unlockAccount(int id) {
+//		User user = findUserById(id);
+//		user.setAccountLocked(false);
+//		saveUser(user);
+//	}
+//
+//
+//
+//	/* Lock the User Account */
+//	@Override
+//	public void lockAccount(int id) {
+//		User user = findUserById(id);
+//		user.setAccountLocked(true);
+//		saveUser(user);
+//	}
 
 	
 	

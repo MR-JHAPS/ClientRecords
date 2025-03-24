@@ -29,12 +29,11 @@ public class JWTFilter extends OncePerRequestFilter{
 	//THIS IS TO SKIP THE JWT FILTER FOR "/user/login" page to disable the JWT interference for login.
 	@Override
 	protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-	String req = request.getServletPath(); 
-	System.out.println("this is the neraz servlet path : " + req);
-	return req.equals("/api/public/login") || 
-			req.equals("/api/public/signup") ||
-           req.contains("swagger-ui")||
-           req.contains("api-docs");
+		String req = request.getServletPath(); 
+		return req.equals("/api/public/login") || 
+		req.equals("/api/public/signup") ||
+		req.contains("swagger-ui")||
+		req.contains("api-docs");
 	}
 
 	
@@ -52,7 +51,7 @@ public class JWTFilter extends OncePerRequestFilter{
 			username = jwtServiceImpl.extractUsername(token);	
 		}
 	/*    If the token contains a username and the user is not already authenticated:
-	 * 	Because if the user is already authenticated in another filter we don't want to redo the same to prevent performance issues.
+	 * 		Because if the user is already authenticated in another filter we don't want to redo the same to prevent performance issues.
 		       1.  Load the user details from the database using userDetailsService.
 		       2.  Validate the token using jwtUtil.validateToken.
 		       3.  Set the UsernamePasswordAuthenticationToken and then set that authentication to SecurityContextHolder.

@@ -89,6 +89,12 @@ public class GlobalExceptionHandler {
 	}
 	
 	
+	@ExceptionHandler(LockedException.class)
+	public ResponseEntity<ApiResponseModel<String>> handleLockedException(LockedException e){
+		log.error("InternalAuthenticationServiceException ---> Locked Exception Occured : {} ",e.getMessage(), e);
+		return apiResponseBuilder.buildApiResponse(ResponseMessage.LOCKED, HttpStatus.LOCKED);
+	}
+	
 	
 	@ExceptionHandler(BadCredentialsException.class)
 	public ResponseEntity<ApiResponseModel<String>> handleBadCredentialsException(BadCredentialsException e){

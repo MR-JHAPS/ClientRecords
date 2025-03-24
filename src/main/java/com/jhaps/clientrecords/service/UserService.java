@@ -36,16 +36,16 @@ public interface UserService {
 	
 	public void updateUserRoleById(int id, RoleDto roleDto); /* We have the "id" of user and the "RoleDto" that contains the name of the roles.*/
 	
-	public void updateLoginAttempts(UserDto userDto);
-	
-	public void unlockAccount(int id);	/* ADMIN - Unlock the locked User Account by ID */
-	
-	public void lockAccount(int id);	/* ADMIN - Lock the user Account by ID*/
-	
-	public void resetLoginAttempts(LoginAttempts loginAttempts);
-	
-	public boolean unlockAfterGivenTime(User user);
-	
+//	public void updateLoginAttempts(UserDto userDto);
+//	
+//	public void unlockAccount(int id);	/* ADMIN - Unlock the locked User Account by ID */
+//	
+//	public void lockAccount(int id);	/* ADMIN - Lock the user Account by ID*/
+//	
+//	public void resetLoginAttempts(LoginAttempts loginAttempts);
+//	
+//	public boolean unlockAfterGivenTime(User user);
+//	
 	
 	
 	
