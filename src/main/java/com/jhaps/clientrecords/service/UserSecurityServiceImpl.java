@@ -12,9 +12,11 @@ import com.jhaps.clientrecords.entity.User;
 import com.jhaps.clientrecords.exception.UserNotFoundException;
 import com.jhaps.clientrecords.repository.UserRepository;
 
+import lombok.extern.slf4j.Slf4j;
 
 
 
+@Slf4j
 @Service
 public class UserSecurityServiceImpl implements UserSecurityService{
 
@@ -34,15 +36,14 @@ public class UserSecurityServiceImpl implements UserSecurityService{
 	public void updateLoginAttempts(UserDto userDto) {
 		String email = userDto.getEmail(); //email of user who made wrong password attempt
 		User user = userRepo.findByEmail(email)
-					.orElseThrow(()-> new UserNotFoundException("Unable to find User with Email : " + email));
+					.orElseThrow(()-> new UserNotFoundException("Error: User_Not_Found, Email : " + email));
 		int previousAttempts = user.getAttempts(); /* Getting the user wrong password attempts from the Database if exists */
 		int currentAttempts = previousAttempts + 1 ;  /* current wrong password attempts*/
 		user.setAttempts(currentAttempts);		/* Saving the current wrong password attempts in the user Database.*/
 		if(currentAttempts >= 3) {				/* If the wrong attempts equals 3 or more than 3 attempts the account will be locked along with TimeStamp*/
 			user.setAccountLocked(true); 
 			user.setLockTime(LocalDateTime.now());
-//			throw new LockedException("Your Account is locked. Wait 15 minutes.");
-//			throw new InternalAuthenticationServiceException( "UserSecurityService ----->updateLoginAttempts() ---> Your Account is locked. ");
+			log.debug("Warning: You made 3 wrong attempts ");
 		}
 		userService.saveUser(user);
 	}
@@ -71,7 +72,7 @@ public class UserSecurityServiceImpl implements UserSecurityService{
 	@Override
 	public void resetLoginAttempts(String email) {
 		User user = userRepo.findByEmail(email)
-				.orElseThrow(()-> new UserNotFoundException("Unable to find User with Email : " + email));
+				.orElseThrow(()-> new UserNotFoundException("Error:User_Not_Found, Email : " + email));
 		user.setAttempts(0);
 		userService.saveUser(user);
 	}

@@ -77,16 +77,16 @@ public class GlobalExceptionHandler {
 	}
 		
 	
-	/* For Locked Account and InternalAuthenticationServiceException */
-	@ExceptionHandler(InternalAuthenticationServiceException.class)
-	public ResponseEntity<ApiResponseModel<String>> handleLockedException(InternalAuthenticationServiceException e){
-		if(e.getCause() instanceof LockedException) {
-		log.error("InternalAuthenticationServiceException ---> Locked Exception Occured : {} ",e.getMessage(), e);
-		return apiResponseBuilder.buildApiResponse(ResponseMessage.LOCKED, HttpStatus.LOCKED);
-		}
-		log.error("InternalAuthenticationServiceException Occured  : {} ",e.getMessage(), e);
-		return apiResponseBuilder.buildApiResponse(ResponseMessage.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
+//	/* For Locked Account and InternalAuthenticationServiceException */
+//	@ExceptionHandler(InternalAuthenticationServiceException.class)
+//	public ResponseEntity<ApiResponseModel<String>> handleLockedException(InternalAuthenticationServiceException e){
+//		if(e.getCause() instanceof LockedException) {
+//		log.error("InternalAuthenticationServiceException ---> Locked Exception Occured : {} ",e.getMessage(), e);
+//		return apiResponseBuilder.buildApiResponse(ResponseMessage.LOCKED, HttpStatus.LOCKED);
+//		}
+//		log.error("InternalAuthenticationServiceException Occured  : {} ",e.getMessage(), e);
+//		return apiResponseBuilder.buildApiResponse(ResponseMessage.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
+//	}
 	
 	
 	@ExceptionHandler(LockedException.class)
@@ -114,11 +114,6 @@ public class GlobalExceptionHandler {
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.ACCESS_DENIED, HttpStatus.UNAUTHORIZED);
 	}
 	
-//	@ExceptionHandler(UsernameNotFoundException.class)
-//	public ResponseEntity<ApiResponseModel<String>> handleUsernameNotFoundException(UsernameNotFoundException e){
-//		log.error("Username Not Found Exception Occured : {} ",e.getMessage(), e);
-//		return apiResponseBuilder.buildApiResponse(ResponseMessage.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
-//	}
 	
 	@ExceptionHandler(AccessDeniedException.class)
 	public ResponseEntity<ApiResponseModel<String>> handleAccessDeniedException(AccessDeniedException e){
