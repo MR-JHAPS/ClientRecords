@@ -24,7 +24,15 @@ public enum ResponseMessage {
 	USER_NOT_FOUND("User Not Found"),
 	USER_DELETED("User Deleted Successfully"),
 	DUPLICATE_DATA("Data with provided name already exists"),
-	LOCKED("Your Account is locked");
+	LOCKED("Your Account is locked"),
+	
+	
+	IMAGE_OBTAINED("Images Obtained Successfully"),
+	INVALID_IMAGE("Image Cannot be Found in the Database."),
+	IMAGE_SAVED("Image Saved Successfully."),
+	IMAGE_DELETED("Image Deleted Successfully");
+	
+	
 	
 	
 	

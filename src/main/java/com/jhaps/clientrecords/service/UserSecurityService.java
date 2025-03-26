@@ -1,6 +1,5 @@
 package com.jhaps.clientrecords.service;
 
-import com.jhaps.clientrecords.dto.LoginAttempts;
 import com.jhaps.clientrecords.dto.UserDto;
 import com.jhaps.clientrecords.entity.User;
 

@@ -1,29 +1,14 @@
 package com.jhaps.clientrecords.serviceImpl;
 
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.LockedException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.jhaps.clientrecords.dto.LoginAttempts;
 import com.jhaps.clientrecords.dto.RoleDto;
 import com.jhaps.clientrecords.dto.UserDto;
-import com.jhaps.clientrecords.entity.CustomUserDetails;
 import com.jhaps.clientrecords.entity.Role;
 import com.jhaps.clientrecords.entity.User;
 import com.jhaps.clientrecords.enums.RoleNames;
@@ -56,29 +41,6 @@ public class UserServiceImpl implements UserService{
 		this.passwordEncoder = passwordEncoder;
 	}
 
-	
-//-------------------------------LOGIN VERIFICATION----------------------------------------------------------------------------------------------------------	
-
-	
-	/*THIS IS TO UPDATE THE USER LOGIN ATTEMPTS*/
-//	@Override
-//	public void updateLoginAttempts(UserDto userDto) {
-//		String email = userDto.getEmail(); //email of user who made wrong password attempt
-//		User user = userRepo.findByEmail(email)
-//					.orElseThrow(()-> new UserNotFoundException("Unable to find User with Email : " + email));
-//		int previousAttempts = user.getAttempts(); /* Getting the user wrong password attempts from the Database if exists */
-//		int currentAttempts = previousAttempts + 1 ;  /* current wrong password attempts*/
-//		user.setAttempts(currentAttempts);		/* Saving the current wrong password attempts in the user Database.*/
-//		if(currentAttempts >= 3) {				/* If the wrong attempts equals 3 or more than 3 attempts the account will be locked along with TimeStamp*/
-//			user.setAccountLocked(true); 
-//			user.setLockTime(LocalDateTime.now());
-//			throw new LockedException("Your Account is locked. Wait 15 minutes.");
-//		}
-//		userRepo.save(user);
-//	}
-//	
-	
-	
 //-------------------------------THESE ARE CRUD----------------------------------------------------------------------------------------------------------	
 	@Override
 	public Page<UserDto> findAllUsers(Pageable pageable) {
@@ -124,7 +86,7 @@ public class UserServiceImpl implements UserService{
 		}
 		User user = mapper.toUserEntity(userDto); //changing dto to entity
 		
-		log.info("Saving new User with default Role: {}", RoleNames.USER.getRole());
+		log.info("Saving new User: {} with default Role: {}" , userDto.getEmail(), RoleNames.USER.getRole());
 		Role defaultRole = roleService.findRoleByName(RoleNames.USER.getRole()); //error is handled in roleService.
 		String encodedPassword = passwordEncoder.encode(user.getPassword()); //encrypting/encoding Password
 		user.setPassword(encodedPassword);
@@ -201,10 +163,17 @@ public class UserServiceImpl implements UserService{
 	
 	//Email field is unique so instead of list it returns only single User.
 	@Override
-	public UserDto findUserByEmail(String email) {
+	public UserDto findUserDtoByEmail(String email) {
 		User user = userRepo.findByEmail(email).orElseThrow(()->
 						 new UserNotFoundException("Unable to find the user with Email : " + email));
 		return mapper.toUserDto(user);					
+	}
+	
+	@Override
+	public User findUserByEmail(String email) {
+		User user = userRepo.findByEmail(email).orElseThrow(()->
+						 new UserNotFoundException("Unable to find the user with Email : " + email));
+		return user;					
 	}
 
 

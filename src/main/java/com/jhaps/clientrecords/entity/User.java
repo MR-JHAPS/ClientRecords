@@ -1,11 +1,10 @@
 package com.jhaps.clientrecords.entity;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-
-import com.jhaps.clientrecords.enums.RoleNames;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,20 +15,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import lombok.NoArgsConstructor;
-
-//@Column(name="telephone")
-//private String telephone;
-
-//*******I will add a address, city and country here as well.*******
 
 
-
-//@NoArgsConstructor
 @Entity
 @Table(name="users")
-public class User {
+public class User extends BaseEntity{
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -57,13 +49,11 @@ public class User {
 			inverseJoinColumns = @JoinColumn(name="role_id") //joins the relationedEntity(Role) FK.	
 	)
 	private Set<Role> roles;
-	
-//	@ManyToOne(fetch = FetchType.EAGER)
-//	@JoinColumn(name="role_id", nullable = false)
-//	private Role role;
+
 	
 	
-	public User(int id, String email, String password, int attempts, Set<Role> roles, boolean isAccountLocked, LocalDateTime lockTime) {
+	public User(int id, String email, String password, int attempts, Set<Role> roles, boolean isAccountLocked, 
+			LocalDateTime lockTime) {
 		super();
 		this.id = id;
 		this.email = email;
@@ -72,6 +62,7 @@ public class User {
 		this.roles = roles;
 		this.isAccountLocked = isAccountLocked;
 		this.lockTime = lockTime;
+
 	}
 	
 	public User() {
@@ -83,21 +74,11 @@ public class User {
 		this.roles = new HashSet<>();
 		this.isAccountLocked = false;
 		this.lockTime = null;
+
 	}
 	
 	
-	
-	
-	
-	
-//	public User(int id, String email, String password, Integer attempts, Set<Role> roles) {
-//		super();
-//		this.id = id;
-//		this.email = email;
-//		this.password = password;
-//		this.attempts = attempts;
-//		this.roles = roles;
-//	}
+
 	
 	public int getId() {
 		return id;
@@ -168,25 +149,13 @@ public class User {
 		this.lockTime = lockTime;
 	}
 
-
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	@Override
+	public String toString() {
+		return "User [id=" + id + ", email=" + email + ", password=" + password + ", attempts=" + attempts
+				+ ", isAccountLocked=" + isAccountLocked + ", lockTime=" + lockTime + ", roles=" + roles + "]";
+	}	
 	
 	
 	

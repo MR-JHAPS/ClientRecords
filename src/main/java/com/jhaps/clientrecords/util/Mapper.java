@@ -10,9 +10,11 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 import com.jhaps.clientrecords.dto.ClientDto;
+import com.jhaps.clientrecords.dto.ImageDto;
 import com.jhaps.clientrecords.dto.RoleDto;
 import com.jhaps.clientrecords.dto.UserDto;
 import com.jhaps.clientrecords.entity.Client;
+import com.jhaps.clientrecords.entity.Image;
 import com.jhaps.clientrecords.entity.Role;
 import com.jhaps.clientrecords.entity.User;
 
@@ -74,7 +76,7 @@ public class Mapper {
 	
 
 	
-/*-----------------------ROLE---------------------------------------------------------------------------------------------------------------*/
+/*-----------------------RoleDto-Set<Role> Not Role Entity---------------------------------------------------------------------------------------------------------------*/
 	
 	//Converting Set<Roles> to RoleDto.   **RoleDto-->RoleNames is of type Set<String>
 	public RoleDto toRoleDtoFromRoleSet(Set<Role> roleList) {
@@ -99,6 +101,24 @@ public class Mapper {
 		return dto;
 	}
 	
+	
+/*-----------------------IMAGE ENTITY-DTO ---------------------------------------------------------------------------------------------------------------*/	
+	
+
+	/* ImageEntity to ImageDto*/
+	public ImageDto toImageDto(Image image) {
+		ImageDto dto = new ImageDto();
+		dto.setImageName(image.getImageName());
+		return dto;
+	}
+	
+	
+	/* ImageDto to ImageEntity */
+	public Image toImageEntity(ImageDto imageDto) {
+		Image entity = new Image();
+		entity.setImageName(imageDto.getImageName());
+		return entity;
+	}
 	
 	
 	

@@ -2,11 +2,8 @@ package com.jhaps.clientrecords.serviceImpl;
 
 import java.time.LocalDateTime;
 
-import org.springframework.security.authentication.InternalAuthenticationServiceException;
-import org.springframework.security.authentication.LockedException;
 import org.springframework.stereotype.Service;
 
-import com.jhaps.clientrecords.dto.LoginAttempts;
 import com.jhaps.clientrecords.dto.UserDto;
 import com.jhaps.clientrecords.entity.User;
 import com.jhaps.clientrecords.exception.UserNotFoundException;

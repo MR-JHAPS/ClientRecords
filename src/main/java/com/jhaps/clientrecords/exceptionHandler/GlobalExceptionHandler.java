@@ -18,6 +18,7 @@ import org.springframework.web.client.HttpClientErrorException.Unauthorized;
 import com.jhaps.clientrecords.enums.ResponseMessage;
 import com.jhaps.clientrecords.exception.ClientNotFoundException;
 import com.jhaps.clientrecords.exception.DuplicateDataException;
+import com.jhaps.clientrecords.exception.ImageNotFoundException;
 import com.jhaps.clientrecords.exception.RoleNotFoundException;
 import com.jhaps.clientrecords.exception.UserNotFoundException;
 import com.jhaps.clientrecords.response.ApiResponseModel;
@@ -75,19 +76,7 @@ public class GlobalExceptionHandler {
 		);			
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.VALIDATION_FAILED, HttpStatus.BAD_REQUEST, validationErrors);
 	}
-		
-	
-//	/* For Locked Account and InternalAuthenticationServiceException */
-//	@ExceptionHandler(InternalAuthenticationServiceException.class)
-//	public ResponseEntity<ApiResponseModel<String>> handleLockedException(InternalAuthenticationServiceException e){
-//		if(e.getCause() instanceof LockedException) {
-//		log.error("InternalAuthenticationServiceException ---> Locked Exception Occured : {} ",e.getMessage(), e);
-//		return apiResponseBuilder.buildApiResponse(ResponseMessage.LOCKED, HttpStatus.LOCKED);
-//		}
-//		log.error("InternalAuthenticationServiceException Occured  : {} ",e.getMessage(), e);
-//		return apiResponseBuilder.buildApiResponse(ResponseMessage.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
-//	}
-	
+
 	
 	@ExceptionHandler(LockedException.class)
 	public ResponseEntity<ApiResponseModel<String>> handleLockedException(LockedException e){
@@ -102,11 +91,13 @@ public class GlobalExceptionHandler {
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.BAD_CREDENTIALS, HttpStatus.UNAUTHORIZED);
 	}
 	
+	
 	@ExceptionHandler(UsernameNotFoundException.class)
 	public ResponseEntity<ApiResponseModel<String>> handleUsernameNotFoundException(UsernameNotFoundException e){
 		log.error("Username Not Found Exception Occured : {} ",e.getMessage(), e);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.BAD_CREDENTIALS, HttpStatus.BAD_REQUEST);
 	}
+	
 	
 	@ExceptionHandler(Unauthorized.class)
 	public ResponseEntity<ApiResponseModel<String>> handleUnauthorizedException(Unauthorized e){
@@ -142,6 +133,7 @@ public class GlobalExceptionHandler {
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
 	}
 	
+	
 	//This is for the case the roleName is not found in the Database.
 	@ExceptionHandler(RoleNotFoundException.class)
 	public ResponseEntity<ApiResponseModel<String>> handleRoleNotFoundException(RoleNotFoundException e){
@@ -149,6 +141,13 @@ public class GlobalExceptionHandler {
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.INVALID_ROLE, HttpStatus.BAD_REQUEST);
 	}
 	
+	
+	//This is for the case the Image is not found in the Database.
+	@ExceptionHandler(ImageNotFoundException.class)
+	public ResponseEntity<ApiResponseModel<String>> handleImageNotFoundException(ImageNotFoundException e){
+		log.error("Image Not Found Exception Occured : {} ",e.getMessage(), e);
+		return apiResponseBuilder.buildApiResponse(ResponseMessage.INVALID_IMAGE, HttpStatus.NOT_FOUND);
+	}
 	
 	
 }//ends class

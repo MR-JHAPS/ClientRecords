@@ -155,68 +155,6 @@ public class ClientServiceImpl implements ClientService  {
 			log.info("Finding Client By PostalCode :{} is Executed Successfully. and fetched :{} clients", postalCode, clientList.getNumberOfElements());
 			return clientList.map(mapper::toClientDto);	
 	}
-
-	
-//-------------------------------SORTING-----------------------------------------------------------------------------------------------	
-
-//	@Override
-//	public List<ClientDto> sortClientByFirstNameAscending(List<ClientDto> clientList) {
-//		clientList.sort(Comparator.comparing(ClientDto::getFirstName, String::compareToIgnoreCase));
-//		return clientList;
-//	}
-//
-//
-//	@Override
-//	public List<Client> sortClientByFirstNameDescending(List<Client> clientList) {
-//		clientList.sort(Comparator.comparing(Client::getFirstName, String::compareToIgnoreCase).reversed());
-//		return clientList;
-//	}
-//
-//
-//	@Override
-//	public List<Client> sortClientByLastNameAscending(List<Client> clientList) {
-//		clientList.sort(Comparator.comparing(Client::getLastName, String::compareToIgnoreCase));
-//		return clientList;
-//	}
-//
-//
-//	@Override
-//	public List<Client> sortClientByLastNameDescending(List<Client> clientList) {
-//		clientList.sort(Comparator.comparing(Client::getLastName, String::compareToIgnoreCase).reversed());
-//		return clientList;
-//	}
-//
-//
-//	@Override
-//	public List<Client> sortClientByDateOfBirthAscending(List<Client> clientList) {
-//		clientList.sort(Comparator.comparing(Client::getDateOfBirth));
-//		return clientList;
-//	}
-//
-//
-//	@Override
-//	public List<Client> sortClientByDateOfBirthDescending(List<Client> clientList) {
-//		clientList.sort(Comparator.comparing(Client::getDateOfBirth).reversed());
-//		return clientList;
-//	}
-//
-//
-//	@Override
-//	public List<Client> sortClientByPostalCodeAscending(List<Client> clientList) {
-//		clientList.sort(Comparator.comparing(Client::getPostalCode, String::compareToIgnoreCase));
-//		return clientList;
-//	}
-//
-//
-//	@Override
-//	public List<Client> sortClientByPostalCodeDescending(List<Client> clientList) {
-//		clientList.sort(Comparator.comparing(Client::getPostalCode, String::compareToIgnoreCase).reversed());
-//		return clientList;
-//	}
-//
-
-	
-	
 	
 	
 	

@@ -5,9 +5,6 @@ package com.jhaps.clientrecords.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.Authentication;
-
-import com.jhaps.clientrecords.dto.LoginAttempts;
 import com.jhaps.clientrecords.dto.RoleDto;
 import com.jhaps.clientrecords.dto.UserDto;
 import com.jhaps.clientrecords.entity.User;
@@ -22,7 +19,9 @@ public interface UserService {
 	
 	public UserDto findUserDtoById(int id); /* Returns "UserDto" specially used for Controller.*/
 	
-	public UserDto findUserByEmail(String email);
+	public User findUserByEmail(String email);
+	
+	public UserDto findUserDtoByEmail(String email);
 	
 	public Page<UserDto> findUsersByRoleName(String roleName, Pageable pageable);
 	
