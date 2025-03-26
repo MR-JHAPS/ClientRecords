@@ -1,4 +1,4 @@
-package com.jhaps.clientrecords.service;
+package com.jhaps.clientrecords.serviceImpl;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -18,6 +18,9 @@ import com.jhaps.clientrecords.dto.UserDto;
 import com.jhaps.clientrecords.entity.User;
 import com.jhaps.clientrecords.exception.UserNotFoundException;
 import com.jhaps.clientrecords.repository.UserRepository;
+import com.jhaps.clientrecords.service.AuthService;
+import com.jhaps.clientrecords.service.UserSecurityService;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Service

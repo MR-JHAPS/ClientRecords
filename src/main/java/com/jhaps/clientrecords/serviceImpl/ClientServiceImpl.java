@@ -1,4 +1,4 @@
-package com.jhaps.clientrecords.service;
+package com.jhaps.clientrecords.serviceImpl;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
@@ -10,6 +10,7 @@ import com.jhaps.clientrecords.dto.ClientDto;
 import com.jhaps.clientrecords.entity.Client;
 import com.jhaps.clientrecords.exception.ClientNotFoundException;
 import com.jhaps.clientrecords.repository.ClientRepository;
+import com.jhaps.clientrecords.service.ClientService;
 import com.jhaps.clientrecords.util.Mapper;
 
 import jakarta.transaction.Transactional;

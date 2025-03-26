@@ -1,4 +1,4 @@
-package com.jhaps.clientrecords.service;
+package com.jhaps.clientrecords.serviceImpl;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

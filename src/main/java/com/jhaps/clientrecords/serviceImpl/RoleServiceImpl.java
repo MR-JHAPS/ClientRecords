@@ -1,4 +1,4 @@
-package com.jhaps.clientrecords.service;
+package com.jhaps.clientrecords.serviceImpl;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -15,6 +15,7 @@ import com.jhaps.clientrecords.entity.User;
 import com.jhaps.clientrecords.enums.RoleNames;
 import com.jhaps.clientrecords.exception.RoleNotFoundException;
 import com.jhaps.clientrecords.repository.RoleRepository;
+import com.jhaps.clientrecords.service.RoleService;
 import com.jhaps.clientrecords.util.Mapper;
 import com.jhaps.clientrecords.util.SecurityUtils;
 

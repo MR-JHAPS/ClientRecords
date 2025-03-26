@@ -1,4 +1,4 @@
-package com.jhaps.clientrecords.service;
+package com.jhaps.clientrecords.serviceImpl;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -31,6 +31,8 @@ import com.jhaps.clientrecords.exception.DuplicateDataException;
 import com.jhaps.clientrecords.exception.RoleNotFoundException;
 import com.jhaps.clientrecords.exception.UserNotFoundException;
 import com.jhaps.clientrecords.repository.UserRepository;
+import com.jhaps.clientrecords.service.RoleService;
+import com.jhaps.clientrecords.service.UserService;
 import com.jhaps.clientrecords.util.Mapper;
 import com.jhaps.clientrecords.util.SecurityUtils;
 

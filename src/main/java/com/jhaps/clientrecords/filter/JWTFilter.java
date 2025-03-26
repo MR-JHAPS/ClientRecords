@@ -8,8 +8,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.jhaps.clientrecords.service.JWTServiceImpl;
-import com.jhaps.clientrecords.service.UserDetailsServiceImpl;
+import com.jhaps.clientrecords.serviceImpl.JWTServiceImpl;
+import com.jhaps.clientrecords.serviceImpl.UserDetailsServiceImpl;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

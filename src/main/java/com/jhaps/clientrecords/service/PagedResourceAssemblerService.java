@@ -12,14 +12,14 @@ import org.springframework.stereotype.Service;
  * 				---> PagedModel<EntityModel<Entity>> contains "content, links, page"
  * 
  * 
- * This class is responsible to convert a :   Page<T> / Page<ClientDto> 
- * 											  			TO
- *											  PagedModel<EntityModel<T>> / PagedModel<EntityModel<ClientDto>>.
+ * This class is responsible to convert a :
+ *  			  Page<T>  To  PagedModel<EntityModel<T>>
+ * 	Example:
+ * 			 Page<ClientDto>  To  PagedModel<EntityModel<ClientDto>>.
  * */
 @Service
 public class PagedResourceAssemblerService<T> {
 
-	//Field
 	private final PagedResourcesAssembler<T> pagedResourceAssember;
 	
 	//Constructor
@@ -27,8 +27,8 @@ public class PagedResourceAssemblerService<T> {
 		this.pagedResourceAssember = pagedResourceAssember;
 	}
 	
-	//Method
-	//Converts page<T> to PagedModel<EntityModel<T>>.
+	
+	/*	Method: Converts page<T> to PagedModel<EntityModel<T>>	*/
 	public  PagedModel<EntityModel<T>> toPagedModel(Page<T> paginatedEntity) {
         return (PagedModel<EntityModel<T>>) pagedResourceAssember.toModel(paginatedEntity);
     }
