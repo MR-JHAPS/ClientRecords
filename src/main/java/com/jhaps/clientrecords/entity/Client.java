@@ -7,6 +7,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,13 +16,9 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name="clients")
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-//@Getter
-
-
 public class Client {
 
 	@Id
@@ -38,6 +36,10 @@ public class Client {
 	
 	@Column(name="date_of_birth", nullable = false)
 	private LocalDate dateOfBirth;
+	
+	@ManyToOne
+	@JoinColumn(name = "user_id")
+	private User user;
 	
 	
 	

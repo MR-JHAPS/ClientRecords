@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdatedClientLog {
+public class ClientLog {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

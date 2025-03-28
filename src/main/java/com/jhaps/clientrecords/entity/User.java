@@ -42,6 +42,9 @@ public class User extends BaseEntity{
 	@Column(name = "lock_time")
 	private LocalDateTime lockTime;		//time when the account was locked.
 	
+//	@OneToMany(mappedBy = "user")
+//	private List<Client> clientList;
+	
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(
 			name = "user_role",
@@ -50,6 +53,8 @@ public class User extends BaseEntity{
 	)
 	private Set<Role> roles;
 
+	
+	
 	
 	
 	public User(int id, String email, String password, int attempts, Set<Role> roles, boolean isAccountLocked, 

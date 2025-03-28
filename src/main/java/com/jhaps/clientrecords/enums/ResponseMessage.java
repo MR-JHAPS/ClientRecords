@@ -30,7 +30,9 @@ public enum ResponseMessage {
 	IMAGE_OBTAINED("Images Obtained Successfully"),
 	INVALID_IMAGE("Image Cannot be Found in the Database."),
 	IMAGE_SAVED("Image Saved Successfully."),
-	IMAGE_DELETED("Image Deleted Successfully");
+	IMAGE_DELETED("Image Deleted Successfully"),
+	
+	CLIENT_LOG_NOT_FOUND("Unable to find the Client Log");
 	
 	
 	

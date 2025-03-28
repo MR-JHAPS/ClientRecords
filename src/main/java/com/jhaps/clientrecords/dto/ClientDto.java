@@ -30,6 +30,10 @@ public class ClientDto {
 	private LocalDate dateOfBirth;
 	
 	
+	/*
+	 * Might as well add the inserted DateTime. LATER.
+	 * */
+	
 	
 	
 	

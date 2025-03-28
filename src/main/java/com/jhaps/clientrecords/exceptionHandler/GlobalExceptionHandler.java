@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException.Unauthorized;
 
 import com.jhaps.clientrecords.enums.ResponseMessage;
+import com.jhaps.clientrecords.exception.ClientLogNotFoundException;
 import com.jhaps.clientrecords.exception.ClientNotFoundException;
 import com.jhaps.clientrecords.exception.DuplicateDataException;
 import com.jhaps.clientrecords.exception.ImageNotFoundException;
@@ -148,6 +149,13 @@ public class GlobalExceptionHandler {
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.INVALID_IMAGE, HttpStatus.NOT_FOUND);
 	}
 	
+	
+	//This is for the case the ClientLog is not found in the Database.
+		@ExceptionHandler(ClientLogNotFoundException.class)
+		public ResponseEntity<ApiResponseModel<String>> handleClientLogNotFoundException(ClientLogNotFoundException e){
+			log.error("ERROR: Client_Log Not Found Exception Occured : {} ",e.getMessage(), e);
+			return apiResponseBuilder.buildApiResponse(ResponseMessage.CLIENT_LOG_NOT_FOUND, HttpStatus.NOT_FOUND);
+		}
 	
 }//ends class
 

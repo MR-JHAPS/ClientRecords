@@ -2,18 +2,26 @@ package com.jhaps.clientrecords.serviceImpl;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.jhaps.clientrecords.dto.ClientDto;
 import com.jhaps.clientrecords.entity.Client;
+import com.jhaps.clientrecords.entity.User;
+import com.jhaps.clientrecords.enums.ModificationType;
 import com.jhaps.clientrecords.exception.ClientNotFoundException;
 import com.jhaps.clientrecords.repository.ClientRepository;
+import com.jhaps.clientrecords.service.ClientLogService;
 import com.jhaps.clientrecords.service.ClientService;
+import com.jhaps.clientrecords.service.UserService;
 import com.jhaps.clientrecords.util.Mapper;
+import com.jhaps.clientrecords.util.SecurityUtils;
 
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /*
@@ -23,17 +31,20 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
+@AllArgsConstructor //	lombok - for constructor. 
 public class ClientServiceImpl implements ClientService  {
 
 	private ClientRepository clientRepo;
 	
 	private Mapper mapper; //this contains the custom mapping 
+	
+	private UserService userService;
+	
+	private ClientLogService clientLogService;
 
-//CONSTRUCTOR	
-	public ClientServiceImpl(ClientRepository clientRepo, Mapper mapper) {
-		this.clientRepo = clientRepo;
-		this.mapper = mapper;
-	}
+
+
+	
 	
 	
 	
@@ -47,7 +58,7 @@ public class ClientServiceImpl implements ClientService  {
 	   Page is itself a type of collections. I didn't knew that. Page, list are type of collections.
 	 */
 	@Override
-	public Page<ClientDto> findAllClients(Pageable pageable) {
+	public Page<ClientDto> findAllClients(Pageable pageable) {		
 		log.info("Fetching clients with Pagination - page{} , size{}",pageable.getPageNumber(),pageable.getPageSize());
 		Page<Client> clientList = clientRepo.findAll(pageable);
 		if(clientList.isEmpty()) {
@@ -71,17 +82,28 @@ public class ClientServiceImpl implements ClientService  {
 	
 	@Override
 	public void saveClient(ClientDto clientDto) {
+		log.info("Saving Client with name {} .",clientDto.getFirstName());
 		clientRepo.save(  mapper.toClientEntity(clientDto) );  //converting DTO to entity before saving to repository.
 		log.info("Client with name {} saved Successfully.",clientDto.getFirstName());
+		
+		int userId = SecurityUtils.getUserIdFromCustomUserDetails();
+		clientLogService.insertClientLog(userId, 0, ModificationType.INSERT);
 	}
 
 	
 	@Override
-	public void deleteClientById(int id) {
-		Client client = clientRepo.findById(id).orElseThrow(()->
-			new ClientNotFoundException("Client with ID : " + id + " not found, to delete."));
+	public void deleteClientById(int clientId) {
+		Client client = clientRepo.findById(clientId).orElseThrow(()->
+			new ClientNotFoundException("Client with ID : " + clientId + " not found, to delete."));
+/*LATER:
+ 		I WILL NEED to create a  CLIENT_BIN Entity to save the deleted client. To relation it with ClientLog.
+		1. Insert to "clientBin" entity before deleting the client.
+		2. 
+*/		
+		log.warn("Action: Deleting the Client: {}", client);
+		log.info("Client with id {} deleted Successfully.",clientId);
 		clientRepo.delete(client);
-		log.info("Client with id {} deleted Successfully.",id);
+
 	}
 
 	
