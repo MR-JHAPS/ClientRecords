@@ -9,7 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import com.jhaps.clientrecords.entity.CustomUserDetails;
 
 /*
- * This class extracts the security details
+ * This class extracts the security details(CustomUserDetails)
  *  from the SecurityContextHolder.
  */
 public class SecurityUtils {
@@ -25,10 +25,15 @@ public class SecurityUtils {
 		/* Extracting user Email from the CustomUserDetails.*/
 		public static String getEmailFromCustomUserDetails() {
 			CustomUserDetails customUserDetails = getCustomUserDetailsFromSecurityContext();
-			return customUserDetails.getUsername();
+			return customUserDetails.getUsername(); // returns email
 		}
 		
-		
+		/* Extracting userId from the CustomUserDetails */
+		public static int getUserIdFromCustomUserDetails() {
+			CustomUserDetails customUserDetails = getCustomUserDetailsFromSecurityContext();
+			int userId = customUserDetails.getUser().getId(); 
+			return userId;
+		}
 		
 		/* Extracting Authorities from the CustomUserDetails. */
 		public static Set<String> getAuthoritiesFromCustomUserDetails(){

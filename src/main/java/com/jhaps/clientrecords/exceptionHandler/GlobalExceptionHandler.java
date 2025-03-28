@@ -27,7 +27,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import com.jhaps.clientrecords.response.ApiResponseBuilder;
 
-//LOGGING IS NOT DONE YET.
 
 
 
