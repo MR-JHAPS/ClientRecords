@@ -6,8 +6,8 @@ import java.util.stream.Collectors;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.jhaps.clientrecords.entity.CustomUserDetails;
 import com.jhaps.clientrecords.entity.User;
+import com.jhaps.clientrecords.springSecurity.CustomUserDetails;
 
 /*
  * This class extracts the security details(CustomUserDetails)

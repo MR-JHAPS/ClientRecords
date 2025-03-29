@@ -30,7 +30,7 @@ public class User extends BaseEntity{
 	@Column(name="email", nullable = false, unique = true)
 	private String email;
 	
-	@Column(name="password", nullable=false)
+	@Column(name="password") //nullable for oauth2 
 	private String password;
 	
 	@Column(name = "wrong_password_attempts", nullable = false )

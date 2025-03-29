@@ -1,4 +1,4 @@
-package com.jhaps.clientrecords.filter;
+package com.jhaps.clientrecords.springSecurity;
 
 import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;

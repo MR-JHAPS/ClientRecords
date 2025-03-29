@@ -5,9 +5,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.jhaps.clientrecords.entity.CustomUserDetails;
 import com.jhaps.clientrecords.entity.User;
 import com.jhaps.clientrecords.repository.UserRepository;
+import com.jhaps.clientrecords.springSecurity.CustomUserDetails;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
