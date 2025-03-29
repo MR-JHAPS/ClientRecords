@@ -7,6 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.jhaps.clientrecords.entity.CustomUserDetails;
+import com.jhaps.clientrecords.entity.User;
 
 /*
  * This class extracts the security details(CustomUserDetails)
@@ -21,6 +22,11 @@ public class SecurityUtils {
 			return (CustomUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		}
 		
+		/* Extracts the User from CustomUserDetails */
+		public static User getCurrentUser() {
+			User currentUser = getCustomUserDetailsFromSecurityContext().getUser();
+			return currentUser;
+		}
 		
 		/* Extracting user Email from the CustomUserDetails.*/
 		public static String getEmailFromCustomUserDetails() {

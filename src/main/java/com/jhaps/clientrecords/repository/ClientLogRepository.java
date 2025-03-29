@@ -15,47 +15,33 @@ import com.jhaps.clientrecords.entity.ClientLog;
 @Repository
 public interface ClientLogRepository extends JpaRepository<ClientLog, Integer> {
 
-/*
- *  @user-Table : u,
- * 
- * @client-Table : c,
- * 
- * @updatedClientLog-Table : ucl;
- * 
- */
 	
-/*new com.jhaps.clientrecords.dto.UpdatedClientLogDto(
- * 							 "ucl.id, c.firstName, c.lastName,
- * 							 c.dateOfBirth, c.postalCode, u.email,
- * 							 ucl.modificationType, ucl.updatedAt ).
- * 
- * We are creating a new instance of : updateClientLogDto()
- * to store the each necessary field of both user and client Tables.
- */	
+	/*	new com.jhaps.clientrecords.dto.UpdatedClientLogDto(
+	 * 											cl.id, cl.clientId, cl.firstName, cl.lastName, cl.dateOfBirth,
+	 * 								 			cl.postalCode, u.email, cl.modificationType, cl.updatedAt
+	 * 											 )
+	 * 
+	 * We are creating a new instance of : updateClientLogDto()
+	 * to store the each necessary field of both user and clientLog Tables.
+	 */	
 	
-	@Query("SELECT new com.jhaps.clientrecords.dto.ClientLogDto( " +
-			"ucl.id, c.firstName, c.lastName, c.dateOfBirth, c.postalCode, u.email, ucl.modificationType, ucl.updatedAt)"+
-			" FROM ClientLog ucl " +
-			" JOIN Client c ON ucl.clientId = c.id"+
-			" JOIN User u ON ucl.userId = u.id" +
-			" WHERE ucl.id = :updatedClientLogId"
-			)
-	Optional<ClientLogDto> getUpdatedClientLogById(@Param(":updatedClientLogId")int updatedClientId);
+/* ----------------------------FIND CLIENTLOG By ClientLogID.---------------------------- */		
 	
-	
-	
+	@Query("SELECT new com.jhaps.clientrecords.dto.ClientLogDto(" +
+			"cl.id, cl.clientId, cl.firstName, cl.lastName, cl.dateOfBirth, cl.postalCode, u.email, cl.modificationType, cl.updatedAt) "+
+			"FROM ClientLog cl " +
+			"JOIN cl.user u " +
+			"WHERE cl.id= :clientLogId"
+		)
+	Optional<ClientLogDto> getClientLogById(@Param("clientLogId")int clientLogId);
 	
 	
 /* ----------------------------FIND ALL CLIENTLOG USING PAGEABLE.---------------------------- */	
+	
 	@Query("SELECT new com.jhaps.clientrecords.dto.ClientLogDto( " +
-			"ucl.id, c.firstName, c.lastName, c.dateOfBirth, c.postalCode, u.email, ucl.modificationType, ucl.updatedAt)"+
-			" FROM ClientLog ucl " +
-			" JOIN Client c ON ucl.clientId = c.id"+
-			" JOIN User u ON ucl.userId = u.id"
+			"cl.id, cl.clientId, cl.firstName, cl.lastName, cl.dateOfBirth, cl.postalCode, u.email, cl.modificationType, cl.updatedAt) "+
+			"FROM ClientLog cl " +
+			"JOIN cl.user u"
 			)
-	Page<ClientLogDto> getAllUpdatedClientLog(Pageable pageable);
-	
-	
-	
-	
+	Page<ClientLogDto> getAllClientLog(Pageable pageable);
 }

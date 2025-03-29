@@ -1,9 +1,5 @@
 package com.jhaps.clientrecords.serviceImpl;
 import java.time.LocalDate;
-import java.util.Comparator;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -14,9 +10,9 @@ import com.jhaps.clientrecords.entity.User;
 import com.jhaps.clientrecords.enums.ModificationType;
 import com.jhaps.clientrecords.exception.ClientNotFoundException;
 import com.jhaps.clientrecords.repository.ClientRepository;
+import com.jhaps.clientrecords.service.ClientBinService;
 import com.jhaps.clientrecords.service.ClientLogService;
 import com.jhaps.clientrecords.service.ClientService;
-import com.jhaps.clientrecords.service.UserService;
 import com.jhaps.clientrecords.util.Mapper;
 import com.jhaps.clientrecords.util.SecurityUtils;
 
@@ -38,9 +34,9 @@ public class ClientServiceImpl implements ClientService  {
 	
 	private Mapper mapper; //this contains the custom mapping 
 	
-	private UserService userService;
-	
 	private ClientLogService clientLogService;
+	
+	private ClientBinService clientBinService;
 
 
 
@@ -82,27 +78,25 @@ public class ClientServiceImpl implements ClientService  {
 	
 	@Override
 	public void saveClient(ClientDto clientDto) {
+		User currentUser = SecurityUtils.getCurrentUser();
 		log.info("Saving Client with name {} .",clientDto.getFirstName());
-		clientRepo.save(  mapper.toClientEntity(clientDto) );  //converting DTO to entity before saving to repository.
+		Client savedClient = clientRepo.save(mapper.toClientEntity(clientDto));  //converting DTO to entity before saving to repository.
 		log.info("Client with name {} saved Successfully.",clientDto.getFirstName());
-		
-		int userId = SecurityUtils.getUserIdFromCustomUserDetails();
-		clientLogService.insertClientLog(userId, 0, ModificationType.INSERT);
+		//logging the client in the clientLog.
+		clientLogService.insertInClientLog(currentUser, savedClient, ModificationType.INSERT);
 	}
 
 	
 	@Override
 	public void deleteClientById(int clientId) {
+		log.warn("Action: Deleting the Client with ClientID: {}", clientId);
+		User currentUser = SecurityUtils.getCurrentUser();
 		Client client = clientRepo.findById(clientId).orElseThrow(()->
-			new ClientNotFoundException("Client with ID : " + clientId + " not found, to delete."));
-/*LATER:
- 		I WILL NEED to create a  CLIENT_BIN Entity to save the deleted client. To relation it with ClientLog.
-		1. Insert to "clientBin" entity before deleting the client.
-		2. 
-*/		
-		log.warn("Action: Deleting the Client: {}", client);
-		log.info("Client with id {} deleted Successfully.",clientId);
+			new ClientNotFoundException("Client with ID : " + clientId + " not found, to delete."));	
+		clientBinService.insertInClientBin(client); //inserting client to client been before deleting from the client.
+		clientLogService.insertInClientLog(currentUser, client, ModificationType.DELETE); // inserting client in client log before deleting.
 		clientRepo.delete(client);
+		log.info("Client with id {} deleted Successfully.",clientId);
 
 	}
 
@@ -110,6 +104,7 @@ public class ClientServiceImpl implements ClientService  {
 	@Transactional
 	@Override
 	public void updateClientById(int id, ClientDto clientUpdateInfo) {
+		User currentUser = SecurityUtils.getCurrentUser();
 		Client client = clientRepo.findById(id).orElseThrow(
 							()-> new ClientNotFoundException("Client with ID : " +id + "not found to update."));
 		client.setFirstName(clientUpdateInfo.getFirstName());
@@ -118,6 +113,8 @@ public class ClientServiceImpl implements ClientService  {
 		client.setPostalCode(clientUpdateInfo.getPostalCode());
 		clientRepo.save(client);	
 		log.info("Client with id :{} updated with new info",id);
+		
+		clientLogService.insertInClientLog(currentUser, client, ModificationType.UPDATE);
 	}
 
 //--------------------SEARCHING----------------------------------------------------------------------------------------------------------	

@@ -32,7 +32,9 @@ public enum ResponseMessage {
 	IMAGE_SAVED("Image Saved Successfully."),
 	IMAGE_DELETED("Image Deleted Successfully"),
 	
-	CLIENT_LOG_NOT_FOUND("Unable to find the Client Log");
+	CLIENT_LOG_NOT_FOUND("Unable to find the Client Log"),
+	
+	CLIENT_BIN_NOT_FOUND(" Unable to find the Client in ClientBin");
 	
 	
 	

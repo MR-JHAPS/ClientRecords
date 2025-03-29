@@ -9,11 +9,13 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
+import com.jhaps.clientrecords.dto.ClientBinDto;
 import com.jhaps.clientrecords.dto.ClientDto;
 import com.jhaps.clientrecords.dto.ImageDto;
 import com.jhaps.clientrecords.dto.RoleDto;
 import com.jhaps.clientrecords.dto.UserDto;
 import com.jhaps.clientrecords.entity.Client;
+import com.jhaps.clientrecords.entity.ClientBin;
 import com.jhaps.clientrecords.entity.Image;
 import com.jhaps.clientrecords.entity.Role;
 import com.jhaps.clientrecords.entity.User;
@@ -48,6 +50,34 @@ public class Mapper {
 		return client;
 		
 	}
+/*-----------------------ClientBin Conversion ---------------------------------------------------------------------------------------------------------------*/	
+	
+	public ClientBinDto toClientBinDto(ClientBin clientBin) {
+		ClientBinDto dto = new ClientBinDto();
+		dto.setId(clientBin.getId());
+		dto.setClientId(clientBin.getClientId());
+		dto.setFirstName(clientBin.getFirstName());
+		dto.setLastName(clientBin.getLastName());
+		dto.setDateOfBirth(clientBin.getDateOfBirth());
+		dto.setPostalCode(clientBin.getPostalCode());
+		return dto;
+	}
+	
+	
+	
+	public ClientBin toClientBinEntity(ClientBinDto clientBinDto) {
+		ClientBin entity = new ClientBin();
+		entity.setClientId(clientBinDto.getClientId());
+		entity.setFirstName(clientBinDto.getFirstName());
+		entity.setLastName(clientBinDto.getLastName());
+		entity.setDateOfBirth(clientBinDto.getDateOfBirth());
+		entity.setPostalCode(clientBinDto.getPostalCode());
+		return entity;
+	}
+	
+	
+	
+	
 	
 	
 	

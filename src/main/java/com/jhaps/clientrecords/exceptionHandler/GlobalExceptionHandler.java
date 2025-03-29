@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException.Unauthorized;
 
 import com.jhaps.clientrecords.enums.ResponseMessage;
+import com.jhaps.clientrecords.exception.ClientBinNotFoundException;
 import com.jhaps.clientrecords.exception.ClientLogNotFoundException;
 import com.jhaps.clientrecords.exception.ClientNotFoundException;
 import com.jhaps.clientrecords.exception.DuplicateDataException;
@@ -157,6 +158,16 @@ public class GlobalExceptionHandler {
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.CLIENT_LOG_NOT_FOUND, HttpStatus.NOT_FOUND);
 		}
 	
+		
+		//This is for the case the ClientLog is not found in the Database.
+		@ExceptionHandler(ClientBinNotFoundException.class)
+		public ResponseEntity<ApiResponseModel<String>> handleClientBinNotFoundException(ClientBinNotFoundException e){
+			log.error("ERROR:Clients_Data in Client_Bin Not Found Exception Occured : {} ",e.getMessage(), e);
+			return apiResponseBuilder.buildApiResponse(ResponseMessage.CLIENT_BIN_NOT_FOUND, HttpStatus.NOT_FOUND);
+		}
+		
+		
+		
 }//ends class
 
 

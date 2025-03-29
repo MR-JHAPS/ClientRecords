@@ -23,11 +23,13 @@ public class ClientDto {
 	@NotBlank(message = "LastName cannot be Blank")
 	private String lastName;
 	
+	@NotNull(message="Date Of Birth cannot be Null")
+	private LocalDate dateOfBirth;
+	
 	@NotBlank(message = "PostalCode cannot be Blank")
 	private String postalCode;
 	
-	@NotNull(message="Date Of Birth cannot be Null")
-	private LocalDate dateOfBirth;
+	
 	
 	
 	/*

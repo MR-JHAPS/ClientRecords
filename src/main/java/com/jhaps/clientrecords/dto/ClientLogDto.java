@@ -3,6 +3,8 @@ package com.jhaps.clientrecords.dto;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import com.jhaps.clientrecords.enums.ModificationType;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,7 +14,9 @@ import lombok.NoArgsConstructor;
 @Data
 public class ClientLogDto {
 
-	private int id;
+	private int id; // this is clientLog id
+	
+	private int clientId;	// this is client Id.
 	
 	private String firstName;
 	
@@ -24,7 +28,7 @@ public class ClientLogDto {
 	
 	private String userEmail;		// user who modified the client
 	
-	private String modificationType;  // (insert, delete, update).
+	private ModificationType modificationType;  // (insert, delete, update).
 	
 	private LocalDateTime updatedAt;
 	
