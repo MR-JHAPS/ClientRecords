@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.jhaps.clientrecords.dto.RoleDto;
-import com.jhaps.clientrecords.entity.Role;
+import com.jhaps.clientrecords.apiResponse.ApiResponseBuilder;
+import com.jhaps.clientrecords.apiResponse.ApiResponseModel;
+import com.jhaps.clientrecords.dto.response.RoleDto;
+import com.jhaps.clientrecords.entity.system.Role;
 import com.jhaps.clientrecords.enums.ResponseMessage;
-import com.jhaps.clientrecords.response.ApiResponseBuilder;
-import com.jhaps.clientrecords.response.ApiResponseModel;
-import com.jhaps.clientrecords.service.RoleService;
+import com.jhaps.clientrecords.service.system.RoleService;
 import com.jhaps.clientrecords.util.Mapper;
 
 import io.swagger.v3.oas.annotations.Operation;

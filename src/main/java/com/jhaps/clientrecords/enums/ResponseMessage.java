@@ -26,6 +26,8 @@ public enum ResponseMessage {
 	DUPLICATE_DATA("Data with provided name already exists"),
 	LOCKED("Your Account is locked"),
 	
+	USER_REGISTRATION_ERROR("Unable to Register the new user"),
+	
 	
 	IMAGE_OBTAINED("Images Obtained Successfully"),
 	INVALID_IMAGE("Image Cannot be Found in the Database."),
@@ -34,7 +36,10 @@ public enum ResponseMessage {
 	
 	CLIENT_LOG_NOT_FOUND("Unable to find the Client Log"),
 	
-	CLIENT_BIN_NOT_FOUND(" Unable to find the Client in ClientBin");
+	CLIENT_BIN_NOT_FOUND(" Unable to find the Client in ClientBin"),
+	ADMIN_UPDATED("Admin Updated Successfully")
+	;
+	
 	
 	
 	

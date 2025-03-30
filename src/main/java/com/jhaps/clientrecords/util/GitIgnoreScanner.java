@@ -7,6 +7,8 @@ package com.jhaps.clientrecords.util;
  *  may contain somewhat security risks for me.
  * */
 
+
+/* WILL CREATE LATER : */
 public class GitIgnoreScanner {
 
 }

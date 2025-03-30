@@ -7,11 +7,11 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import com.jhaps.clientrecords.entity.Role;
-import com.jhaps.clientrecords.entity.User;
+import com.jhaps.clientrecords.entity.system.Role;
+import com.jhaps.clientrecords.entity.system.User;
 import com.jhaps.clientrecords.enums.RoleNames;
-import com.jhaps.clientrecords.repository.UserRepository;
-import com.jhaps.clientrecords.service.RoleService;
+import com.jhaps.clientrecords.repository.system.UserRepository;
+import com.jhaps.clientrecords.service.system.RoleService;
 
 import jakarta.transaction.Transactional;
 

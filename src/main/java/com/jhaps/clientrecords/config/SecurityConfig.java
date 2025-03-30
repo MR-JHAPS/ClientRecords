@@ -16,12 +16,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.jhaps.clientrecords.serviceImpl.UserDetailsServiceImpl;
-import com.jhaps.clientrecords.springSecurity.JWTFilter;
+import com.jhaps.clientrecords.security.spring.JWTFilter;
+import com.jhaps.clientrecords.security.spring.UserDetailsServiceImpl;
 
 @Configuration
 @EnableWebSecurity
-//@EnableMethodSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
 	@Autowired

@@ -1,29 +1,25 @@
 package com.jhaps.clientrecords.util;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
-import com.jhaps.clientrecords.dto.ClientBinDto;
-import com.jhaps.clientrecords.dto.ClientDto;
-import com.jhaps.clientrecords.dto.ImageDto;
-import com.jhaps.clientrecords.dto.RoleDto;
-import com.jhaps.clientrecords.dto.UserDto;
-import com.jhaps.clientrecords.entity.Client;
-import com.jhaps.clientrecords.entity.ClientBin;
-import com.jhaps.clientrecords.entity.Image;
-import com.jhaps.clientrecords.entity.Role;
-import com.jhaps.clientrecords.entity.User;
+import com.jhaps.clientrecords.dto.request.ClientBinDto;
+import com.jhaps.clientrecords.dto.request.ClientDto;
+import com.jhaps.clientrecords.dto.response.ImageDto;
+import com.jhaps.clientrecords.dto.response.RoleDto;
+import com.jhaps.clientrecords.dto.response.UserDto;
+import com.jhaps.clientrecords.entity.client.Client;
+import com.jhaps.clientrecords.entity.client.ClientBin;
+import com.jhaps.clientrecords.entity.system.Image;
+import com.jhaps.clientrecords.entity.system.Role;
+import com.jhaps.clientrecords.entity.system.User;
 
 @Component
 public class Mapper {
 
-	
 	
 	
 	

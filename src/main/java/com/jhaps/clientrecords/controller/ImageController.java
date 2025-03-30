@@ -16,12 +16,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.jhaps.clientrecords.dto.ImageDto;
+import com.jhaps.clientrecords.apiResponse.ApiResponseBuilder;
+import com.jhaps.clientrecords.apiResponse.ApiResponseModel;
+import com.jhaps.clientrecords.dto.response.ImageDto;
 import com.jhaps.clientrecords.enums.ResponseMessage;
-import com.jhaps.clientrecords.response.ApiResponseBuilder;
-import com.jhaps.clientrecords.response.ApiResponseModel;
-import com.jhaps.clientrecords.service.ImageService;
-import com.jhaps.clientrecords.service.PagedResourceAssemblerService;
+import com.jhaps.clientrecords.service.system.ImageService;
+import com.jhaps.clientrecords.service.system.PagedResourceAssemblerService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

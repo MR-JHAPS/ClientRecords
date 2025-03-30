@@ -6,8 +6,8 @@ import java.util.stream.Collectors;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.jhaps.clientrecords.entity.User;
-import com.jhaps.clientrecords.springSecurity.CustomUserDetails;
+import com.jhaps.clientrecords.entity.system.User;
+import com.jhaps.clientrecords.security.spring.CustomUserDetails;
 
 /*
  * This class extracts the security details(CustomUserDetails)
@@ -18,31 +18,31 @@ public class SecurityUtils {
 	
 	
   		/* Extracts CustomUserDetails From SecurityContextHolder.*/
-		public static CustomUserDetails getCustomUserDetailsFromSecurityContext() {
+		public  CustomUserDetails getCustomUserDetailsFromSecurityContext() {
 			return (CustomUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		}
 		
 		/* Extracts the User from CustomUserDetails */
-		public static User getCurrentUser() {
+		public  User getCurrentUser() {
 			User currentUser = getCustomUserDetailsFromSecurityContext().getUser();
 			return currentUser;
 		}
 		
 		/* Extracting user Email from the CustomUserDetails.*/
-		public static String getEmailFromCustomUserDetails() {
+		public  String getEmailFromCustomUserDetails() {
 			CustomUserDetails customUserDetails = getCustomUserDetailsFromSecurityContext();
 			return customUserDetails.getUsername(); // returns email
 		}
 		
 		/* Extracting userId from the CustomUserDetails */
-		public static int getUserIdFromCustomUserDetails() {
+		public  int getUserIdFromCustomUserDetails() {
 			CustomUserDetails customUserDetails = getCustomUserDetailsFromSecurityContext();
 			int userId = customUserDetails.getUser().getId(); 
 			return userId;
 		}
 		
 		/* Extracting Authorities from the CustomUserDetails. */
-		public static Set<String> getAuthoritiesFromCustomUserDetails(){
+		public  Set<String> getAuthoritiesFromCustomUserDetails(){
 			CustomUserDetails customUserDetails = getCustomUserDetailsFromSecurityContext();
 			Set<String> roles = customUserDetails.getAuthorities()
 								.stream()

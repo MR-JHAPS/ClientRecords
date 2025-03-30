@@ -9,12 +9,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.jhaps.clientrecords.dto.UserDto;
+import com.jhaps.clientrecords.apiResponse.ApiResponseBuilder;
+import com.jhaps.clientrecords.apiResponse.ApiResponseModel;
+import com.jhaps.clientrecords.dto.request.user.UserAuth;
+import com.jhaps.clientrecords.dto.request.user.UserRegister;
+import com.jhaps.clientrecords.dto.response.UserDto;
 import com.jhaps.clientrecords.enums.ResponseMessage;
-import com.jhaps.clientrecords.response.ApiResponseModel;
-import com.jhaps.clientrecords.response.ApiResponseBuilder;
-import com.jhaps.clientrecords.service.AuthService;
-import com.jhaps.clientrecords.service.UserService;
+import com.jhaps.clientrecords.security.customAuth.AuthService;
+import com.jhaps.clientrecords.service.system.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -44,9 +46,9 @@ public class AuthController {
 		@Operation(summary = "user Login")
 		@PostMapping("/login")
 		//@PreAuthorize("permitAll()")
-		public ResponseEntity<ApiResponseModel<String>> userLogin(@Valid @RequestBody UserDto userDto){
+		public ResponseEntity<ApiResponseModel<String>> userLogin(@Valid @RequestBody UserAuth userAuth){
 			log.info("Requesting verification of userLogin Details | PublicController -->'/login' ");
-			String token = authService.verifyUser(userDto);
+			String token = authService.verifyUser(userAuth);
 			log.info("inside the userLogin controller after token generation : {}", token);
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, token);
 		}
@@ -54,8 +56,8 @@ public class AuthController {
 		
 		@Operation(summary = "user Signup")
 		@PostMapping("/signup")
-		public ResponseEntity<ApiResponseModel<String>> userSignUp(@Valid @RequestBody UserDto userDto){
-			userService.saveNewUser(userDto);
+		public ResponseEntity<ApiResponseModel<String>> userSignUp(@Valid @RequestBody UserRegister registrationDto){
+			userService.saveNewUser(registrationDto);
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.CREATED, "User Created Successfully");
 		}
 		
