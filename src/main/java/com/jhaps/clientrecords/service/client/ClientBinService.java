@@ -3,7 +3,7 @@ package com.jhaps.clientrecords.service.client;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import com.jhaps.clientrecords.dto.request.ClientBinDto;
+import com.jhaps.clientrecords.dto.response.ClientBinDto;
 import com.jhaps.clientrecords.entity.client.Client;
 
 public interface ClientBinService {
@@ -47,7 +47,7 @@ public interface ClientBinService {
 	  * 
 	  * @return : Page<ClientBinDto>. 
 	  */
-	Page<ClientBinDto> getAllClientBinClients(Pageable pageable);
+	Page<ClientBinDto> getAllFromClientBin(Pageable pageable);
 	
 	
 }

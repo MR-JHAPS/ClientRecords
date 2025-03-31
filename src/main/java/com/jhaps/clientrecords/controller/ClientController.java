@@ -8,6 +8,8 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,7 +24,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.jhaps.clientrecords.apiResponse.ApiResponseBuilder;
 import com.jhaps.clientrecords.apiResponse.ApiResponseModel;
 import com.jhaps.clientrecords.dto.request.ClientDto;
+import com.jhaps.clientrecords.dto.request.ClientRequest;
+import com.jhaps.clientrecords.dto.response.ClientResponse;
 import com.jhaps.clientrecords.enums.ResponseMessage;
+import com.jhaps.clientrecords.security.spring.CustomUserDetails;
 import com.jhaps.clientrecords.service.client.ClientService;
 import com.jhaps.clientrecords.service.system.PagedResourceAssemblerService;
 import com.jhaps.clientrecords.util.SortBuilder;
@@ -46,10 +51,10 @@ public class ClientController {
 	 */
 	private ApiResponseBuilder apiResponseBuilder;
 	private ClientService clientService;
-	private PagedResourceAssemblerService<ClientDto> pagedResourceAssemblerService;
+	private PagedResourceAssemblerService<ClientResponse> pagedResourceAssemblerService;
 
 	public ClientController(ClientService clientService, ApiResponseBuilder apiResponseBuilder,
-			PagedResourceAssemblerService<ClientDto> pagedResourceAssemblerService) {
+			PagedResourceAssemblerService<ClientResponse> pagedResourceAssemblerService) {
 		this.clientService = clientService;
 		this.apiResponseBuilder = apiResponseBuilder;
 		this.pagedResourceAssemblerService = pagedResourceAssemblerService;
@@ -59,7 +64,7 @@ public class ClientController {
 	
 	@Operation(summary = "get all clients")
 	@GetMapping
-	public ResponseEntity<ApiResponseModel<PagedModel<EntityModel<ClientDto>>>> getAllClients(
+	public ResponseEntity<ApiResponseModel<PagedModel<EntityModel<ClientResponse>>>> getAllClients(
 					@RequestParam(defaultValue = "0") int page,
 					@RequestParam(defaultValue = "10") int size,
 					@RequestParam(required = false) String sortBy,
@@ -70,41 +75,49 @@ public class ClientController {
 		//if sort returns null, don't apply sorting in PageRequest.
 		Pageable pageable = (sort==null)? PageRequest.of(page, size) : PageRequest.of(page, size, sort);
 		
-		Page<ClientDto> paginatedClients = clientService.findAllClients(pageable);
+		Page<ClientResponse> paginatedClients = clientService.findAllClients(pageable);
 		//converting the clientList To PagedClientList
-		PagedModel<EntityModel<ClientDto>> pagedClientModel = pagedResourceAssemblerService.toPagedModel(paginatedClients);
+		PagedModel<EntityModel<ClientResponse>> pagedClientModel = pagedResourceAssemblerService.toPagedModel(paginatedClients);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, pagedClientModel);
 	}
 	
 	@Operation(summary = "get clients by id")
 	@GetMapping("/id/{id}")
-	public ResponseEntity<ApiResponseModel<ClientDto>> getClientById( @PathVariable @Positive(message = "Id must be a positive number") int id){
-		ClientDto client = clientService.findClientById(id);
+	public ResponseEntity<ApiResponseModel<ClientResponse>> getClientById( @PathVariable @Positive(message = "Id must be a positive number") int id){
+		ClientResponse client = clientService.findClientById(id);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, client);
 	}
 	
 	
 	@Operation(summary = "create new client")
 	@PostMapping("/insert")
-	public ResponseEntity<ApiResponseModel<String>> saveNewClient( @RequestBody @Valid ClientDto client){
-			clientService.saveClient(client);
+	public ResponseEntity<ApiResponseModel<String>> saveNewClient( @RequestBody @Valid ClientRequest clientRequest,
+			@AuthenticationPrincipal UserDetails userDetails){
+		String userEmail = userDetails.getUsername();
+		clientService.saveClient(userEmail, clientRequest);
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.CREATED, "Client Data Created Successfully");
 	}
 	
 	
 	@Operation(summary = "delete client by id")
 	@DeleteMapping("/delete/id/{id}")
-	public ResponseEntity<ApiResponseModel<String>> deleteClientById(@PathVariable @Positive(message = "Id must be a positive number") int id){
-			clientService.deleteClientById(id);
+	public ResponseEntity<ApiResponseModel<String>> deleteClientById(
+			@PathVariable @Positive(message = "Id must be a positive number") int id,
+			@AuthenticationPrincipal UserDetails userDetails){
+			String userEmail = userDetails.getUsername();
+			clientService.deleteClientById(userEmail, id);
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.NO_CONTENT);
 	}
 	
 	
 	@Operation(summary = "update client by id")
 	@PutMapping("/update/id/{id}")
-	public ResponseEntity<ApiResponseModel<Object>> updateClientById( @PathVariable @Positive(message = "Id must be a positive number") int id,
-									@RequestBody @Valid ClientDto clientUpdateInfo){
-			clientService.updateClientById(id, clientUpdateInfo);
+	public ResponseEntity<ApiResponseModel<String>> updateClientById(
+							@PathVariable @Positive(message = "Id must be a positive number") int id,
+							@RequestBody @Valid ClientRequest clientRequest,
+							@AuthenticationPrincipal UserDetails userDetails){
+			String userEmail = userDetails.getUsername();
+			clientService.updateClientById(userEmail, id, clientRequest);
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, "Your Data is updated.");	
 	}
 

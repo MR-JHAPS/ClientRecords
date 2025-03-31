@@ -1,5 +1,6 @@
 package com.jhaps.clientrecords.dto.response;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import lombok.AllArgsConstructor;
@@ -19,7 +20,7 @@ public class ClientBinDto {
 	
 	private String lastName;
 	
-	private LocalDateTime dateOfBirth;
+	private LocalDate dateOfBirth;
 	
 	private String postalCode;
 	

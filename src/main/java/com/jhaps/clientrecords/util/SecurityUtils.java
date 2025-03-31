@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 
 import com.jhaps.clientrecords.entity.system.User;
 import com.jhaps.clientrecords.security.spring.CustomUserDetails;
@@ -13,6 +14,7 @@ import com.jhaps.clientrecords.security.spring.CustomUserDetails;
  * This class extracts the security details(CustomUserDetails)
  *  from the SecurityContextHolder.
  */
+@Component
 public class SecurityUtils {
 
 	

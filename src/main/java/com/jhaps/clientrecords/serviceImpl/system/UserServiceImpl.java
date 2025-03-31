@@ -18,6 +18,7 @@ import com.jhaps.clientrecords.exception.system.DuplicateDataException;
 import com.jhaps.clientrecords.exception.system.UserNotFoundException;
 import com.jhaps.clientrecords.repository.system.UserRepository;
 import com.jhaps.clientrecords.security.customAuth.PasswordValidator;
+import com.jhaps.clientrecords.service.system.ImageService;
 import com.jhaps.clientrecords.service.system.RoleService;
 import com.jhaps.clientrecords.service.system.UserService;
 import com.jhaps.clientrecords.util.Mapper;
@@ -38,6 +39,7 @@ public class UserServiceImpl implements UserService{
 	private UserMapper userMapper; //Maps user
 	private final SecurityUtils securityUtils;  // it's method extracts userDetails from SecurityContextHolder
 	private PasswordValidator passwordValidator; // handles password validation
+	private ImageService imageService;
 	
 	public UserServiceImpl(UserRepository userRepo, RoleService roleService, 
 							Mapper mapper, PasswordEncoder passwordEncoder,
@@ -130,15 +132,10 @@ public class UserServiceImpl implements UserService{
 			log.info("Action: Preparing to delete user: {}", email);
 		Set<String> roles = securityUtils.getAuthoritiesFromCustomUserDetails(); //this is the private method written above.
 			log.info("Current user roles are : {}", roles);
-		User user = findUserByEmail(email); 
+		User user = findUserByEmail(email);
+		imageService.deleteImagesByUserEmail(email); //deletes the images of the user before deleting the account.
 		userRepo.delete(user);
 		log.info("Action: user Deleted successfully");
-//		//Only the owner of the Account or Admin will be able to delete the userAccount.
-//		if(user.getEmail().equals(activeUser) || roles.contains(RoleNames.ADMIN.getRole())) {
-//			userRepo.delete(user);
-//		}else {
-//			throw new AccessDeniedException("You don't have permission required to perform the operation");
-//		}
 	}//ends method.
 	
 	

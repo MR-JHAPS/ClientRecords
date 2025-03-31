@@ -2,6 +2,8 @@ package com.jhaps.clientrecords.repository.system;
 
 
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -24,6 +26,8 @@ public interface ImageRepository extends JpaRepository<Image, Integer> {
 	Page<Image> findByUser_Id(int id, Pageable pageable);
 	
 	Page<Image> findByUser_Email(String email, Pageable pageable);
+	
+	List<Image> findByUser_Email(String email);
 	
 	
 	

@@ -22,6 +22,7 @@ import com.jhaps.clientrecords.exception.client.ClientBinNotFoundException;
 import com.jhaps.clientrecords.exception.client.ClientLogNotFoundException;
 import com.jhaps.clientrecords.exception.client.ClientNotFoundException;
 import com.jhaps.clientrecords.exception.system.DuplicateDataException;
+import com.jhaps.clientrecords.exception.system.ImageDeletionException;
 import com.jhaps.clientrecords.exception.system.ImageNotFoundException;
 import com.jhaps.clientrecords.exception.system.RoleNotFoundException;
 import com.jhaps.clientrecords.exception.system.UserNotFoundException;
@@ -91,6 +92,15 @@ public class GlobalExceptionHandler {
 		log.error("Bad Credentials Exception Occured : {} ",e.getMessage(), e);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.BAD_CREDENTIALS, HttpStatus.UNAUTHORIZED);
 	}
+	
+	
+	@ExceptionHandler(SecurityException.class)
+	public ResponseEntity<ApiResponseModel<String>> handleSecurityException(SecurityException e){
+		log.error("Security Exception Occured : {} ",e.getMessage(), e);
+		return apiResponseBuilder.buildApiResponse(ResponseMessage.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	
 	
 	
 	@ExceptionHandler(UsernameNotFoundException.class)
@@ -173,6 +183,12 @@ public class GlobalExceptionHandler {
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.USER_REGISTRATION_ERROR, HttpStatus.BAD_REQUEST);
 		}
 		
+		
+		@ExceptionHandler(ImageDeletionException.class)
+		public ResponseEntity<ApiResponseModel<String>> handleImageDeletionException(ImageDeletionException e){
+			log.error("Image_Deletion_Exception Occured : {} ",e.getMessage(), e);
+			return apiResponseBuilder.buildApiResponse(ResponseMessage.IMAGE_DELETION_FAILED, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 		
 		
 }//ends class

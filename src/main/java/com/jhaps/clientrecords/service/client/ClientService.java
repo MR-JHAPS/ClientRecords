@@ -9,51 +9,33 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.jhaps.clientrecords.dto.request.ClientDto;
+import com.jhaps.clientrecords.dto.request.ClientRequest;
+import com.jhaps.clientrecords.dto.response.ClientResponse;
 import com.jhaps.clientrecords.entity.client.Client;
 
 public interface ClientService {
 
 	//CRUD OPERATIONS
-	public Page<ClientDto> findAllClients(Pageable pageable);
+	public Page<ClientResponse> findAllClients(Pageable pageable);
 	
-	public ClientDto findClientById(int id);
+	public ClientResponse findClientById(int id);
 
-	public void saveClient(ClientDto clientDto);
+	public void saveClient(String userEmail, ClientRequest clientRequest); /* @param userEmail is to save the user in the clientLog*/
 	
-	public void deleteClientById(int id);
+	public void deleteClientById(String userEmail, int id); /*  @param userEmail to log the user in clientLog */
 	
-	public void updateClientById(int id, ClientDto clientUpdateInfo);
+	public void updateClientById(String userEmail, int id, ClientRequest clientUpdateInfo ); /*  @param userEmail to log the user in clientLog */
 	
 	//THIS IS FOR THE SEARCH QUERY 
-	public Page<ClientDto> findClientBySearchQuery(String searchQuery, Pageable pageable);
+	public Page<ClientResponse> findClientBySearchQuery(String searchQuery, Pageable pageable);
 	
-	public Page<ClientDto> findClientsByFirstName(String firstName, Pageable pageable);
+	public Page<ClientResponse> findClientsByFirstName(String firstName, Pageable pageable);
 	
-	public Page<ClientDto> findClientsByLastName(String lastName, Pageable pageable);
+	public Page<ClientResponse> findClientsByLastName(String lastName, Pageable pageable);
 	
-	public Page<ClientDto> findClientsByDateOfBirth(LocalDate dateOfBirth, Pageable pageable);
+	public Page<ClientResponse> findClientsByDateOfBirth(LocalDate dateOfBirth, Pageable pageable);
 	
-	public Page<ClientDto> findClientsByPostalCode(String postalCode, Pageable pageable);
-	
-	
-//	//THIS IS FOR SORTING CLIENTS
-//	public List<ClientDto> sortClientByFirstNameAscending(List<ClientDto> clientList);
-//	
-//	public List<Client> sortClientByFirstNameDescending(List<Client> clientList);
-//	
-//	public List<Client> sortClientByLastNameAscending(List<Client> clientList);
-//	
-//	public List<Client> sortClientByLastNameDescending(List<Client> clientList);
-//	
-//	public List<Client> sortClientByDateOfBirthAscending(List<Client> clientList);
-//	
-//	public List<Client> sortClientByDateOfBirthDescending(List<Client> clientList);
-//	
-//	public List<Client> sortClientByPostalCodeAscending(List<Client> clientList);
-//	
-//	public List<Client> sortClientByPostalCodeDescending(List<Client> clientList);
-	
-	
+	public Page<ClientResponse> findClientsByPostalCode(String postalCode, Pageable pageable);
 	
 	
 }
