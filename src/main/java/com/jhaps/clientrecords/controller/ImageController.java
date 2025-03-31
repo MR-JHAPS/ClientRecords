@@ -42,7 +42,7 @@ public class ImageController {
 	@Operation(summary = "gets Images of logged in user.")
 	public ResponseEntity<ApiResponseModel<PagedModel<EntityModel<ImageDto>>>> getImagesOfActiveUser(
 				@PageableDefault(page = 0, size = 10) Pageable pageable){
-		Page<ImageDto> paginatedImages = imageService.getImagesOfActiveUser(pageable); 
+		Page<ImageDto> paginatedImages = imageService.getImagesByEmail(pageable); 
 		/* 
 		 * Converting to "Hateoas" format Api response 
 		 * because it provides Pagination links like: FirstPage, NextPage, LastPage.

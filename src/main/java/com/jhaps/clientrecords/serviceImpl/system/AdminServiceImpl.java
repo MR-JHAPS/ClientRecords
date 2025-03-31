@@ -6,10 +6,12 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import com.jhaps.clientrecords.dto.request.RoleRequest;
 import com.jhaps.clientrecords.dto.request.user.AdminUpdate;
 import com.jhaps.clientrecords.dto.response.RoleDto;
 import com.jhaps.clientrecords.dto.response.UserDto;
@@ -68,17 +70,13 @@ public class AdminServiceImpl implements AdminService{
 	
 	
 	@Override
-	public void updateUserRoleById(int id, RoleDto roleDto) {
+	@PreAuthorize("hasAuthority('admin')")
+	public void updateUserRoleById(int id, RoleRequest roleRequest) {
 		User user = userService.findUserById(id); 
-		Set<String> activeUserRoles = securityUtils.getAuthoritiesFromCustomUserDetails(); //getting the roles of the logged in user.
-		
-		if(!activeUserRoles.contains(RoleNames.ADMIN.getRole())) {
-			throw new AccessDeniedException("You do not have authorization to update the role");
-		}
-		Set<String> roleNamesFromDto = roleDto.getRoleNames(); 
-		log.info("updating role of User with id: {} with roles :{}", id, roleDto.getRoleNames());
+		Set<String> requestRoleNames = roleRequest.getRoles(); 
+		log.info("updating role of User with id: {} with roles :{}", id, roleRequest.getRoles());
 		//checking if the roles exists in the roleRepository.
-		Set<Role> roles = roleService.findRoleByNames(roleNamesFromDto);
+		Set<Role> roles = roleService.findRoleByNames(requestRoleNames);
 		user.getRoles().clear(); // clearing previous roles
 		user.setRoles(roles); // setting new roles.
 		userRepo.save(user);

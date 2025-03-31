@@ -16,10 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.jhaps.clientrecords.apiResponse.ApiResponseBuilder;
 import com.jhaps.clientrecords.apiResponse.ApiResponseModel;
 import com.jhaps.clientrecords.dto.response.RoleDto;
+import com.jhaps.clientrecords.dto.response.RoleResponse;
 import com.jhaps.clientrecords.entity.system.Role;
 import com.jhaps.clientrecords.enums.ResponseMessage;
 import com.jhaps.clientrecords.service.system.RoleService;
 import com.jhaps.clientrecords.util.Mapper;
+import com.jhaps.clientrecords.util.RoleMapper;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -34,20 +36,20 @@ public class RoleController {
 	
 	private ApiResponseBuilder apiResponseBuilder;
 	
-	private Mapper mapper;
+	private RoleMapper roleMapper;
 	
-	public RoleController(RoleService roleService, ApiResponseBuilder apiResponseBuilder, Mapper mapper) {
+	public RoleController(RoleService roleService, ApiResponseBuilder apiResponseBuilder, RoleMapper roleMapper) {
 		this.roleService = roleService;
 		this.apiResponseBuilder = apiResponseBuilder;
-		this.mapper = mapper;
+		this.roleMapper = roleMapper;
 	}
 	
 	@Operation(summary = "Get all roles")
 	@GetMapping
 	@PreAuthorize("hasAuthority('admin')")
-	public ResponseEntity<ApiResponseModel<RoleDto>> getAllRoles(){
+	public ResponseEntity<ApiResponseModel<RoleResponse>> getAllRoles(){
 		Set<Role> role = roleService.findAllRoles();
-		RoleDto roleDto = mapper.toRoleDtoFromRoleSet(role); //converting Set<Role> to RoleDto.
+		RoleDto roleDto = roleMapper.toRoleDtoFromRoleSet(role); //converting Set<Role> to RoleDto.
 		return apiResponseBuilder
 					.buildApiResponse(ResponseMessage.ROLE_OBTAINED, HttpStatus.OK, roleDto);
 	}

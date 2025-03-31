@@ -9,7 +9,10 @@ import java.util.stream.Collectors;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
+import com.jhaps.clientrecords.dto.request.RoleCreateRequest;
+import com.jhaps.clientrecords.dto.request.RoleRequest;
 import com.jhaps.clientrecords.dto.response.RoleDto;
+import com.jhaps.clientrecords.dto.response.RoleResponse;
 import com.jhaps.clientrecords.entity.system.Role;
 import com.jhaps.clientrecords.entity.system.User;
 import com.jhaps.clientrecords.enums.RoleNames;
@@ -17,6 +20,7 @@ import com.jhaps.clientrecords.exception.system.RoleNotFoundException;
 import com.jhaps.clientrecords.repository.system.RoleRepository;
 import com.jhaps.clientrecords.service.system.RoleService;
 import com.jhaps.clientrecords.util.Mapper;
+import com.jhaps.clientrecords.util.RoleMapper;
 import com.jhaps.clientrecords.util.SecurityUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -26,15 +30,14 @@ import lombok.extern.slf4j.Slf4j;
 public class RoleServiceImpl implements RoleService {
 
 	private RoleRepository roleRepo;
-	
-//	private UserService userService;
+	private RoleMapper roleMapper;
 	
 	private Mapper mapper;
 
-	public RoleServiceImpl(RoleRepository roleRepo, Mapper mapper) {
+	public RoleServiceImpl(RoleRepository roleRepo, Mapper mapper, RoleMapper roleMapper) {
 		this.roleRepo = roleRepo;
 		this.mapper = mapper;
-//		this.userService = userService;
+		this.roleMapper = roleMapper;
 	}
 	
 	
@@ -70,28 +73,22 @@ public class RoleServiceImpl implements RoleService {
 	
 	
 	@Override
-	public Set<Role> findAllRoles() {
+	public Set<RoleResponse> findAllRoles() {
 		log.info("Getting the List of all the Roles.");
 		List<Role> roleList = roleRepo.findAll();
 		if(roleList.isEmpty()) {
 			throw new RoleNotFoundException("Unable to find any roles in the Database.");
 		}
-		Set<Role> roleSet = roleList.stream().collect(Collectors.toSet());  //converting roleList to roleSet.
-		return roleSet; 
+		return roleList.stream().map(roleMapper::toRoleResponse).collect(Collectors.toSet());
 	}
 
 
 
 
 	@Override
-	public void saveNewRole(RoleDto roleDto) {
-		String roleName = roleDto.getRoleNames().toString(); //converting Set<String> to String
-		
-		/*The converted String still contains "[" and "]" brackets like this [role]"
-		 *we will remove the brackets from string. 
-		 */
-		 String formattedRoleName = roleName.substring(1, roleName.length()-1); //removed the brackets
-		 Role role = new Role(0, formattedRoleName);	//saving new role.
+	public void saveNewRole(RoleCreateRequest roleCreateRequest) {
+		String roleName = roleCreateRequest.getRole(); //converting Set<String> to String
+		 Role role = new Role(0, roleName);	//saving new role.
 		 roleRepo.save(role);
 		
 	}

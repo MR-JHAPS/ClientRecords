@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jhaps.clientrecords.apiResponse.ApiResponseBuilder;
 import com.jhaps.clientrecords.apiResponse.ApiResponseModel;
+import com.jhaps.clientrecords.dto.request.RoleRequest;
 import com.jhaps.clientrecords.dto.request.user.AdminUpdate;
 import com.jhaps.clientrecords.dto.response.RoleDto;
 import com.jhaps.clientrecords.dto.response.user.UserAdmin;
@@ -114,9 +115,9 @@ public class AdminController {
 	@Operation(summary = "Update Role Of User By UserId : ADMIN ONLY")
 	@PutMapping("/user/update/{id}")
 	@PreAuthorize("hasAuthority('admin')")
-	public ResponseEntity<ApiResponseModel<String>> updateRoleByUserId(@PathVariable int id, @RequestBody @Valid RoleDto roleDto){
-		log.info("this is the roleDto from postman :{}", roleDto);
-		adminService.updateUserRoleById(id, roleDto);
+	public ResponseEntity<ApiResponseModel<String>> updateRoleByUserId(@PathVariable int id, @RequestBody @Valid RoleRequest roleRequest){
+		log.info("this is the roleDto from postman :{}", roleRequest);
+		adminService.updateUserRoleById(id, roleRequest);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, "User Role Updated Successfully");
 	}
 	

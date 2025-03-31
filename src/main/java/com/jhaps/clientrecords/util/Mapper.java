@@ -6,8 +6,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
-import com.jhaps.clientrecords.dto.request.ClientBinDto;
 import com.jhaps.clientrecords.dto.request.ClientDto;
+import com.jhaps.clientrecords.dto.response.ClientBinDto;
 import com.jhaps.clientrecords.dto.response.ImageDto;
 import com.jhaps.clientrecords.dto.response.RoleDto;
 import com.jhaps.clientrecords.dto.response.UserDto;
@@ -46,30 +46,30 @@ public class Mapper {
 		return client;
 		
 	}
-/*-----------------------ClientBin Conversion ---------------------------------------------------------------------------------------------------------------*/	
-	
-	public ClientBinDto toClientBinDto(ClientBin clientBin) {
-		ClientBinDto dto = new ClientBinDto();
-		dto.setId(clientBin.getId());
-		dto.setClientId(clientBin.getClientId());
-		dto.setFirstName(clientBin.getFirstName());
-		dto.setLastName(clientBin.getLastName());
-		dto.setDateOfBirth(clientBin.getDateOfBirth());
-		dto.setPostalCode(clientBin.getPostalCode());
-		return dto;
-	}
-	
-	
-	
-	public ClientBin toClientBinEntity(ClientBinDto clientBinDto) {
-		ClientBin entity = new ClientBin();
-		entity.setClientId(clientBinDto.getClientId());
-		entity.setFirstName(clientBinDto.getFirstName());
-		entity.setLastName(clientBinDto.getLastName());
-		entity.setDateOfBirth(clientBinDto.getDateOfBirth());
-		entity.setPostalCode(clientBinDto.getPostalCode());
-		return entity;
-	}
+///*-----------------------ClientBin Conversion ---------------------------------------------------------------------------------------------------------------*/	
+//	
+//	public ClientBinDto toClientBinDto(ClientBin clientBin) {
+//		ClientBinDto dto = new ClientBinDto();
+//		dto.setId(clientBin.getId());
+//		dto.setClientId(clientBin.getClientId());
+//		dto.setFirstName(clientBin.getFirstName());
+//		dto.setLastName(clientBin.getLastName());
+//		dto.setDateOfBirth(clientBin.getDateOfBirth());
+//		dto.setPostalCode(clientBin.getPostalCode());
+//		return dto;
+//	}
+//	
+//	
+//	
+//	public ClientBin toClientBinEntity(ClientBinDto clientBinDto) {
+//		ClientBin entity = new ClientBin();
+//		entity.setClientId(clientBinDto.getClientId());
+//		entity.setFirstName(clientBinDto.getFirstName());
+//		entity.setLastName(clientBinDto.getLastName());
+//		entity.setDateOfBirth(clientBinDto.getDateOfBirth());
+//		entity.setPostalCode(clientBinDto.getPostalCode());
+//		return entity;
+//	}
 	
 	
 	
@@ -102,51 +102,51 @@ public class Mapper {
 	
 
 	
-/*-----------------------RoleDto-Set<Role> Not Role Entity---------------------------------------------------------------------------------------------------------------*/
-	
-	//Converting Set<Roles> to RoleDto.   **RoleDto-->RoleNames is of type Set<String>
-	public RoleDto toRoleDtoFromRoleSet(Set<Role> roleList) {
-		RoleDto dto = new RoleDto();
-		//collecting/extracting roles of Set<Role> roleList to Set<String>
-		Set<String> roles  = roleList.stream()
-								.map(role -> role.getName())
-								.collect(Collectors.toSet());
-		dto.setRoleNames(roles);
-		return dto;
-	}
-	
-	
-	
-	//Converting Single Role to RoleDto
-	public RoleDto toRoleDtoFromSingleRole(Role role) {
-		RoleDto dto = new RoleDto();
-		Set<String> roleSet = new HashSet<>();
-		
-		roleSet.add(role.getName());
-		dto.setRoleNames(roleSet);
-		return dto;
-	}
+///*-----------------------RoleDto-Set<Role> Not Role Entity---------------------------------------------------------------------------------------------------------------*/
+//	
+//	//Converting Set<Roles> to RoleDto.   **RoleDto-->RoleNames is of type Set<String>
+//	public RoleDto toRoleDtoFromRoleSet(Set<Role> roleList) {
+//		RoleDto dto = new RoleDto();
+//		//collecting/extracting roles of Set<Role> roleList to Set<String>
+//		Set<String> roles  = roleList.stream()
+//								.map(role -> role.getName())
+//								.collect(Collectors.toSet());
+//		dto.setRoleNames(roles);
+//		return dto;
+//	}
+//	
+//	
+//	
+//	//Converting Single Role to RoleDto
+//	public RoleDto toRoleDtoFromSingleRole(Role role) {
+//		RoleDto dto = new RoleDto();
+//		Set<String> roleSet = new HashSet<>();
+//		
+//		roleSet.add(role.getName());
+//		dto.setRoleNames(roleSet);
+//		return dto;
+//	}
 	
 	
 /*-----------------------IMAGE ENTITY-DTO ---------------------------------------------------------------------------------------------------------------*/	
 	
 
-	/* ImageEntity to ImageDto*/
-	public ImageDto toImageDto(Image image) {
-		ImageDto dto = new ImageDto();
-		dto.setImageName(image.getImageName());
-		return dto;
-	}
-	
-	
-	/* ImageDto to ImageEntity */
-	public Image toImageEntity(ImageDto imageDto) {
-		Image entity = new Image();
-		entity.setImageName(imageDto.getImageName());
-		return entity;
-	}
-	
-	
+//	/* ImageEntity to ImageDto*/
+//	public ImageDto toImageDto(Image image) {
+//		ImageDto dto = new ImageDto();
+//		dto.setImageName(image.getImageName());
+//		return dto;
+//	}
+//	
+//	
+//	/* ImageDto to ImageEntity */
+//	public Image toImageEntity(ImageDto imageDto) {
+//		Image entity = new Image();
+//		entity.setImageName(imageDto.getImageName());
+//		return entity;
+//	}
+//	
+//	
 	
 	
 }//ends class

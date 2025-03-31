@@ -1,8 +1,12 @@
 package com.jhaps.clientrecords.service.system;
 
+import java.util.List;
 import java.util.Set;
 
+import com.jhaps.clientrecords.dto.request.RoleCreateRequest;
+import com.jhaps.clientrecords.dto.request.RoleRequest;
 import com.jhaps.clientrecords.dto.response.RoleDto;
+import com.jhaps.clientrecords.dto.response.RoleResponse;
 import com.jhaps.clientrecords.entity.system.Role;
 
 public interface RoleService {
@@ -17,9 +21,9 @@ public interface RoleService {
 	
 	public Set<Role> findRoleByNames(Set<String> roleNames); //for multiple role.
 	
-	public Set<Role> findAllRoles();
+	public Set<RoleResponse> findAllRoles();
 	
-	public void saveNewRole(RoleDto roleDto);
+	public void saveNewRole(RoleCreateRequest roleCreateRequest);
 	
 	public void deleteRole(int id);
 	
