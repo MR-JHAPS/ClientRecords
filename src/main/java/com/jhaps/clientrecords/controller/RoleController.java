@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jhaps.clientrecords.apiResponse.ApiResponseBuilder;
 import com.jhaps.clientrecords.apiResponse.ApiResponseModel;
+import com.jhaps.clientrecords.dto.request.RoleSaveRequest;
+import com.jhaps.clientrecords.dto.request.RoleRequest;
 import com.jhaps.clientrecords.dto.response.RoleDto;
 import com.jhaps.clientrecords.dto.response.RoleResponse;
 import com.jhaps.clientrecords.entity.system.Role;
@@ -47,21 +49,20 @@ public class RoleController {
 	@Operation(summary = "Get all roles")
 	@GetMapping
 	@PreAuthorize("hasAuthority('admin')")
-	public ResponseEntity<ApiResponseModel<RoleResponse>> getAllRoles(){
-		Set<Role> role = roleService.findAllRoles();
-		RoleDto roleDto = roleMapper.toRoleDtoFromRoleSet(role); //converting Set<Role> to RoleDto.
-		return apiResponseBuilder
-					.buildApiResponse(ResponseMessage.ROLE_OBTAINED, HttpStatus.OK, roleDto);
+	public ResponseEntity<ApiResponseModel<Set<RoleResponse>>> getAllRoles(){
+		Set<RoleResponse> roles = roleService.findAllRoles();
+//		RoleDto roleDto = roleMapper.toRoleDtoFromRoleSet(role); //converting Set<Role> to RoleDto.
+		return apiResponseBuilder.buildApiResponse(ResponseMessage.ROLE_OBTAINED, HttpStatus.OK, roles);
 	}
 	
 	
 	@Operation(summary = "Save new role")
 	@PostMapping("/save")
 	@PreAuthorize("hasAuthority('admin')")
-	public ResponseEntity<ApiResponseModel<String>> saveNewRole(@RequestBody @Valid RoleDto roleDto){
-		roleService.saveNewRole(roleDto);
+	public ResponseEntity<ApiResponseModel<String>> saveNewRole(@RequestBody @Valid RoleSaveRequest roleSaveRequest){
+		roleService.saveNewRole(roleSaveRequest);
 		return apiResponseBuilder
-					.buildApiResponse(ResponseMessage.ROLE_SAVED, HttpStatus.OK, "Role : " +roleDto.getRoleNames() + " saved successfully");
+				.buildApiResponse(ResponseMessage.ROLE_SAVED, HttpStatus.OK, "Role : " +roleSaveRequest.getRole() + " saved successfully");
 	}
 	
 	

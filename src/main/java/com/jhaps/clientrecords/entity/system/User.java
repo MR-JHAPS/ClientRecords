@@ -18,6 +18,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 
@@ -43,6 +44,10 @@ public class User extends BaseEntity{
 	
 	@Column(name = "lock_time")
 	private LocalDateTime lockTime;		//time when the account was locked.
+
+	@OneToOne
+	@JoinColumn(name = "profile_image_id")
+	private Image profileImage; // this field is for the profile image
 	
 //	@OneToMany(mappedBy = "user")
 //	private List<Client> clientList;
@@ -101,6 +106,14 @@ public class User extends BaseEntity{
 		return email;
 	}
 
+
+	public Image getProfileImage() {
+		return profileImage;
+	}
+
+	public void setProfileImage(Image profileImage) {
+		this.profileImage = profileImage;
+	}
 
 	public void setEmail(String email) {
 		this.email = email;
@@ -161,7 +174,8 @@ public class User extends BaseEntity{
 	@Override
 	public String toString() {
 		return "User [id=" + id + ", email=" + email + ", password=" + password + ", attempts=" + attempts
-				+ ", isAccountLocked=" + isAccountLocked + ", lockTime=" + lockTime + ", roles=" + roles + "]";
+				+ ", isAccountLocked=" + isAccountLocked + ", lockTime=" + lockTime + ", profileImage=" + profileImage
+				+ ", roles=" + roles + "]";
 	}	
 	
 	

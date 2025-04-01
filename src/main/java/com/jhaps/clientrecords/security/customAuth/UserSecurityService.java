@@ -1,6 +1,6 @@
 package com.jhaps.clientrecords.security.customAuth;
 
-import com.jhaps.clientrecords.dto.request.user.UserAuth;
+import com.jhaps.clientrecords.dto.request.user.UserAuthRequest;
 import com.jhaps.clientrecords.dto.response.UserDto;
 import com.jhaps.clientrecords.entity.system.User;
 
@@ -17,7 +17,7 @@ import com.jhaps.clientrecords.entity.system.User;
 
 public interface UserSecurityService {
 
-	public void updateLoginAttempts(UserAuth userAuth); /* After each wrong password attempt user->attempt field will be updated till it reaches 3*/
+	public void updateLoginAttempts(UserAuthRequest userAuthRequest); /* After each wrong password attempt user->attempt field will be updated till it reaches 3*/
 	
 	public void unlockAccount(int id);	/* ADMIN - Unlock the locked User Account by ID */
 	

@@ -5,8 +5,10 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
-import com.jhaps.clientrecords.dto.request.user.UserAuth;
-import com.jhaps.clientrecords.dto.request.user.UserRegister;
+import com.jhaps.clientrecords.dto.request.ImageRequest;
+import com.jhaps.clientrecords.dto.request.user.UserAuthRequest;
+import com.jhaps.clientrecords.dto.request.user.UserRegisterRequest;
+import com.jhaps.clientrecords.dto.request.user.UserImageUploadRequest;
 import com.jhaps.clientrecords.dto.response.UserDto;
 import com.jhaps.clientrecords.dto.response.user.UserAdmin;
 import com.jhaps.clientrecords.dto.response.user.UserGeneralDto;
@@ -25,14 +27,14 @@ public class UserMapper {
 	 * Password, roles others will be
 	 * handled in service class.
 	 * */
-	public  User toUserEntity(UserRegister dto) {
+	public  User toUserEntity(UserRegisterRequest dto) {
 		User user = new User();
 		user.setEmail(dto.getEmail());
 		return user;
 	}
 	
 	
-	public User toUserEntity(UserAuth dto) {
+	public User toUserEntity(UserAuthRequest dto) {
 		User user = new User();
 		user.setEmail(dto.getEmail());
 		user.setPassword(dto.getPassword());
@@ -72,9 +74,17 @@ public class UserMapper {
 	
 	
 	
+/*----------------------FOR PROFILE PICTURE-------------------------------------------------------------*/
 	
+	/* For profilePicture update of User we need to convert :
+	 * 	UserUpdateProfile To ImageRequest 
+	 */
 	
-	
+	public ImageRequest toImageRequestFromUserUpdateImage(UserImageUploadRequest userImageUploadRequest) {
+		ImageRequest imageRequest = new ImageRequest();
+		imageRequest.setImageName(userImageUploadRequest.getImageName());
+		return imageRequest;
+	}
 	
 	
 	

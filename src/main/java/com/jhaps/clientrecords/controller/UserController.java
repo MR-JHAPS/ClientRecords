@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,11 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jhaps.clientrecords.apiResponse.ApiResponseBuilder;
 import com.jhaps.clientrecords.apiResponse.ApiResponseModel;
-import com.jhaps.clientrecords.dto.request.user.UserUpdate;
-import com.jhaps.clientrecords.dto.response.ImageDto;
+import com.jhaps.clientrecords.dto.request.user.UserUpdateRequest;
+import com.jhaps.clientrecords.dto.request.user.UserImageUploadRequest;
 import com.jhaps.clientrecords.dto.response.user.UserGeneralDto;
 import com.jhaps.clientrecords.enums.ResponseMessage;
-import com.jhaps.clientrecords.service.system.ImageService;
 import com.jhaps.clientrecords.service.system.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,7 +34,6 @@ public class UserController {
 
 	
 	private UserService userService;
-	private ImageService imageService;
 	private ApiResponseBuilder apiResponseBuilder;
 
 	
@@ -46,7 +45,7 @@ public class UserController {
 
 	
 	
-	@Operation(summary = "Get User By current logged on user")
+	@Operation(summary = "Get authenticated user's details")
 	@GetMapping("/me")
 	public ResponseEntity<ApiResponseModel<UserGeneralDto>> getUserSelf(@AuthenticationPrincipal UserDetails userDetails) {
 		String email = userDetails.getUsername();
@@ -55,20 +54,9 @@ public class UserController {
 	}
 	
 	
-	
-	
-//	@Operation(summary = "Get User along with Roles By ID")
-//	@GetMapping("/id/{id}/details")
-//	@PreAuthorize("hasAuthority('admin')")
-//	public ResponseEntity<ApiResponseModel<UserAdminDto>> getUserWithRolesById(@PathVariable int id) {
-//		UserAdminDto userAdminDto = userService.findUserWithRolesById(id);
-//		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, userAdminDto);
-//	}
-	
-	
-	@Operation(summary = "Delete current user using userDetails from SecurityContextHolder")
+	@Operation(summary = "Delete authenticated user's profile")
 	@DeleteMapping("/delete/me")
-	public ResponseEntity<ApiResponseModel<String>> deleteUserById(@AuthenticationPrincipal UserDetails userDetails ){			
+	public ResponseEntity<ApiResponseModel<String>> deleteUser(@AuthenticationPrincipal UserDetails userDetails ){			
 		String email = userDetails.getUsername();
 		System.out.println("Controller : user with email: " + email + " is deleting the user account");
 		userService.deleteUserByEmail(email);
@@ -76,24 +64,26 @@ public class UserController {
 	}
 	
 	
-	@Operation(summary = "Update User By ID")
+	@Operation(summary = "Update authenticated user's profile" )
 	@PutMapping("/update/me")
-	public ResponseEntity<ApiResponseModel<String>> updateUserByEmail(@RequestBody UserUpdate userUpdate ,
+	public ResponseEntity<ApiResponseModel<String>> updateAuthenticatedUser(@RequestBody UserUpdateRequest request ,
 					@AuthenticationPrincipal UserDetails userDetails){
 		String email = userDetails.getUsername();
-		userService.updateUserByEmail(email, userUpdate);
+		userService.updateUserByEmail(email, request);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, "User with email " + email + " updated Successfully");
 	}
 	
 	
-	@Operation(summary = "Save Image of User using userEmail")
-	@PutMapping("/image/save")
-	public ResponseEntity<ApiResponseModel<String>> uploadImage(@RequestBody ImageDto imageDto ,
+	@Operation(summary = "Upload profile image for authenticated user")
+	@PostMapping("/image/save")
+	public ResponseEntity<ApiResponseModel<String>> uploadImage(@RequestBody UserImageUploadRequest request ,
 					@AuthenticationPrincipal UserDetails userDetails){
 		String email = userDetails.getUsername();
-		imageService.saveImage(email, imageDto);
+		userService.updateUserProfileImage(email, request);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, 
-					"Image with name " + imageDto.getImageName() + " for user " + email + " saved Successfully");
+					"Image with name " + request.getImageName() + " for user " + email + " saved Successfully");
 	}
+	
+	
 	
 }// ends class

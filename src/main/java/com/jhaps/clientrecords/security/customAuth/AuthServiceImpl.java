@@ -13,7 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
-import com.jhaps.clientrecords.dto.request.user.UserAuth;
+import com.jhaps.clientrecords.dto.request.user.UserAuthRequest;
 import com.jhaps.clientrecords.entity.system.User;
 import com.jhaps.clientrecords.exception.system.UserNotFoundException;
 import com.jhaps.clientrecords.repository.system.UserRepository;
@@ -66,28 +66,28 @@ public class AuthServiceImpl implements AuthService {
 
 
 	@Override
-	public String verifyUser(UserAuth userAuth) {
-		log.info("Action: verify_user_initiated, email: {}", userAuth.getEmail());
-		User user =  userRepo.findByEmail(userAuth.getEmail())
+	public String verifyUser(UserAuthRequest userAuthRequest) {
+		log.info("Action: verify_user_initiated, email: {}", userAuthRequest.getEmail());
+		User user =  userRepo.findByEmail(userAuthRequest.getEmail())
 						.orElseThrow(()-> {
-							log.error("Error: user_not_found, email: {}", userAuth.getEmail());
-							throw new UserNotFoundException("User with Email " + userAuth.getEmail() + " not found.");
+							log.error("Error: user_not_found, email: {}", userAuthRequest.getEmail());
+							throw new UserNotFoundException("User with Email " + userAuthRequest.getEmail() + " not found.");
 							});
 		
 		try{
 			manageLockedAccount(user); /* All business logic that is related to locked account is handled by this method */
-			Authentication auth = authManager.authenticate(new UsernamePasswordAuthenticationToken(userAuth.getEmail(), userAuth.getPassword()));
+			Authentication auth = authManager.authenticate(new UsernamePasswordAuthenticationToken(userAuthRequest.getEmail(), userAuthRequest.getPassword()));
 			
 			Collection<? extends GrantedAuthority> roles = auth.getAuthorities(); /* Getting the user roles/authorities from Authentication auth.*/
 			if(roles.isEmpty()) {													/* Checking if the user Role is Empty while logging in.*/
-				throw new AccessDeniedException(userAuth.getEmail() + "Error: You don't have required role to login");
+				throw new AccessDeniedException(userAuthRequest.getEmail() + "Error: You don't have required role to login");
 			}
-			log.info("Action: verification_successful,  email: {}", userAuth.getEmail());
-			userSecurityService.resetLoginAttempts(userAuth.getEmail()); // resets the password if log in is successful. 
-			return jwtServiceImpl.generateJWTToken(userAuth.getEmail());
+			log.info("Action: verification_successful,  email: {}", userAuthRequest.getEmail());
+			userSecurityService.resetLoginAttempts(userAuthRequest.getEmail()); // resets the password if log in is successful. 
+			return jwtServiceImpl.generateJWTToken(userAuthRequest.getEmail());
  		}catch (BadCredentialsException e) {
- 			userSecurityService.updateLoginAttempts(userAuth);
- 			throw new BadCredentialsException( "Error: wrong_Authentication/Credentials_Details, Email : " + userAuth.getEmail() );
+ 			userSecurityService.updateLoginAttempts(userAuthRequest);
+ 			throw new BadCredentialsException( "Error: wrong_Authentication/Credentials_Details, Email : " + userAuthRequest.getEmail() );
 		}	
 	}//ends method
 	

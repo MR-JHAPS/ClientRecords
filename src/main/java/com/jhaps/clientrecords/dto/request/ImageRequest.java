@@ -8,9 +8,11 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RoleCreateRequest {
+public class ImageRequest {
 
-	@NotBlank(message = "RoleCreateRequest: roleName cannot be empty")
-	private String role;
+	@NotBlank(message = "ImageRequest: imageName cannot be Empty")
+	private String imageName;
 	
-}
+	
+
+}//ends dto

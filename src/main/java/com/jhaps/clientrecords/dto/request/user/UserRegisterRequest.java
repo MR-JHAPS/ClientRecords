@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class UserRegister {
+public class UserRegisterRequest {
 
 	@Email
 	@NotBlank(message = "User email cannot be blank")

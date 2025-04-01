@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserAuth {
+public class UserAuthRequest {
 	
 	@NotBlank(message = "Email cannot be empty")
 	@Email(message ="Email Format is not correct")

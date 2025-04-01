@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jhaps.clientrecords.apiResponse.ApiResponseBuilder;
 import com.jhaps.clientrecords.apiResponse.ApiResponseModel;
-import com.jhaps.clientrecords.dto.request.user.UserAuth;
-import com.jhaps.clientrecords.dto.request.user.UserRegister;
+import com.jhaps.clientrecords.dto.request.user.UserAuthRequest;
+import com.jhaps.clientrecords.dto.request.user.UserRegisterRequest;
 import com.jhaps.clientrecords.dto.response.UserDto;
 import com.jhaps.clientrecords.enums.ResponseMessage;
 import com.jhaps.clientrecords.security.customAuth.AuthService;
@@ -46,9 +46,9 @@ public class AuthController {
 		@Operation(summary = "user Login")
 		@PostMapping("/login")
 		//@PreAuthorize("permitAll()")
-		public ResponseEntity<ApiResponseModel<String>> userLogin(@Valid @RequestBody UserAuth userAuth){
+		public ResponseEntity<ApiResponseModel<String>> userLogin(@Valid @RequestBody UserAuthRequest userAuthRequest){
 			log.info("Requesting verification of userLogin Details | PublicController -->'/login' ");
-			String token = authService.verifyUser(userAuth);
+			String token = authService.verifyUser(userAuthRequest);
 			log.info("inside the userLogin controller after token generation : {}", token);
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, token);
 		}
@@ -56,7 +56,7 @@ public class AuthController {
 		
 		@Operation(summary = "user Signup")
 		@PostMapping("/signup")
-		public ResponseEntity<ApiResponseModel<String>> userSignUp(@Valid @RequestBody UserRegister registrationDto){
+		public ResponseEntity<ApiResponseModel<String>> userSignUp(@Valid @RequestBody UserRegisterRequest registrationDto){
 			userService.saveNewUser(registrationDto);
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.CREATED, "User Created Successfully");
 		}

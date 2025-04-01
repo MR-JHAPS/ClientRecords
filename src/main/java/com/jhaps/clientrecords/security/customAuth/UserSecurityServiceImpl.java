@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Service;
 
-import com.jhaps.clientrecords.dto.request.user.UserAuth;
+import com.jhaps.clientrecords.dto.request.user.UserAuthRequest;
 import com.jhaps.clientrecords.dto.response.UserDto;
 import com.jhaps.clientrecords.entity.system.User;
 import com.jhaps.clientrecords.exception.system.UserNotFoundException;
@@ -32,8 +32,8 @@ public class UserSecurityServiceImpl implements UserSecurityService{
 
 	/*	THIS IS TO UPDATE THE USER LOGIN ATTEMPTS AFTER EACH WRONG PASSWORD/CREDENTIALS. */
 	@Override
-	public void updateLoginAttempts(UserAuth userAuth) {
-		String email = userAuth.getEmail(); //email of user who made wrong password attempt
+	public void updateLoginAttempts(UserAuthRequest userAuthRequest) {
+		String email = userAuthRequest.getEmail(); //email of user who made wrong password attempt
 		User user = userRepo.findByEmail(email)
 					.orElseThrow(()-> new UserNotFoundException("Error: User_Not_Found, Email : " + email));
 		int previousAttempts = user.getAttempts(); /* Getting the user wrong password attempts from the Database if exists */

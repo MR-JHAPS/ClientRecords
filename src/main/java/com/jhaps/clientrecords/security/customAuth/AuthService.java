@@ -1,6 +1,6 @@
 package com.jhaps.clientrecords.security.customAuth;
 
-import com.jhaps.clientrecords.dto.request.user.UserAuth;
+import com.jhaps.clientrecords.dto.request.user.UserAuthRequest;
 
 public interface AuthService {
 	/*
@@ -8,7 +8,7 @@ public interface AuthService {
 	 * @return  JWT token as a String.
 	 * 
 	 * */
-	String verifyUser(UserAuth userAuth);
+	String verifyUser(UserAuthRequest userAuthRequest);
 	
 	
 	

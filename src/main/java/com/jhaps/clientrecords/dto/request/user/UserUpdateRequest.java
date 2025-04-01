@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserUpdate {
+public class UserUpdateRequest {
 
 	@NotBlank(message = "UserUpdate 'Email' cannot be empty")
 	@Email

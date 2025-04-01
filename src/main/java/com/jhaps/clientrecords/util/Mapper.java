@@ -1,20 +1,10 @@
 package com.jhaps.clientrecords.util;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import org.springframework.stereotype.Component;
 
 import com.jhaps.clientrecords.dto.request.ClientDto;
-import com.jhaps.clientrecords.dto.response.ClientBinDto;
-import com.jhaps.clientrecords.dto.response.ImageDto;
-import com.jhaps.clientrecords.dto.response.RoleDto;
 import com.jhaps.clientrecords.dto.response.UserDto;
 import com.jhaps.clientrecords.entity.client.Client;
-import com.jhaps.clientrecords.entity.client.ClientBin;
-import com.jhaps.clientrecords.entity.system.Image;
-import com.jhaps.clientrecords.entity.system.Role;
 import com.jhaps.clientrecords.entity.system.User;
 
 @Component

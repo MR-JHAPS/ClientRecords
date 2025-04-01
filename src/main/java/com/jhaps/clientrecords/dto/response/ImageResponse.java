@@ -5,16 +5,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class ImageDto {
+@NoArgsConstructor
+public class ImageResponse {
 
 	private int id;
+	
 	private String imageName;
-	
-	
-	
-	
-	
-	
-}// ends class
+}

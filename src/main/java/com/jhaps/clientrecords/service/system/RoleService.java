@@ -3,7 +3,7 @@ package com.jhaps.clientrecords.service.system;
 import java.util.List;
 import java.util.Set;
 
-import com.jhaps.clientrecords.dto.request.RoleCreateRequest;
+import com.jhaps.clientrecords.dto.request.RoleSaveRequest;
 import com.jhaps.clientrecords.dto.request.RoleRequest;
 import com.jhaps.clientrecords.dto.response.RoleDto;
 import com.jhaps.clientrecords.dto.response.RoleResponse;
@@ -23,7 +23,7 @@ public interface RoleService {
 	
 	public Set<RoleResponse> findAllRoles();
 	
-	public void saveNewRole(RoleCreateRequest roleCreateRequest);
+	public void saveNewRole(RoleSaveRequest roleSaveRequest);
 	
 	public void deleteRole(int id);
 	

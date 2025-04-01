@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
-import com.jhaps.clientrecords.dto.request.RoleCreateRequest;
+import com.jhaps.clientrecords.dto.request.RoleSaveRequest;
 import com.jhaps.clientrecords.dto.request.RoleRequest;
 import com.jhaps.clientrecords.dto.response.RoleDto;
 import com.jhaps.clientrecords.dto.response.RoleResponse;
@@ -86,8 +86,8 @@ public class RoleServiceImpl implements RoleService {
 
 
 	@Override
-	public void saveNewRole(RoleCreateRequest roleCreateRequest) {
-		String roleName = roleCreateRequest.getRole(); //converting Set<String> to String
+	public void saveNewRole(RoleSaveRequest roleSaveRequest) {
+		String roleName = roleSaveRequest.getRole(); //converting Set<String> to String
 		 Role role = new Role(0, roleName);	//saving new role.
 		 roleRepo.save(role);
 		
