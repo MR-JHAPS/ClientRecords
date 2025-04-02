@@ -38,7 +38,6 @@ public class AdminServiceImpl implements AdminService{
 
 	private RoleService roleService;
 	private UserRepository userRepo;
-	private SecurityUtils securityUtils;
 	private UserMapper userMapper;
 	private UserService userService;
 	private PasswordEncoder passwordEncoder;
@@ -53,7 +52,7 @@ public class AdminServiceImpl implements AdminService{
 			throw new UserNotFoundException("No users Found in the Database");
 		}
 		log.info("Finding All Users is Executed Successfully. and fetched :{} clients", userList.getNumberOfElements());
-		return userList.map(userMapper::toUserAdminDto);
+		return userList.map(userMapper::toUserAdminResponse);
 	}
 	
 	
@@ -61,7 +60,7 @@ public class AdminServiceImpl implements AdminService{
 	public UserAdminResponse findUserWithRolesById(int id) {
 		User user = userRepo.findById(id).orElseThrow( ()->
 			new UserNotFoundException("Unable to find the user with ID : " + id) );
-		return userMapper.toUserAdminDto(user);
+		return userMapper.toUserAdminResponse(user);
 	}
 	
 	
@@ -93,7 +92,7 @@ public class AdminServiceImpl implements AdminService{
 		if(userList.getContent().isEmpty()) {
 			throw new UserNotFoundException("No users found in Database with given Role");
 		}
-		return userList.map(userMapper::toUserAdminDto); //mapping user to userAdmin
+		return userList.map(userMapper::toUserAdminResponse); //mapping user to userAdmin
 	}
 
 
@@ -129,6 +128,15 @@ public class AdminServiceImpl implements AdminService{
 	public void deleteUserById(int id) {
 		User user = userService.findUserById(id);
 		userRepo.delete(user);
+	}
+
+
+	@Override
+	public UserAdminResponse searchUserByEmail(String email) {
+		User user=userRepo.findByEmail(email)
+					.orElseThrow(()-> new UserNotFoundException("Unable to find the user by email:" + email));
+		
+		return userMapper.toUserAdminResponse(user);
 	}
 		
 		

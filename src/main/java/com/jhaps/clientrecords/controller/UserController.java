@@ -29,7 +29,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Validated
 @RestController
 @RequestMapping("/api/user")
-@Tag(name = "2. User Controller")
+@Tag(name = "User API's")
 public class UserController {
 
 	

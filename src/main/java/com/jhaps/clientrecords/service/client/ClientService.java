@@ -26,6 +26,7 @@ public interface ClientService {
 	public void updateClientById(String userEmail, int id, ClientRequest clientUpdateInfo ); /*  @param userEmail to log the user in clientLog */
 	
 	//THIS IS FOR THE SEARCH QUERY 
+
 	public Page<ClientResponse> findClientBySearchQuery(String searchQuery, Pageable pageable);
 	
 	public Page<ClientResponse> findClientsByFirstName(String firstName, Pageable pageable);

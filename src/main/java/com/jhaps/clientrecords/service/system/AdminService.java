@@ -21,7 +21,7 @@ public interface AdminService {
 	
 	public void deleteUserById(int id); /* Admin can delete any user By id */
 	
-	
+	UserAdminResponse searchUserByEmail(String email);
 	
 	
 	

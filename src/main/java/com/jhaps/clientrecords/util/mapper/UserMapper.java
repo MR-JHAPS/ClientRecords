@@ -53,7 +53,7 @@ public class UserMapper {
 	}
 	
 	
-	public UserAdminResponse toUserAdminDto(User user) {
+	public UserAdminResponse toUserAdminResponse(User user) {
 		UserAdminResponse dto = new UserAdminResponse();
 		dto.setId(user.getId());
 		dto.setEmail(user.getEmail());

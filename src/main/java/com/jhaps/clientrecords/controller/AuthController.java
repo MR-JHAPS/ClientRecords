@@ -4,11 +4,8 @@ package com.jhaps.clientrecords.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,17 +18,14 @@ import com.jhaps.clientrecords.security.customAuth.AuthService;
 import com.jhaps.clientrecords.service.system.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
 @RequestMapping("/api/public")
-@Tag(name = "1. Public Controller" , description = "Log-In, refreshToken, Sign-Up API's") // this is for the swagger
+@Tag(name = "Public API's" , description = "Log-In, refreshToken, Sign-Up API's") // this is for the swagger
 public class AuthController {
 
 	
@@ -68,7 +62,17 @@ public class AuthController {
 		
 		
 		
-		@Operation(summary = "user LogOut")
+}//ends controller
+
+
+
+		
+/* ------------------------ WILL IMPLEMENT TOKEN LOG OUT WHEN I IMPLEMENT REDIS CACHE ------------------------*/
+	
+		
+		
+	/*	
+	    @Operation(summary = "user LogOut")
 		@PostMapping("/logout")
 		public ResponseEntity<ApiResponseModel<String>> userLogin(@Parameter(hidden=true) @RequestHeader("Authorization") String authHeader,
 				HttpServletRequest request, HttpServletResponse response,
@@ -77,22 +81,15 @@ public class AuthController {
 			authService.logOutUser(authHeader, request, response, userDetails);
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, "userLogged out successfully");
 		}
+	*/	
+		
+/* ------------------------ WILL IMPLEMENT TOKEN LOG OUT WHEN I IMPLEMENT REDIS CACHE ------------------------*/		
+		
+		
 
 		
 		
 		
 		
 		
-		
-//		public ResponseEntity<ApiResponseModel<String>> refreshJwtToken(){
-//			
-//		}
-		
-		
-		
-		
-		
-		
-		
-		
-}//ends controller
+

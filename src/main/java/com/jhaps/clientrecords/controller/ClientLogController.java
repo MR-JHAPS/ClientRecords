@@ -28,7 +28,7 @@ import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/api/clientLog")
-@Tag(name = "All actions related to client Log ",
+@Tag(name = "Client-Log API's ",
 		description = "This api containst the manipulation done to the client (deleted, updated, created Client Informations)")
 @AllArgsConstructor
 public class ClientLogController {

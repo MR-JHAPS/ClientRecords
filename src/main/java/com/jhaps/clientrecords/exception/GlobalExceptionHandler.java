@@ -94,6 +94,11 @@ public class GlobalExceptionHandler {
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.BAD_CREDENTIALS, HttpStatus.UNAUTHORIZED);
 	}
 	
+	@ExceptionHandler(IllegalArgumentException.class)
+	public ResponseEntity<ApiResponseModel<String>> handleIllegalArgumentException(IllegalArgumentException e){
+		log.error("Illegal_Argument_Exception Occured : {} ",e.getMessage(), e);
+		return apiResponseBuilder.buildApiResponse(ResponseMessage.WRONG_ARGUMENT, HttpStatus.BAD_REQUEST, e.getMessage());
+	}
 	
 	@ExceptionHandler(SecurityException.class)
 	public ResponseEntity<ApiResponseModel<String>> handleSecurityException(SecurityException e){

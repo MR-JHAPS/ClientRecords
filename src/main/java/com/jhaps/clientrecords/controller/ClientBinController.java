@@ -22,8 +22,6 @@ import com.jhaps.clientrecords.enums.ResponseMessage;
 import com.jhaps.clientrecords.service.client.ClientBinService;
 import com.jhaps.clientrecords.service.system.PagedResourceAssemblerService;
 import com.jhaps.clientrecords.util.PageableUtils;
-import com.jhaps.clientrecords.util.SortBuilder;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
@@ -31,7 +29,7 @@ import lombok.AllArgsConstructor;
 @RestController
 @RequestMapping("/api/clientBin")
 @AllArgsConstructor
-@Tag(name = "Client Bin Controller (Get,Delete,Restore)", description = "Manage Deleted Clients(Restore, Get, Delete)")
+@Tag(name = "Client Bin API's", description = "Manage Deleted Clients(Restore, Get, Delete)")
 public class ClientBinController {
 
 	private ClientBinService clientBinService;

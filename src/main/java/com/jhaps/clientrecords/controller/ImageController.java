@@ -35,7 +35,7 @@ import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/api/images")
-@Tag(name = "5. Image Controller", description = "Insert, Delete, Get images of the User")
+@Tag(name = "Image API's", description = "Insert, Delete, Get images of the User")
 @AllArgsConstructor
 public class ImageController {
 

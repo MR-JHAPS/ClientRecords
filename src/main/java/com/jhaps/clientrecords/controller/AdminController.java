@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,16 +29,17 @@ import com.jhaps.clientrecords.dto.response.user.UserAdminResponse;
 import com.jhaps.clientrecords.enums.ResponseMessage;
 import com.jhaps.clientrecords.service.system.AdminService;
 import com.jhaps.clientrecords.service.system.PagedResourceAssemblerService;
-import com.jhaps.clientrecords.util.SortBuilder;
-
+import com.jhaps.clientrecords.util.PageableUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestController
 @RequestMapping("/api/admin")
-@Tag(name = "3. Admin Controller" , description = "Manage Users, Manage Clients, Manage Roles")
+@Validated
+@Tag(name = "Admin API's" , description = "Manage Users, Manage Clients, Manage Roles")
 public class AdminController {
 
 	private ApiResponseBuilder apiResponseBuilder;	
@@ -63,10 +65,7 @@ public class AdminController {
 								@RequestParam(required = false) String sortBy,
 								@RequestParam(required = false) String direction
 								){
-		//if "sortBy" and "Direction" parameters is null then "Sort sort" will return null.
-		Sort sort = SortBuilder.createSorting(direction, sortBy);
-		//if sort returns null, don't apply sorting in PageRequest/pageable.
-		Pageable pageable =  (sort == null) ? PageRequest.of(pageNumber, pageSize) : PageRequest.of(pageNumber, pageSize, sort);
+		Pageable pageable =  PageableUtils.createPageable(pageNumber, pageSize, sortBy, direction);
 		Page<UserAdminResponse> paginatedUsers = adminService.findAllUsers(pageable);
 		PagedModel<EntityModel<UserAdminResponse>> pagedUserModel = pagedResourceAssemblerService.toPagedModel(paginatedUsers);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, pagedUserModel);
@@ -76,7 +75,7 @@ public class AdminController {
 	@Operation(summary = "Get User along with Roles By ID")
 	@GetMapping("/user/{id}")
 	@PreAuthorize("hasAuthority('admin')")
-	public ResponseEntity<ApiResponseModel<UserAdminResponse>> getUserWithRolesById(@PathVariable int id) {
+	public ResponseEntity<ApiResponseModel<UserAdminResponse>> getUserWithRolesByUserId(@PathVariable int id) {
 		UserAdminResponse userAdminResponse = adminService.findUserWithRolesById(id);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, userAdminResponse);
 	}
@@ -94,22 +93,30 @@ public class AdminController {
 
 	
 	@Operation(summary = "Get List Of Users By Role Name")
-	@GetMapping("/role/{role}")
+	@GetMapping("/search-by/role")
 	@PreAuthorize("hasAuthority('admin')")
-	public ResponseEntity<ApiResponseModel<PagedModel<EntityModel<UserAdminResponse>>>> getUsersByRole(@PathVariable String role,
+	public ResponseEntity<ApiResponseModel<PagedModel<EntityModel<UserAdminResponse>>>> getUsersByRole(
+												@NotBlank @RequestParam String role,
 												@RequestParam(defaultValue="0") int pageNumber,
 												@RequestParam(defaultValue="10") int pageSize,
 												@RequestParam(required = false) String sortBy,
 												@RequestParam(required = false) String direction){
 		
-		//if "sortBy" and "Direction" parameters is null then "Sort sort" will return null.
-		Sort sort = SortBuilder.createSorting(direction, sortBy);
-		//if sort returns null, don't apply sorting in PageRequest/pageable.
-		Pageable pageable =  (sort == null) ? PageRequest.of(pageNumber, pageSize) : PageRequest.of(pageNumber, pageSize, sort);
-		Page<UserAdminResponse> paginatedUsers = adminService.findUsersByRoleName(role, pageable);
+		Pageable pageable =  PageableUtils.createPageable(pageNumber, pageSize, sortBy, direction);
+		Page<UserAdminResponse> paginatedUsers =adminService.findUsersByRoleName(role, pageable);
 		PagedModel<EntityModel<UserAdminResponse>> pagedUserModel = pagedResourceAssemblerService.toPagedModel(paginatedUsers);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, pagedUserModel);
 	}
+	
+
+	@Operation(summary = "Search user by user Email", description = "User-Email is unique so it will return only one data.")
+	@GetMapping("/search-by/email")
+	@PreAuthorize("hasAuthority('admin')")
+	public ResponseEntity<ApiResponseModel<UserAdminResponse>> getUserWithRolesByUserEmail(@RequestParam String email) {
+		UserAdminResponse userAdminResponse = adminService.searchUserByEmail(email);
+		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, userAdminResponse);
+	}
+	
 	
 	
 	

@@ -27,7 +27,7 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/roles")
-@Tag(name = "4. Role Controller", description = "Manages all the operations related to Roles")
+@Tag(name = "Role API's", description = "Manages all the operations related to Roles")
 public class RoleController {
 
 	private RoleService roleService;

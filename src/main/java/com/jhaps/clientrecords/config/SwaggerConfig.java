@@ -52,30 +52,20 @@ public class SwaggerConfig {
 	}//ends method
 	
 	
+	
 
-	@Bean
-	OpenApiCustomizer sortTags() {
-		return openApi -> {
-			List<Tag> tags = openApi.getTags();
-			if(tags!=null && !tags.isEmpty()) {
-				List<Tag> sortedTags = tags.stream()
-											.sorted(Comparator.comparingInt(
-															(tag) ->{
-																String[] splitedName = ((Tag)tag).getName().split("\\.");
-																int number = Integer.parseInt(splitedName[0]);
-																System.out.println(Arrays.toString(splitedName) );
-																System.out.println( number);
-																return number;
-															})//ends comparingInt 
-													)//ends sorted
-											.toList();
-				System.out.println(sortedTags);
-				openApi.setTags(sortedTags);
-			}//ends if
-		};//ends return
-	}//ends method.
+public OpenApiCustomizer makePublicTagFirst() {
+return openApi -> {
+	List<Tag> tags = openApi.getTags();
+	if(tags!=null) {
+		tags.sort(Comparator.comparing((Tag tag)->
+			!"Public Controller".equals(tag.getName()))
+				.thenComparing(Tag::getName));
+	}
+};
+}
 	
-	
+
 
 	
 	
@@ -83,14 +73,34 @@ public class SwaggerConfig {
 
 
 
+/*
+ * TRIED SORTING USING 1.CONTROLLER API's but it wont work maybe because Swagger Overrides the custom sort.
+ * 
+ * Tried extracting the number from TAG.name and sorting with that number. It's not working.
+ *
+*/
+//@Bean
+//OpenApiCustomizer sortTags() {
+//	return openApi -> {
+//		List<Tag> tags = openApi.getTags();
+//		if(tags!=null && !tags.isEmpty()) {
+//			List<Tag> sortedTags = tags.stream()
+//										.sorted(Comparator.comparingInt(
+//														(tag) ->{
+//															String[] splitedName = ((Tag)tag).getName().split("\\.");
+//															int number = Integer.parseInt(splitedName[0]);
+//															System.out.println(Arrays.toString(splitedName) );
+//															System.out.println( number);
+//															return number;
+//														})//ends comparingInt 
+//												)//ends sorted
+//										.toList();
+//			System.out.println(sortedTags);
+//			openApi.setTags(sortedTags);
+//		}//ends if
+//	};//ends return
+//}//ends method.
+//
+//
 
-//public OpenApiCustomizer makePublicTagFirst() {
-//return openApi -> {
-//	List<Tag> tags = openApi.getTags();
-//	if(tags!=null) {
-//		tags.sort(Comparator.comparing((Tag tag)->
-//			!"Public Controller".equals(tag.getName()))
-//				.thenComparing(Tag::getName));
-//	}
-//};
-//}
+

@@ -25,6 +25,7 @@ public enum ResponseMessage {
 	USER_DELETED("User Deleted Successfully"),
 	DUPLICATE_DATA("Data with provided name already exists"),
 	LOCKED("Your Account is locked"),
+	WRONG_ARGUMENT(" Wrong argument passed"),
 	
 	USER_REGISTRATION_ERROR("Unable to Register the new user"),
 	

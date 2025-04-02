@@ -1,13 +1,14 @@
 package com.jhaps.userrecords.role;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Set;
 
-import org.assertj.core.util.Arrays;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -36,25 +37,29 @@ public class RoleServiceTest {
 		//setting up role test data. | arrange
 		Role role1 = new Role(1, "user");
 		Role role2 = new Role(2, "admin");
+		RoleResponse roleResponse1 = new RoleResponse(1, "user");
+		RoleResponse roleResponse2 = new RoleResponse(2, "admin");
 		
 		//mock behaviour | act (logic's inside findAllMethods)
 		when(roleRepo.findAll()).thenReturn(List.of(role1, role2));
-		when(roleMapper.toRoleResponse(role1)).thenReturn(new RoleResponse(1, "user"));
+		when(roleMapper.toRoleResponse(role1)).thenReturn(roleResponse1);
+		when(roleMapper.toRoleResponse(role2)).thenReturn(roleResponse2);
 		
-		//running the service method
+		//running the roleServiceImpl.findAllRoles(). returns Set<RoleResponse>.
 		Set<RoleResponse> response = roleServiceImpl.findAllRoles();
 		
 		//verification of result
 		assertEquals(2, response.size());
+		assertTrue(response.contains(roleResponse1));
+		assertTrue(response.contains(roleResponse2));
 		
 		//verifying mock interactions
 		verify(roleRepo).findAll();
 		verify(roleMapper).toRoleResponse(role1);
-		
-		
+
 	}
 	
 	
 	
 	
-}
+}//ends class
