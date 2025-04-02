@@ -1,7 +1,6 @@
 package com.jhaps.clientrecords.security.customAuth;
 
 import com.jhaps.clientrecords.dto.request.user.UserAuthRequest;
-import com.jhaps.clientrecords.dto.response.UserDto;
 import com.jhaps.clientrecords.entity.system.User;
 
 /*

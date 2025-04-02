@@ -12,10 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.jhaps.clientrecords.dto.request.RoleRequest;
-import com.jhaps.clientrecords.dto.request.user.AdminUpdate;
-import com.jhaps.clientrecords.dto.response.RoleDto;
-import com.jhaps.clientrecords.dto.response.UserDto;
-import com.jhaps.clientrecords.dto.response.user.UserAdmin;
+import com.jhaps.clientrecords.dto.request.user.AdminUpdateRequest;
+import com.jhaps.clientrecords.dto.response.user.UserAdminResponse;
 import com.jhaps.clientrecords.entity.system.Role;
 import com.jhaps.clientrecords.entity.system.User;
 import com.jhaps.clientrecords.enums.RoleNames;
@@ -26,7 +24,6 @@ import com.jhaps.clientrecords.security.customAuth.PasswordValidator;
 import com.jhaps.clientrecords.service.system.AdminService;
 import com.jhaps.clientrecords.service.system.RoleService;
 import com.jhaps.clientrecords.service.system.UserService;
-import com.jhaps.clientrecords.util.Mapper;
 import com.jhaps.clientrecords.util.SecurityUtils;
 import com.jhaps.clientrecords.util.UserMapper;
 
@@ -42,7 +39,6 @@ public class AdminServiceImpl implements AdminService{
 	private RoleService roleService;
 	private UserRepository userRepo;
 	private SecurityUtils securityUtils;
-	private Mapper mapper;
 	private UserMapper userMapper;
 	private UserService userService;
 	private PasswordEncoder passwordEncoder;
@@ -51,7 +47,7 @@ public class AdminServiceImpl implements AdminService{
 	
 	
 	@Override
-	public Page<UserAdmin> findAllUsers(Pageable pageable) {
+	public Page<UserAdminResponse> findAllUsers(Pageable pageable) {
 		Page<User> userList = userRepo.findAll(pageable);
 		if(userList.getContent().isEmpty()) {
 			throw new UserNotFoundException("No users Found in the Database");
@@ -62,7 +58,7 @@ public class AdminServiceImpl implements AdminService{
 	
 	
 	/* Returns "UserAdminDto" this contains userRoles to view in admin-Dashboard */
-	public UserAdmin findUserWithRolesById(int id) {
+	public UserAdminResponse findUserWithRolesById(int id) {
 		User user = userRepo.findById(id).orElseThrow( ()->
 			new UserNotFoundException("Unable to find the user with ID : " + id) );
 		return userMapper.toUserAdminDto(user);
@@ -87,7 +83,7 @@ public class AdminServiceImpl implements AdminService{
 	//Getting the list of user by their role|Authority.
 	@Transactional
 	@Override
-	public Page<UserAdmin> findUsersByRoleName(String roleName, Pageable pageable) {
+	public Page<UserAdminResponse> findUsersByRoleName(String roleName, Pageable pageable) {
 		//checking if the argument roleName is valid.
 		boolean isRoleFound = roleService.isRoleValid(roleName); 
 		if(!isRoleFound) {
@@ -103,7 +99,7 @@ public class AdminServiceImpl implements AdminService{
 
 
 	@Override
-	public void updateAdmin(String currentUserEmail, AdminUpdate adminUpdate) {
+	public void updateAdmin(String currentUserEmail, AdminUpdateRequest adminUpdateRequest) {
 		User user = userService.findUserByEmail(currentUserEmail); //getting current User from securityContextHolder
 		// For Safety: to check if the user has Role: admin. 
 		Set<String> userRoles = user.getRoles().stream().map(role -> role.getName()).collect(Collectors.toSet());
@@ -111,17 +107,17 @@ public class AdminServiceImpl implements AdminService{
 			throw new AccessDeniedException("Error: You are not admin and cannot update this account");
 		}
 		/* If "current-password" does not match the "encoded-account-password" it will throw exception*/
-		passwordValidator.verifyCurrentPassword(adminUpdate.getCurrentPassword(), user.getPassword());
+		passwordValidator.verifyCurrentPassword(adminUpdateRequest.getCurrentPassword(), user.getPassword());
 		
 		/* Checking if user is asking to change a password*/
-		if(StringUtils.hasText(adminUpdate.getNewPassword())) {
+		if(StringUtils.hasText(adminUpdateRequest.getNewPassword())) {
 			/* throws error if newPassword and confirmPassword does not match. */
-			passwordValidator.validatePasswordMatch(adminUpdate.getNewPassword(), adminUpdate.getConfirmPassword()); 
-			String encodedNewPassword = passwordEncoder.encode(adminUpdate.getNewPassword());
+			passwordValidator.validatePasswordMatch(adminUpdateRequest.getNewPassword(), adminUpdateRequest.getConfirmPassword()); 
+			String encodedNewPassword = passwordEncoder.encode(adminUpdateRequest.getNewPassword());
 			user.setPassword(encodedNewPassword);
 		}
-		user.setEmail(adminUpdate.getEmail());
-		Set<Role> roles = roleService.findRoleByNames(adminUpdate.getRoles());
+		user.setEmail(adminUpdateRequest.getEmail());
+		Set<Role> roles = roleService.findRoleByNames(adminUpdateRequest.getRoles());
 		user.setRoles(roles);
 		userRepo.save(user);
 	}

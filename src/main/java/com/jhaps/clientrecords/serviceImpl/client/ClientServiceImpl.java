@@ -4,7 +4,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.jhaps.clientrecords.dto.request.ClientDto;
 import com.jhaps.clientrecords.dto.request.ClientRequest;
 import com.jhaps.clientrecords.dto.response.ClientResponse;
 import com.jhaps.clientrecords.entity.client.Client;
@@ -17,9 +16,6 @@ import com.jhaps.clientrecords.service.client.ClientLogService;
 import com.jhaps.clientrecords.service.client.ClientService;
 import com.jhaps.clientrecords.service.system.UserService;
 import com.jhaps.clientrecords.util.ClientMapper;
-import com.jhaps.clientrecords.util.Mapper;
-import com.jhaps.clientrecords.util.SecurityUtils;
-
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +31,6 @@ import lombok.extern.slf4j.Slf4j;
 public class ClientServiceImpl implements ClientService  {
 
 	private ClientRepository clientRepo;
-	private Mapper mapper; //this contains the custom mapping 
 	private ClientLogService clientLogService;
 	private ClientBinService clientBinService;	
 	private UserService userService;
@@ -76,12 +71,12 @@ public class ClientServiceImpl implements ClientService  {
 	
 	@Override
 	public void saveClient(String userEmail, ClientRequest clientRequest) {
-		User user = userService.findUserByEmail(userEmail);
+		User currentUser = userService.findUserByEmail(userEmail);
 		log.info("Saving Client with name {} .",clientRequest.getFirstName());
 		Client savedClient = clientRepo.save(clientMapper.toClientEntity(clientRequest));  //converting DTO to entity before saving to repository.
 		log.info("Client with name {} saved Successfully.",clientRequest.getFirstName());
 		//logging the client in the clientLog.
-		clientLogService.insertInClientLog(user, savedClient, ModificationType.INSERT);
+		clientLogService.insertInClientLog(currentUser, savedClient, ModificationType.INSERT);
 	}
 
 	

@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jhaps.clientrecords.apiResponse.ApiResponseBuilder;
 import com.jhaps.clientrecords.apiResponse.ApiResponseModel;
-import com.jhaps.clientrecords.dto.request.ClientDto;
 import com.jhaps.clientrecords.dto.response.ClientResponse;
 import com.jhaps.clientrecords.enums.ResponseMessage;
 import com.jhaps.clientrecords.service.client.ClientService;
@@ -31,7 +30,8 @@ import jakarta.validation.constraints.NotBlank;
 @Validated // this is so that "@NotBlank" can be used in @pathVariable
 @RestController
 @RequestMapping("/api/clients/search")
-@Tag(name = "Client Search Controller", description = "Search Clients by 'AnyQuery', 'FirstName', 'LastName', 'PostalCode'")
+//@Tag(name = "7. Client Search Controller", description = "Search Clients by 'AnyQuery', 'FirstName', 'LastName', 'PostalCode'")
+@Tag(name = "6. Client Controller", description = "Create, Read, Update, Delete CLIENT-INFORMATION")
 public class ClientSearchController{	
 	/*In the ApiResponseBuilder.class, responseEntity building method is created
 		to reduce the boilerplate code

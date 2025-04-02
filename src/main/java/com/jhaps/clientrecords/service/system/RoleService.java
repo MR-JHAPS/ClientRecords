@@ -1,11 +1,8 @@
 package com.jhaps.clientrecords.service.system;
 
-import java.util.List;
 import java.util.Set;
 
 import com.jhaps.clientrecords.dto.request.RoleSaveRequest;
-import com.jhaps.clientrecords.dto.request.RoleRequest;
-import com.jhaps.clientrecords.dto.response.RoleDto;
 import com.jhaps.clientrecords.dto.response.RoleResponse;
 import com.jhaps.clientrecords.entity.system.Role;
 

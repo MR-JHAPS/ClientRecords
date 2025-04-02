@@ -3,7 +3,7 @@ package com.jhaps.clientrecords.util;
 import org.springframework.stereotype.Component;
 
 import com.jhaps.clientrecords.dto.request.ClientRequest;
-import com.jhaps.clientrecords.dto.response.ClientBinDto;
+import com.jhaps.clientrecords.dto.response.ClientBinResponse;
 import com.jhaps.clientrecords.dto.response.ClientResponse;
 import com.jhaps.clientrecords.entity.client.Client;
 import com.jhaps.clientrecords.entity.client.ClientBin;
@@ -43,8 +43,8 @@ public class ClientMapper {
 		
 /*-----------------------ClientBin Conversion ---------------------------------------------------------------------------------------------------------------*/	
 		
-		public ClientBinDto toClientBinDto(ClientBin clientBin) {
-			ClientBinDto dto = new ClientBinDto();
+		public ClientBinResponse toClientBinDto(ClientBin clientBin) {
+			ClientBinResponse dto = new ClientBinResponse();
 			dto.setId(clientBin.getId());
 			dto.setClientId(clientBin.getClientId());
 			dto.setFirstName(clientBin.getFirstName());
@@ -56,18 +56,28 @@ public class ClientMapper {
 		
 		
 		
-		public ClientBin toClientBinEntity(ClientBinDto clientBinDto) {
+		public ClientBin toClientBinEntity(ClientBinResponse clientBinResponse) {
 			ClientBin entity = new ClientBin();
-			entity.setClientId(clientBinDto.getClientId());
-			entity.setFirstName(clientBinDto.getFirstName());
-			entity.setLastName(clientBinDto.getLastName());
-			entity.setDateOfBirth(clientBinDto.getDateOfBirth());
-			entity.setPostalCode(clientBinDto.getPostalCode());
+			entity.setClientId(clientBinResponse.getClientId());
+			entity.setFirstName(clientBinResponse.getFirstName());
+			entity.setLastName(clientBinResponse.getLastName());
+			entity.setDateOfBirth(clientBinResponse.getDateOfBirth());
+			entity.setPostalCode(clientBinResponse.getPostalCode());
 			return entity;
 		}
 	
 	
 		
+		// This is to restore the clientBin client to Client-Entity.
+		public Client toClient (ClientBin clientBin) {
+			Client client = new Client();
+			client.setId(clientBin.getClientId());
+			client.setFirstName(clientBin.getFirstName());
+			client.setLastName(clientBin.getLastName());
+			client.setDateOfBirth(clientBin.getDateOfBirth());
+			client.setPostalCode(clientBin.getPostalCode());
+			return client;
+		}
 		
 		
 		

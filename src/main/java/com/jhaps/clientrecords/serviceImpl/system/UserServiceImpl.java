@@ -10,7 +10,7 @@ import com.jhaps.clientrecords.dto.request.user.UserRegisterRequest;
 import com.jhaps.clientrecords.dto.request.user.UserUpdateRequest;
 import com.jhaps.clientrecords.dto.request.user.UserImageUploadRequest;
 import com.jhaps.clientrecords.dto.response.ImageResponse;
-import com.jhaps.clientrecords.dto.response.user.UserGeneralDto;
+import com.jhaps.clientrecords.dto.response.user.UserGeneralResponse;
 import com.jhaps.clientrecords.entity.system.Image;
 import com.jhaps.clientrecords.entity.system.Role;
 import com.jhaps.clientrecords.entity.system.User;
@@ -22,8 +22,6 @@ import com.jhaps.clientrecords.security.customAuth.PasswordValidator;
 import com.jhaps.clientrecords.service.system.ImageService;
 import com.jhaps.clientrecords.service.system.RoleService;
 import com.jhaps.clientrecords.service.system.UserService;
-import com.jhaps.clientrecords.util.Mapper;
-import com.jhaps.clientrecords.util.SecurityUtils;
 import com.jhaps.clientrecords.util.UserMapper;
 
 import jakarta.transaction.Transactional;
@@ -42,7 +40,7 @@ public class UserServiceImpl implements UserService{
 
 	
 	public UserServiceImpl(UserRepository userRepo, RoleService roleService, 
-							Mapper mapper, PasswordEncoder passwordEncoder,
+							PasswordEncoder passwordEncoder,
 							UserMapper userMapper, ImageService imageService,
 							PasswordValidator passwordValidator) {
 		this.userRepo = userRepo;
@@ -80,9 +78,9 @@ public class UserServiceImpl implements UserService{
 	
 	/* Returns "UserGeneralDto" this is for User-dashboard.*/
 	@Override			
-	public UserGeneralDto findUserDtoByEmail(String email) {
+	public UserGeneralResponse findUserDtoByEmail(String email) {
 		User user = findUserByEmail(email);
-		return userMapper.toUserGeneralDto(user);	
+		return userMapper.toUserGeneralResponse(user);	
 	}
 	
 	

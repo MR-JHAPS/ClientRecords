@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserGeneralDto {
+public class UserGeneralResponse {
 		
 		int id;
 

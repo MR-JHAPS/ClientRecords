@@ -11,14 +11,21 @@ import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpClientErrorException.Unauthorized;
 
 import com.jhaps.clientrecords.dto.request.user.UserAuthRequest;
 import com.jhaps.clientrecords.entity.system.User;
+import com.jhaps.clientrecords.exception.system.UnauthorizedCustomException;
 import com.jhaps.clientrecords.exception.system.UserNotFoundException;
 import com.jhaps.clientrecords.repository.system.UserRepository;
+import com.jhaps.clientrecords.security.spring.JWTFilter;
 import com.jhaps.clientrecords.security.spring.JWTServiceImpl;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 /*
  * This is called from public controller ("/login")
@@ -41,14 +48,16 @@ public class AuthServiceImpl implements AuthService {
 	private UserRepository userRepo;
 	private JWTServiceImpl jwtServiceImpl;
 	private UserSecurityService userSecurityService;
+	private JWTFilter jwtFilter;
 	
 	public AuthServiceImpl(AuthenticationManager authManager, UserRepository userRepo, JWTServiceImpl jwtServiceImpl,
-			UserSecurityService userSecurityService) {
+			UserSecurityService userSecurityService, JWTFilter jwtFilter) {
 		super();
 		this.authManager = authManager;
 		this.userRepo = userRepo;
 		this.jwtServiceImpl = jwtServiceImpl;
 		this.userSecurityService = userSecurityService;
+		this.jwtFilter = jwtFilter;
 	}
 
 	
@@ -128,6 +137,39 @@ public class AuthServiceImpl implements AuthService {
 		Duration remainingLockedTime = Duration.between(unlockTime, LocalDateTime.now());
 		return remainingLockedTime;
 	}
+
+
+
+	
+/*------------------------------------LOG OUT USER------------------------------------------------------------------------------------*/
+	
+	// need to underStand this further.
+	
+	@Override
+	public String logOutUser(String authHeader, HttpServletRequest request, HttpServletResponse response, UserDetails userDetails) {
+		
+		if(authHeader==null || !authHeader.startsWith("Bearer ")) {
+			throw new UnauthorizedCustomException(" Your auth-Header is either null or doesn't start with 'Bearer '. ");
+		}
+		
+		
+		
+		String token = authHeader.substring(7);
+		
+		boolean isTokenExpired = jwtServiceImpl.isTokenExpired(token);
+		boolean isTokenValid = jwtServiceImpl.validateToken(token, userDetails);
+		
+		if(isTokenExpired || !isTokenValid) {
+			response.setHeader("Authorization", null);
+	
+		}
+		return null;
+	}
+
+		
+		
+
+	
 	
 	
 	

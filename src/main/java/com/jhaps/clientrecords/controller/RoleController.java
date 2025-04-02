@@ -16,13 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.jhaps.clientrecords.apiResponse.ApiResponseBuilder;
 import com.jhaps.clientrecords.apiResponse.ApiResponseModel;
 import com.jhaps.clientrecords.dto.request.RoleSaveRequest;
-import com.jhaps.clientrecords.dto.request.RoleRequest;
-import com.jhaps.clientrecords.dto.response.RoleDto;
 import com.jhaps.clientrecords.dto.response.RoleResponse;
-import com.jhaps.clientrecords.entity.system.Role;
 import com.jhaps.clientrecords.enums.ResponseMessage;
 import com.jhaps.clientrecords.service.system.RoleService;
-import com.jhaps.clientrecords.util.Mapper;
 import com.jhaps.clientrecords.util.RoleMapper;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,7 +27,7 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/roles")
-@Tag(name = "Role Controller", description = "Manages all the operations related to Roles")
+@Tag(name = "4. Role Controller", description = "Manages all the operations related to Roles")
 public class RoleController {
 
 	private RoleService roleService;

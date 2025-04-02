@@ -5,14 +5,14 @@ package com.jhaps.clientrecords.service.system;
 import com.jhaps.clientrecords.dto.request.user.UserRegisterRequest;
 import com.jhaps.clientrecords.dto.request.user.UserImageUploadRequest;
 import com.jhaps.clientrecords.dto.request.user.UserUpdateRequest;
-import com.jhaps.clientrecords.dto.response.user.UserGeneralDto;
+import com.jhaps.clientrecords.dto.response.user.UserGeneralResponse;
 import com.jhaps.clientrecords.entity.system.User;
 
 public interface UserService {
 	
 	User findUserById(int id); /* Return type is "User" | It is used for internal business logic --( Service classes )--*/ 
 	
-	UserGeneralDto findUserDtoByEmail(String email); /* Returns "UserGeneralDto" this is for User-dashboard.*/
+	UserGeneralResponse findUserDtoByEmail(String email); /* Returns "UserGeneralDto" this is for User-dashboard.*/
 	
 	User findUserByEmail(String email);
 	

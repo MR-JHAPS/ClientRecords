@@ -1,28 +1,20 @@
 package com.jhaps.clientrecords.serviceImpl.system;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import com.jhaps.clientrecords.dto.request.RoleSaveRequest;
-import com.jhaps.clientrecords.dto.request.RoleRequest;
-import com.jhaps.clientrecords.dto.response.RoleDto;
 import com.jhaps.clientrecords.dto.response.RoleResponse;
 import com.jhaps.clientrecords.entity.system.Role;
-import com.jhaps.clientrecords.entity.system.User;
 import com.jhaps.clientrecords.enums.RoleNames;
 import com.jhaps.clientrecords.exception.system.RoleNotFoundException;
 import com.jhaps.clientrecords.repository.system.RoleRepository;
 import com.jhaps.clientrecords.service.system.RoleService;
-import com.jhaps.clientrecords.util.Mapper;
 import com.jhaps.clientrecords.util.RoleMapper;
-import com.jhaps.clientrecords.util.SecurityUtils;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -32,11 +24,9 @@ public class RoleServiceImpl implements RoleService {
 	private RoleRepository roleRepo;
 	private RoleMapper roleMapper;
 	
-	private Mapper mapper;
 
-	public RoleServiceImpl(RoleRepository roleRepo, Mapper mapper, RoleMapper roleMapper) {
+	public RoleServiceImpl(RoleRepository roleRepo, RoleMapper roleMapper) {
 		this.roleRepo = roleRepo;
-		this.mapper = mapper;
 		this.roleMapper = roleMapper;
 	}
 	

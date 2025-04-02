@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class AdminUpdate {
+public class AdminUpdateRequest {
 
 	
 	@NotBlank(message = "AdminUpdate 'Email' cannot be empty")

@@ -9,10 +9,8 @@ import com.jhaps.clientrecords.dto.request.ImageRequest;
 import com.jhaps.clientrecords.dto.request.user.UserAuthRequest;
 import com.jhaps.clientrecords.dto.request.user.UserRegisterRequest;
 import com.jhaps.clientrecords.dto.request.user.UserImageUploadRequest;
-import com.jhaps.clientrecords.dto.response.UserDto;
-import com.jhaps.clientrecords.dto.response.user.UserAdmin;
-import com.jhaps.clientrecords.dto.response.user.UserGeneralDto;
-import com.jhaps.clientrecords.entity.system.Role;
+import com.jhaps.clientrecords.dto.response.user.UserAdminResponse;
+import com.jhaps.clientrecords.dto.response.user.UserGeneralResponse;
 import com.jhaps.clientrecords.entity.system.User;
 
 @Component
@@ -45,8 +43,8 @@ public class UserMapper {
 	
 	/*-------------------------------------------------- TO DTO's ----------------------------------------------------------------------*/	
 	
-	public UserGeneralDto toUserGeneralDto(User user) {
-		UserGeneralDto dto = new UserGeneralDto();
+	public UserGeneralResponse toUserGeneralResponse(User user) {
+		UserGeneralResponse dto = new UserGeneralResponse();
 		dto.setId(user.getId());
 		dto.setEmail(user.getEmail());
 		dto.setCreatedOn(user.getCreatedOn());
@@ -55,8 +53,8 @@ public class UserMapper {
 	}
 	
 	
-	public UserAdmin toUserAdminDto(User user) {
-		UserAdmin dto = new UserAdmin();
+	public UserAdminResponse toUserAdminDto(User user) {
+		UserAdminResponse dto = new UserAdminResponse();
 		dto.setId(user.getId());
 		dto.setEmail(user.getEmail());
 		dto.setCreatedOn(user.getCreatedOn());

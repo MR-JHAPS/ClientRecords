@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class UserAdmin {
+public class UserAdminResponse {
 
 	private int id;
 	

@@ -28,7 +28,7 @@ public class PagedResourceAssemblerService<T> {
 	}
 	
 	
-	/*	Method: Converts page<T> to PagedModel<EntityModel<T>>	*/
+	/*	Method: Converts Page<T> to PagedModel<EntityModel<T>>	*/
 	public  PagedModel<EntityModel<T>> toPagedModel(Page<T> paginatedEntity) {
         return (PagedModel<EntityModel<T>>) pagedResourceAssember.toModel(paginatedEntity);
     }

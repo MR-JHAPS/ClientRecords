@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.jhaps.clientrecords.dto.response.ClientLogDto;
+import com.jhaps.clientrecords.dto.response.ClientLogResponse;
 import com.jhaps.clientrecords.entity.client.ClientLog;
 
 @Repository
@@ -33,7 +33,7 @@ public interface ClientLogRepository extends JpaRepository<ClientLog, Integer> {
 			"JOIN cl.user u " +
 			"WHERE cl.id= :clientLogId"
 		)
-	Optional<ClientLogDto> getClientLogById(@Param("clientLogId")int clientLogId);
+	Optional<ClientLogResponse> getClientLogById(@Param("clientLogId")int clientLogId);
 	
 	
 /* ----------------------------FIND ALL CLIENTLOG USING PAGEABLE.---------------------------- */	
@@ -43,5 +43,5 @@ public interface ClientLogRepository extends JpaRepository<ClientLog, Integer> {
 			"FROM ClientLog cl " +
 			"JOIN cl.user u"
 			)
-	Page<ClientLogDto> getAllClientLog(Pageable pageable);
+	Page<ClientLogResponse> getAllClientLog(Pageable pageable);
 }

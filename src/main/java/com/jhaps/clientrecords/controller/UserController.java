@@ -17,7 +17,7 @@ import com.jhaps.clientrecords.apiResponse.ApiResponseBuilder;
 import com.jhaps.clientrecords.apiResponse.ApiResponseModel;
 import com.jhaps.clientrecords.dto.request.user.UserUpdateRequest;
 import com.jhaps.clientrecords.dto.request.user.UserImageUploadRequest;
-import com.jhaps.clientrecords.dto.response.user.UserGeneralDto;
+import com.jhaps.clientrecords.dto.response.user.UserGeneralResponse;
 import com.jhaps.clientrecords.enums.ResponseMessage;
 import com.jhaps.clientrecords.service.system.UserService;
 
@@ -29,7 +29,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Validated
 @RestController
 @RequestMapping("/api/user")
-@Tag(name = "User Controller")
+@Tag(name = "2. User Controller")
 public class UserController {
 
 	
@@ -47,10 +47,10 @@ public class UserController {
 	
 	@Operation(summary = "Get authenticated user's details")
 	@GetMapping("/me")
-	public ResponseEntity<ApiResponseModel<UserGeneralDto>> getUserSelf(@AuthenticationPrincipal UserDetails userDetails) {
+	public ResponseEntity<ApiResponseModel<UserGeneralResponse>> getUserSelf(@AuthenticationPrincipal UserDetails userDetails) {
 		String email = userDetails.getUsername();
-		UserGeneralDto userGeneralDto = userService.findUserDtoByEmail(email);
-		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, userGeneralDto);
+		UserGeneralResponse userGeneralResponse = userService.findUserDtoByEmail(email);
+		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, userGeneralResponse);
 	}
 	
 	

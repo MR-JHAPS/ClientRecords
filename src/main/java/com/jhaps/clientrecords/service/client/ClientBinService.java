@@ -3,7 +3,7 @@ package com.jhaps.clientrecords.service.client;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import com.jhaps.clientrecords.dto.response.ClientBinDto;
+import com.jhaps.clientrecords.dto.response.ClientBinResponse;
 import com.jhaps.clientrecords.entity.client.Client;
 
 public interface ClientBinService {
@@ -36,7 +36,7 @@ public interface ClientBinService {
 	 * @important: this is clientBin_id not client_id.
 	 * 			because clientBin contains its primary key("clientBin_id") and the id of the client("client_id").
 	 */
-	ClientBinDto getClientBinById(int clientBinId);		
+	ClientBinResponse getClientBinById(int clientBinId);		
 	
 	
 	
@@ -47,7 +47,19 @@ public interface ClientBinService {
 	  * 
 	  * @return : Page<ClientBinDto>. 
 	  */
-	Page<ClientBinDto> getAllFromClientBin(Pageable pageable);
+	Page<ClientBinResponse> getAllFromClientBin(Pageable pageable);
+	
+	
+	
+	
+	/*
+	 * This method will restore the client from the ClientBin to the Client entity/table.
+	 * @param: id is the id of the client 
+	 * */
+	
+	void restoreFromClientBin(int id);
+	
+	
 	
 	
 }

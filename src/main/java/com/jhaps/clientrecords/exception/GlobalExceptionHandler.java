@@ -25,6 +25,7 @@ import com.jhaps.clientrecords.exception.system.DuplicateDataException;
 import com.jhaps.clientrecords.exception.system.ImageDeletionException;
 import com.jhaps.clientrecords.exception.system.ImageNotFoundException;
 import com.jhaps.clientrecords.exception.system.RoleNotFoundException;
+import com.jhaps.clientrecords.exception.system.UnauthorizedCustomException;
 import com.jhaps.clientrecords.exception.system.UserNotFoundException;
 import com.jhaps.clientrecords.exception.system.UserRegistrationException;
 
@@ -116,6 +117,12 @@ public class GlobalExceptionHandler {
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.ACCESS_DENIED, HttpStatus.UNAUTHORIZED);
 	}
 	
+	
+	@ExceptionHandler(UnauthorizedCustomException.class)
+	public ResponseEntity<ApiResponseModel<String>> handleUnauthorizedCustomException(UnauthorizedCustomException e){
+		log.error("Unauthorized_Custom_Exception Occured : {} ",e.getMessage(), e);
+		return apiResponseBuilder.buildApiResponse(ResponseMessage.UNAUTHORIZED, HttpStatus.UNAUTHORIZED);
+	}
 	
 	@ExceptionHandler(AccessDeniedException.class)
 	public ResponseEntity<ApiResponseModel<String>> handleAccessDeniedException(AccessDeniedException e){

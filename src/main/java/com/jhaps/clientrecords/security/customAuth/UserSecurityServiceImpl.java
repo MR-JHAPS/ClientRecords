@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import org.springframework.stereotype.Service;
 
 import com.jhaps.clientrecords.dto.request.user.UserAuthRequest;
-import com.jhaps.clientrecords.dto.response.UserDto;
 import com.jhaps.clientrecords.entity.system.User;
 import com.jhaps.clientrecords.exception.system.UserNotFoundException;
 import com.jhaps.clientrecords.repository.system.UserRepository;

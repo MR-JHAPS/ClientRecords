@@ -38,7 +38,9 @@ public enum ResponseMessage {
 	
 	CLIENT_BIN_NOT_FOUND(" Unable to find the Client in ClientBin"),
 	ADMIN_UPDATED("Admin Updated Successfully"),
-	IMAGE_DELETION_FAILED("Failed to Delete image")
+	IMAGE_DELETION_FAILED("Failed to Delete image"),
+	
+	CLIENT_BIN_DELETED("client is deleted from clientBin")
 	;
 	
 	
