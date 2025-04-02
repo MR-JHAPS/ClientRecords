@@ -11,7 +11,8 @@ import com.jhaps.clientrecords.exception.client.ClientBinNotFoundException;
 import com.jhaps.clientrecords.repository.client.ClientBinRepository;
 import com.jhaps.clientrecords.repository.client.ClientRepository;
 import com.jhaps.clientrecords.service.client.ClientBinService;
-import com.jhaps.clientrecords.util.ClientMapper;
+import com.jhaps.clientrecords.util.mapper.ClientMapper;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

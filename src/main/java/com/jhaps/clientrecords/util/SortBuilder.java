@@ -1,6 +1,13 @@
 package com.jhaps.clientrecords.util;
 
 import org.springframework.data.domain.Sort;
+/*
+ * @Deprecated.
+ * WORKS BUT HAS It's LIMITATIONS SO I CREATED : PageableUtils.java class - better version of this class.
+ * 
+ * 
+ * */
+
 
 public class SortBuilder {
 

@@ -25,7 +25,7 @@ import com.jhaps.clientrecords.service.system.AdminService;
 import com.jhaps.clientrecords.service.system.RoleService;
 import com.jhaps.clientrecords.service.system.UserService;
 import com.jhaps.clientrecords.util.SecurityUtils;
-import com.jhaps.clientrecords.util.UserMapper;
+import com.jhaps.clientrecords.util.mapper.UserMapper;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;

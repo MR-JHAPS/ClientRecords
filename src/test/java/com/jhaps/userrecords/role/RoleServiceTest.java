@@ -18,7 +18,7 @@ import com.jhaps.clientrecords.dto.response.RoleResponse;
 import com.jhaps.clientrecords.entity.system.Role;
 import com.jhaps.clientrecords.repository.system.RoleRepository;
 import com.jhaps.clientrecords.serviceImpl.system.RoleServiceImpl;
-import com.jhaps.clientrecords.util.RoleMapper;
+import com.jhaps.clientrecords.util.mapper.RoleMapper;
 
 @ExtendWith(MockitoExtension.class)
 public class RoleServiceTest {

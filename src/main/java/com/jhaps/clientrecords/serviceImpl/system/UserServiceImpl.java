@@ -22,7 +22,7 @@ import com.jhaps.clientrecords.security.customAuth.PasswordValidator;
 import com.jhaps.clientrecords.service.system.ImageService;
 import com.jhaps.clientrecords.service.system.RoleService;
 import com.jhaps.clientrecords.service.system.UserService;
-import com.jhaps.clientrecords.util.UserMapper;
+import com.jhaps.clientrecords.util.mapper.UserMapper;
 
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;

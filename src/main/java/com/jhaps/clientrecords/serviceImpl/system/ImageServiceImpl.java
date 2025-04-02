@@ -15,7 +15,8 @@ import com.jhaps.clientrecords.exception.system.UserNotFoundException;
 import com.jhaps.clientrecords.repository.system.ImageRepository;
 import com.jhaps.clientrecords.repository.system.UserRepository;
 import com.jhaps.clientrecords.service.system.ImageService;
-import com.jhaps.clientrecords.util.ImageMapper;
+import com.jhaps.clientrecords.util.mapper.ImageMapper;
+
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

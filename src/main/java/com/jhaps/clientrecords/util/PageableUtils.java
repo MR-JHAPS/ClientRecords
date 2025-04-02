@@ -5,6 +5,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 
+/*
+ * NOT FULLY SECURE
+ * NEED FURTHER CONFIGURATION
+ * WILL DO IT LATER.
+ * 
+ * */
+
+
 public class PageableUtils {
 
 	private final Sort.Direction DEFAULT_DIRECTION = Direction.ASC;

@@ -14,7 +14,8 @@ import com.jhaps.clientrecords.enums.RoleNames;
 import com.jhaps.clientrecords.exception.system.RoleNotFoundException;
 import com.jhaps.clientrecords.repository.system.RoleRepository;
 import com.jhaps.clientrecords.service.system.RoleService;
-import com.jhaps.clientrecords.util.RoleMapper;
+import com.jhaps.clientrecords.util.mapper.RoleMapper;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Service

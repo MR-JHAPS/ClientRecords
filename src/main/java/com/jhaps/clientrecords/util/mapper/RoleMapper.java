@@ -1,4 +1,4 @@
-package com.jhaps.clientrecords.util;
+package com.jhaps.clientrecords.util.mapper;
 
 import org.springframework.stereotype.Component;
 

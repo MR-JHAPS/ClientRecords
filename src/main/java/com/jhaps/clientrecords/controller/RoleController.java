@@ -19,7 +19,7 @@ import com.jhaps.clientrecords.dto.request.RoleSaveRequest;
 import com.jhaps.clientrecords.dto.response.RoleResponse;
 import com.jhaps.clientrecords.enums.ResponseMessage;
 import com.jhaps.clientrecords.service.system.RoleService;
-import com.jhaps.clientrecords.util.RoleMapper;
+import com.jhaps.clientrecords.util.mapper.RoleMapper;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

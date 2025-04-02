@@ -15,7 +15,8 @@ import com.jhaps.clientrecords.service.client.ClientBinService;
 import com.jhaps.clientrecords.service.client.ClientLogService;
 import com.jhaps.clientrecords.service.client.ClientService;
 import com.jhaps.clientrecords.service.system.UserService;
-import com.jhaps.clientrecords.util.ClientMapper;
+import com.jhaps.clientrecords.util.mapper.ClientMapper;
+
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
