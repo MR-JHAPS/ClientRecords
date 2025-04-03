@@ -83,7 +83,7 @@ public class AdminController {
 	
 	
 	@Operation(summary = " Update Admin info ")
-	@DeleteMapping("/update/me")
+	@PutMapping("/update/me")
 	@PreAuthorize("hasAuthority('admin')")
 	public ResponseEntity<ApiResponseModel<String>> updateAdmin(@RequestBody AdminUpdateRequest adminUpdateRequest,
 											@AuthenticationPrincipal UserDetails userDetails){
