@@ -1,9 +1,7 @@
 package com.jhaps.clientrecords.controller;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
@@ -30,6 +28,7 @@ import com.jhaps.clientrecords.enums.ResponseMessage;
 import com.jhaps.clientrecords.service.system.AdminService;
 import com.jhaps.clientrecords.service.system.PagedResourceAssemblerService;
 import com.jhaps.clientrecords.util.PageableUtils;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
