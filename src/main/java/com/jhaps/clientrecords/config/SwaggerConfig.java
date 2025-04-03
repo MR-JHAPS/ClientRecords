@@ -29,7 +29,7 @@ public class SwaggerConfig {
 		//This is to set the title and the description of the 
 		return new OpenAPI()
 				.info(
-					new Info().title("Client List API's").description("By Neraz Oli")
+					new Info().title("Client-Records API's").description("By Neraz Oli")
 				)
 				
 				.servers(
