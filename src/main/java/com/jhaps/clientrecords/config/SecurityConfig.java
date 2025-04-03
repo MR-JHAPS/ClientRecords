@@ -7,6 +7,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -15,11 +16,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.jhaps.clientrecords.filter.JWTFilter;
-import com.jhaps.clientrecords.service.UserDetailsServiceImpl;
+import com.jhaps.clientrecords.security.jwt.JWTFilter;
+import com.jhaps.clientrecords.serviceImpl.system.UserDetailsServiceImpl;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
 	@Autowired
@@ -49,9 +51,9 @@ public class SecurityConfig {
 				.httpBasic(Customizer.withDefaults())//this is for the API's user like Postman.
 				.userDetailsService(userDetailsServiceImpl)
 				.authorizeHttpRequests(auth->auth
-						.requestMatchers("/public/login", "/public/signup").permitAll() //for userLogin
+						.requestMatchers("/api/public/**", "/api/public/login").permitAll() //for userLogin
 						.requestMatchers("/swagger-ui/**", "/v3/api-docs/**",  "/swagger-ui.html", "/swagger-ui/index.html").permitAll() //for Swagger	 
-						.requestMatchers("/api/roles").hasAuthority("admin")
+						.requestMatchers("/api/roles/**", "/api/admin/**").hasAuthority("admin")
 						.anyRequest().authenticated() 
 				)
 				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class) 
@@ -64,33 +66,8 @@ public class SecurityConfig {
 				.build();
 	}//ends SecurityChainFilter method.
 	
-	
-	
-	
-//	 @Bean
-//	    public AuthenticationProvider authenticationProvider() {
-//	        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-//	        provider.setPasswordEncoder(passwordEncoder());
-//	        provider.setUserDetailsService(userDetailsServiceImpl);
-//
-//
-//	        return provider;
-//	    }
-	
-//	@Bean 
-//	public AuthenticationManager authManagerBuilder(HttpSecurity http) throws Exception {
-//		
-//		AuthenticationManagerBuilder authBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
-//			authBuilder.userDetailsService(userDetailsServiceImpl).passwordEncoder(passwordEncoder());
-//			return authBuilder.build();
-//	}
-//	
 
-	
-	
-	
-	
-	
+
 	
 	
 }//ends class

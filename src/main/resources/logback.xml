@@ -1,6 +1,10 @@
 <configuration>
 	<!-- 	This is for the console -->
     <appender name = "myConsoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+<!--        <root level="TRACE"> -->
+<!--        	 <appender-ref ref="CONSOLE" /> -->
+<!--    	   </root> -->
+        
         <encoder>
 			<!--     This is for the display pattern/style of the log -->
             <pattern>
@@ -20,7 +24,7 @@
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <fileNamePattern>clientRecords-%d{yy-MM-dd_HH-mm}.%i.log</fileNamePattern>
             <maxFileSize>5MB</maxFileSize>
-            <maxHistory>10</maxHistory>
+            <maxHistory>100</maxHistory>
         </rollingPolicy>
         <encoder>
             <pattern>

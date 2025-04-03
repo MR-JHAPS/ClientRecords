@@ -1,13 +1,9 @@
 package com.jhaps.clientrecords.enums;
 
-import java.util.HashSet;
-import java.util.Set;
-
 public enum RoleNames {
 	
 	ADMIN("admin"),
-	USER("user"),
-	BLOCKED("blocked");
+	USER("user");
 	
 	private final String role; //field
 
@@ -22,18 +18,6 @@ public enum RoleNames {
 		return this.role;
 	}
 	
+
 	
-//	// Saving all the roles in Set<String>.
-//	public static Set<String> getRoles(){
-//		Set<String> roles = new HashSet<>();
-//		for(RoleNames role : RoleNames.values()) {
-//			
-//			roles.add(role.toString());
-//		}
-//		return roles;
-//	}
-	
-	
-	
-	
-}//ends enum
+}//ends-Enum

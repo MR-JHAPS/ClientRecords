@@ -41,9 +41,19 @@
 		    <artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
 
+		<!--This is the mail dependency-->
+		<!--		<dependency>-->
+		<!--		    <groupId>org.springframework.boot</groupId>-->
+		<!--		    <artifactId>spring-boot-starter-mail</artifactId>-->
+<!--		</dependency>-->
+		
+		<!--	oauth2 dependency	-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-oauth2-client</artifactId>
+		</dependency>
 
-
-		<!-- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui -->
+		<!-- swaggeer-openapi-starter-webmvc-ui -->
 		<dependency>
 		    <groupId>org.springdoc</groupId>
 		    <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
@@ -52,18 +62,18 @@
 
 
 
-		<!-- mapstruct -->
-		<dependency>
-		    <groupId>org.mapstruct</groupId>
-		    <artifactId>mapstruct</artifactId>
-		    <version>1.6.3</version>
-		</dependency>
-		<dependency>
-		    <groupId>org.mapstruct</groupId>
-		    <artifactId>mapstruct-processor</artifactId>
-		    <version>1.6.3</version>
-		    <scope>provided</scope>
-		</dependency>
+		<!-- mapstruct  This is unused in the project I did manual mapping-->
+<!--		<dependency>-->
+<!--		    <groupId>org.mapstruct</groupId>-->
+<!--		    <artifactId>mapstruct</artifactId>-->
+<!--		    <version>1.6.3</version>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--		    <groupId>org.mapstruct</groupId>-->
+<!--		    <artifactId>mapstruct-processor</artifactId>-->
+<!--		    <version>1.6.3</version>-->
+<!--		    <scope>provided</scope>-->
+<!--		</dependency>-->
 
 		
 		<!--JWT TOKEN-->
@@ -85,7 +95,7 @@
 		    <scope>runtime</scope>
 		</dependency>
 
-		<!--This is for the pagination-->
+		<!--This is for the pagination Links hateoas-->
 		<dependency>
 		    <groupId>org.springframework.boot</groupId>
 		    <artifactId>spring-boot-starter-hateoas</artifactId>
