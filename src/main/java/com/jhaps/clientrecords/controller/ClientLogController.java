@@ -49,7 +49,7 @@ public class ClientLogController {
 	
 	
 	
-	@GetMapping
+	@GetMapping("/getAll")
 	@Operation(summary = "Get all the logs from the ClientLog.")
 	public ResponseEntity<ApiResponseModel<PagedModel<EntityModel<ClientLogResponse>>>> getAllClientLog(
 				@RequestParam(defaultValue="0") int pageNumber,
@@ -62,7 +62,7 @@ public class ClientLogController {
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, pagedClientLog);
 	}
 	
-	@GetMapping("/{id}")
+	@GetMapping("/get/{id}")
 	@Operation(summary = "Get the clientLog By Id.")
 	public ResponseEntity<ApiResponseModel<ClientLogResponse>> getClientLogById(@PathVariable int id){
 		ClientLogResponse clientLog = clientLogService.getClientLogById(id);

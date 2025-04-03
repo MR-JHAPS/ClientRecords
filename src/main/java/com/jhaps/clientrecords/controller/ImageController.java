@@ -56,7 +56,7 @@ public class ImageController {
 	private PagedResourceAssemblerService<ImageResponse> pagedResourceAssemblerService;
 	
 	
-	@GetMapping("/user/current")
+	@GetMapping("/current-user/get-all")
 	@Operation(summary = "Gets All Images of logged in user.")
 	public ResponseEntity<ApiResponseModel<PagedModel<EntityModel<ImageResponse>>>> getImagesOfActiveUser(
 						@RequestParam(defaultValue="0") int pageNumber,

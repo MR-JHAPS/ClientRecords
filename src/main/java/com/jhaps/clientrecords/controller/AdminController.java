@@ -57,7 +57,7 @@ public class AdminController {
 	
 	
 	@Operation(summary = "Get List Of All The Users")
-	@GetMapping("/findAll")
+	@GetMapping("/user/find-all")
 	@PreAuthorize("hasAuthority('admin')")
 	public ResponseEntity<ApiResponseModel<PagedModel<EntityModel<UserAdminResponse>>>> getAllUsers(
 								@RequestParam(defaultValue="0") int pageNumber,
@@ -130,7 +130,7 @@ public class AdminController {
 	
 
 	@Operation(summary = "Update Role Of User By UserId : ADMIN ONLY")
-	@PutMapping("/user/update/{id}")
+	@PutMapping("/user/update-role/{id}")
 	@PreAuthorize("hasAuthority('admin')")
 	public ResponseEntity<ApiResponseModel<String>> updateRoleByUserId(@PathVariable int id, @RequestBody @Valid RoleRequest roleRequest){
 		log.info("this is the roleDto from postman :{}", roleRequest);

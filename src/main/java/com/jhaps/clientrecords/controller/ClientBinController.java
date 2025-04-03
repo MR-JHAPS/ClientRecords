@@ -27,7 +27,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 
 @RestController
-@RequestMapping("/api/clientBin")
+@RequestMapping("/api/client-bin")
 @AllArgsConstructor
 @Tag(name = "Client Bin API's", description = "Manage Deleted Clients(Restore, Get, Delete)")
 public class ClientBinController {
@@ -37,7 +37,7 @@ public class ClientBinController {
 	private PagedResourceAssemblerService<ClientBinResponse> pagedResourceAssembler;
 	
 	
-	@GetMapping
+	@GetMapping("/getAll")
 	@Operation(summary = "Get all the Clients from ClientBin.")
 	public ResponseEntity<ApiResponseModel<PagedModel<EntityModel<ClientBinResponse>>>> getAllClientBin(
 			@RequestParam(defaultValue="0") int pageNumber,
