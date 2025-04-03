@@ -32,6 +32,18 @@ import com.jhaps.clientrecords.util.PageableUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+/*
+ * I have not used Method-Level Security-Authorization.
+ * I have authenticated all controller apart from " AuthController ---> /api/public/** "
+ * 
+ * Because both "user" and "admin" should be able to use this controller.
+ * 
+ *  If I were to create a new Role then I will need to navigate to each 
+ *  method to permit new role. So, I chose not to enable method-level-security.
+ * 
+ * */
+
+
 
 @RestController
 @RequestMapping("/api/images")

@@ -1,4 +1,4 @@
-package com.jhaps.clientrecords.security.spring;
+package com.jhaps.clientrecords.security.model;
 
 import java.util.Collection;
 import java.util.stream.Collectors;

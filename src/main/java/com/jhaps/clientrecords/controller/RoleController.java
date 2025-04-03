@@ -31,15 +31,11 @@ import jakarta.validation.Valid;
 public class RoleController {
 
 	private RoleService roleService;
-	
 	private ApiResponseBuilder apiResponseBuilder;
 	
-	private RoleMapper roleMapper;
-	
-	public RoleController(RoleService roleService, ApiResponseBuilder apiResponseBuilder, RoleMapper roleMapper) {
+	public RoleController(RoleService roleService, ApiResponseBuilder apiResponseBuilder) {
 		this.roleService = roleService;
 		this.apiResponseBuilder = apiResponseBuilder;
-		this.roleMapper = roleMapper;
 	}
 	
 	@Operation(summary = "Get all roles")
@@ -47,7 +43,6 @@ public class RoleController {
 	@PreAuthorize("hasAuthority('admin')")
 	public ResponseEntity<ApiResponseModel<Set<RoleResponse>>> getAllRoles(){
 		Set<RoleResponse> roles = roleService.findAllRoles();
-//		RoleDto roleDto = roleMapper.toRoleDtoFromRoleSet(role); //converting Set<Role> to RoleDto.
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.ROLE_OBTAINED, HttpStatus.OK, roles);
 	}
 	

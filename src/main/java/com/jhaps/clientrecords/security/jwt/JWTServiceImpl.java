@@ -1,4 +1,4 @@
-package com.jhaps.clientrecords.security.spring;
+package com.jhaps.clientrecords.security.jwt;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -63,8 +63,8 @@ public class JWTServiceImpl {
     }
 	
 	
-	//method that implements the Functional Interface and allows the extraction of username, exp date, issu date.
-	public <T> T extractClaim(String token , Function<Claims, T> claimResolver) {	
+	//method that implements the Functional Interface and allows the extraction of "User-name", "expiration-date", "issue date".
+	public <R> R extractClaim(String token , Function<Claims, R> claimResolver) {	
 		final Claims claims = extractAllClaims(token);
         return claimResolver.apply(claims);
 	}

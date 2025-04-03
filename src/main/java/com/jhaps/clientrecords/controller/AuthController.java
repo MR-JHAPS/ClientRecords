@@ -4,6 +4,7 @@ package com.jhaps.clientrecords.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,7 +45,7 @@ public class AuthController {
 		/*We get userDto(email, password) and return the JWT token as response if credentials are Correct. */
 		@Operation(summary = "user Login")
 		@PostMapping("/login")
-		//@PreAuthorize("permitAll()")
+		@PreAuthorize("permitAll()")
 		public ResponseEntity<ApiResponseModel<String>> userLogin(@Valid @RequestBody UserAuthRequest userAuthRequest){
 			log.info("Requesting verification of userLogin Details | PublicController -->'/login' ");
 			String token = authService.verifyUser(userAuthRequest);
@@ -55,6 +56,7 @@ public class AuthController {
 		
 		@Operation(summary = "user Signup")
 		@PostMapping("/signup")
+		@PreAuthorize("permitAll()")
 		public ResponseEntity<ApiResponseModel<String>> userSignUp(@Valid @RequestBody UserRegisterRequest registrationDto){
 			userService.saveNewUser(registrationDto);
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.CREATED, "User Created Successfully");

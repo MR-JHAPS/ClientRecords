@@ -92,6 +92,24 @@ public class AdminController {
 	}
 
 	
+
+	@Operation(summary = "Search user by user Email", description = "User-Email is unique so it will return only one data.")
+	@GetMapping("/search-by/email")
+	@PreAuthorize("hasAuthority('admin')")
+	public ResponseEntity<ApiResponseModel<UserAdminResponse>> getUserWithRolesByUserEmail(@RequestParam String email) {
+		UserAdminResponse userAdminResponse = adminService.searchUserByEmail(email);
+		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, userAdminResponse);
+	}
+	
+	@Operation(summary = " Delete User By Id ")
+	@DeleteMapping("/delete/{id}")
+	@PreAuthorize("hasAuthority('admin')")
+	public ResponseEntity<ApiResponseModel<String>> deleteUserById(@PathVariable int id){
+		adminService.deleteUserById(id);
+		return apiResponseBuilder.buildApiResponse(ResponseMessage.USER_DELETED, HttpStatus.NO_CONTENT);
+	}
+	
+	
 	@Operation(summary = "Get List Of Users By Role Name")
 	@GetMapping("/search-by/role")
 	@PreAuthorize("hasAuthority('admin')")
@@ -108,18 +126,9 @@ public class AdminController {
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, pagedUserModel);
 	}
 	
+	
+	
 
-	@Operation(summary = "Search user by user Email", description = "User-Email is unique so it will return only one data.")
-	@GetMapping("/search-by/email")
-	@PreAuthorize("hasAuthority('admin')")
-	public ResponseEntity<ApiResponseModel<UserAdminResponse>> getUserWithRolesByUserEmail(@RequestParam String email) {
-		UserAdminResponse userAdminResponse = adminService.searchUserByEmail(email);
-		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, userAdminResponse);
-	}
-	
-	
-	
-	
 	@Operation(summary = "Update Role Of User By UserId : ADMIN ONLY")
 	@PutMapping("/user/update/{id}")
 	@PreAuthorize("hasAuthority('admin')")
@@ -128,17 +137,5 @@ public class AdminController {
 		adminService.updateUserRoleById(id, roleRequest);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, "User Role Updated Successfully");
 	}
-	
-	
-	@Operation(summary = " Delete User By Id ")
-	@DeleteMapping("/delete/{id}")
-	@PreAuthorize("hasAuthority('admin')")
-	public ResponseEntity<ApiResponseModel<String>> deleteUserById(@PathVariable int id){
-		adminService.deleteUserById(id);
-		return apiResponseBuilder.buildApiResponse(ResponseMessage.USER_DELETED, HttpStatus.NO_CONTENT);
-	}
-	
-	
-	
 	
 }//ends controller

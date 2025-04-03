@@ -16,8 +16,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.jhaps.clientrecords.security.spring.JWTFilter;
-import com.jhaps.clientrecords.security.spring.UserDetailsServiceImpl;
+import com.jhaps.clientrecords.security.jwt.JWTFilter;
+import com.jhaps.clientrecords.serviceImpl.system.UserDetailsServiceImpl;
 
 @Configuration
 @EnableWebSecurity
@@ -66,33 +66,8 @@ public class SecurityConfig {
 				.build();
 	}//ends SecurityChainFilter method.
 	
-	
-	
-	
-//	 @Bean
-//	    public AuthenticationProvider authenticationProvider() {
-//	        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-//	        provider.setPasswordEncoder(passwordEncoder());
-//	        provider.setUserDetailsService(userDetailsServiceImpl);
-//
-//
-//	        return provider;
-//	    }
-	
-//	@Bean 
-//	public AuthenticationManager authManagerBuilder(HttpSecurity http) throws Exception {
-//		
-//		AuthenticationManagerBuilder authBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
-//			authBuilder.userDetailsService(userDetailsServiceImpl).passwordEncoder(passwordEncoder());
-//			return authBuilder.build();
-//	}
-//	
 
-	
-	
-	
-	
-	
+
 	
 	
 }//ends class

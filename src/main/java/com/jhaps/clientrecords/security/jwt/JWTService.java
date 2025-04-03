@@ -1,4 +1,4 @@
-package com.jhaps.clientrecords.security.spring;
+package com.jhaps.clientrecords.security.jwt;
 
 import java.util.Date;
 import java.util.function.Function;

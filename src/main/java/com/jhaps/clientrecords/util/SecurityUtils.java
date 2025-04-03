@@ -8,7 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import com.jhaps.clientrecords.entity.system.User;
-import com.jhaps.clientrecords.security.spring.CustomUserDetails;
+import com.jhaps.clientrecords.security.model.CustomUserDetails;
 
 /*
  * This class extracts the security details(CustomUserDetails)

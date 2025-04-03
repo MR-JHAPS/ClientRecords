@@ -36,6 +36,7 @@ public class ClientBinController {
 	private ApiResponseBuilder apiResponseBuilder;
 	private PagedResourceAssemblerService<ClientBinResponse> pagedResourceAssembler;
 	
+	
 	@GetMapping
 	@Operation(summary = "Get all the Clients from ClientBin.")
 	public ResponseEntity<ApiResponseModel<PagedModel<EntityModel<ClientBinResponse>>>> getAllClientBin(
@@ -61,6 +62,7 @@ public class ClientBinController {
 	
 	@GetMapping("/restore/{id}")
 	@Operation(summary = "Restore the Selected client From ClientBin to Client")
+	@PreAuthorize("hasAuthority('admin') or hasAuthority('user')")
 	public ResponseEntity<ApiResponseModel<String>> restoreClientFromBin(@PathVariable int id){
 		clientBinService.restoreFromClientBin(id);
 		return apiResponseBuilder

@@ -131,9 +131,10 @@ public class AdminServiceImpl implements AdminService{
 	}
 
 
+	/* This is only for the search user By userEmail. Just for the searching of the user using email. */
 	@Override
 	public UserAdminResponse searchUserByEmail(String email) {
-		User user=userRepo.findByEmail(email)
+		User user=userRepo.findUserByEmail(email)
 					.orElseThrow(()-> new UserNotFoundException("Unable to find the user by email:" + email));
 		
 		return userMapper.toUserAdminResponse(user);

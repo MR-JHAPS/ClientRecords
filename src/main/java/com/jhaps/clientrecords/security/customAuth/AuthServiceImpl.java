@@ -21,8 +21,8 @@ import com.jhaps.clientrecords.entity.system.User;
 import com.jhaps.clientrecords.exception.system.UnauthorizedCustomException;
 import com.jhaps.clientrecords.exception.system.UserNotFoundException;
 import com.jhaps.clientrecords.repository.system.UserRepository;
-import com.jhaps.clientrecords.security.spring.JWTFilter;
-import com.jhaps.clientrecords.security.spring.JWTServiceImpl;
+import com.jhaps.clientrecords.security.jwt.JWTFilter;
+import com.jhaps.clientrecords.security.jwt.JWTServiceImpl;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

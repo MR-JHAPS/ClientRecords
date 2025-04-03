@@ -1,4 +1,4 @@
-package com.jhaps.clientrecords.security.spring;
+package com.jhaps.clientrecords.serviceImpl.system;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.jhaps.clientrecords.entity.system.User;
 import com.jhaps.clientrecords.repository.system.UserRepository;
+import com.jhaps.clientrecords.security.model.CustomUserDetails;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {

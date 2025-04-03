@@ -34,18 +34,27 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 
+/*
+ * I have not used Method-Level Security-Authorization.
+ * I have authenticated all controller apart from " AuthController ---> /api/public/** "
+ * 
+ * Because both "user" and "admin" should be able to use this controller.
+ * 
+ *  If I were to create a new Role then I will need to navigate to each 
+ *  method to permit new role. So, I chose not to enable method-level-security.
+ * 
+ * */
+
+
+
+
 @Validated // this is so that "@NotBlank" can be used in @pathVariable
 @RestController
 @RequestMapping("/api/clients")
 @Tag(name = "Client API's", description = "Create, Read, Update, Delete CLIENT-INFORMATION")
 public class ClientController {
-	/*In the ApiResponseBuilder.class, responseEntity building method is created
-	to reduce the boilerplate code
-	no need to create :
-					ApiResponse<List<Client>> response = new ApiResponse<>(ResponseMessage.SUCCESS, HttpStatus.OK, clientList);
-					return ResponseEntity.ok(response);
-					for each Controller-method.
-	 */
+
+	
 	private ApiResponseBuilder apiResponseBuilder;
 	private ClientService clientService;
 	private PagedResourceAssemblerService<ClientResponse> pagedResourceAssemblerService;
