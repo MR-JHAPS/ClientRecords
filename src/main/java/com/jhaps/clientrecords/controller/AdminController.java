@@ -35,6 +35,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/admin")
@@ -82,7 +83,7 @@ public class AdminController {
 	
 	
 	@Operation(summary = " Update Admin info ")
-	@DeleteMapping("/update/me")
+	@PutMapping("/update/me")
 	@PreAuthorize("hasAuthority('admin')")
 	public ResponseEntity<ApiResponseModel<String>> updateAdmin(@RequestBody AdminUpdateRequest adminUpdateRequest,
 											@AuthenticationPrincipal UserDetails userDetails){
