@@ -166,6 +166,18 @@ public class AuthServiceImpl implements AuthService {
 		return null;
 	}
 
+
+
+	@Override
+	public boolean validateToken(String token, UserDetails userDetails) {
+		boolean isTokenValid = jwtServiceImpl.validateToken(token, userDetails);
+		
+		if(!isTokenValid) {
+			throw new AccessDeniedException("Your Token is not valid");
+		}
+		return true;
+	}
+
 		
 		
 

@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +23,7 @@ import com.jhaps.clientrecords.service.system.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -42,7 +45,7 @@ public class AuthController {
 		}
 		
 		
-		/*We get userDto(email, password) and return the JWT token as response if credentials are Correct. */
+		
 		@Operation(summary = "user Login")
 		@PostMapping("/login")
 		@PreAuthorize("permitAll()")
@@ -61,6 +64,22 @@ public class AuthController {
 			userService.saveNewUser(registrationDto);
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.CREATED, "User Created Successfully");
 		}
+		
+		
+		
+		@Operation(summary = "validate Token")
+		@PostMapping("/validate-token")
+		@PreAuthorize("permitAll()")
+		public ResponseEntity<ApiResponseModel<String>> validateToken(@NotBlank @RequestBody String token, @AuthenticationPrincipal UserDetails userDetails){
+			log.info("Requesting verification of userLogin Details | PublicController -->'/login' ");
+			 authService.validateToken(token, userDetails);
+			log.info("Inside the userLogin controller after token generation : {}", token);
+			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, "Token is Valid");
+		}
+		
+		
+		
+		
 		
 		
 		

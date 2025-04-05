@@ -76,7 +76,7 @@ public class UserServiceImpl implements UserService{
 	}
 	
 	
-	/* Returns "UserGeneralDto" this is for User-dashboard.*/
+	/* Returns "UserGeneralDto" this is for User-Profile.*/
 	@Override			
 	public UserGeneralResponse findUserDtoByEmail(String email) {
 		User user = findUserByEmail(email);

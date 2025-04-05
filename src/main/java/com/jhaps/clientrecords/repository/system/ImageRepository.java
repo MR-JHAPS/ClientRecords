@@ -39,7 +39,7 @@ public interface ImageRepository extends JpaRepository<Image, Integer> {
 	
 	Optional<Image> findByUser_Email(String userEmail);
 	
-	@Query("SELECT i FROM Image i WHERE i.imageName='defaultImage.jpg'")
+	@Query("SELECT i FROM Image i WHERE i.imageName='defaultImage.png'")
 	Optional<Image> findDefaultImage();
 	
 	
