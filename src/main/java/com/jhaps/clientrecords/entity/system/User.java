@@ -6,8 +6,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.jhaps.clientrecords.entity.BaseEntity;
+import com.jhaps.clientrecords.entity.client.ClientLog;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -45,6 +49,10 @@ public class User extends BaseEntity{
 	@Column(name = "lock_time")
 	private LocalDateTime lockTime;		//time when the account was locked.
 
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonIgnore // This is the forward reference that will be serialized
+	private List<ClientLog> clientLogs = new ArrayList<>();
+	
 	@OneToOne
 	@JoinColumn(name = "profile_image_id")
 	private Image profileImage; // this field is for the profile image

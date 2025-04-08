@@ -43,6 +43,8 @@ public interface ImageService {
 	
 	void deleteMultipleImagesById(List<Integer> idList);
 	
+	boolean isDefaultImage(ImageRequest imageRequest);
+	
 	
 	
 	

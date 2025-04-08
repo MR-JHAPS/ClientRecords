@@ -1,6 +1,8 @@
 package com.jhaps.clientrecords.serviceImpl.system;
 
 import java.util.Set;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -22,6 +24,7 @@ import com.jhaps.clientrecords.security.customAuth.PasswordValidator;
 import com.jhaps.clientrecords.service.system.ImageService;
 import com.jhaps.clientrecords.service.system.RoleService;
 import com.jhaps.clientrecords.service.system.UserService;
+import com.jhaps.clientrecords.util.mapper.ImageMapper;
 import com.jhaps.clientrecords.util.mapper.UserMapper;
 
 import jakarta.transaction.Transactional;
@@ -30,7 +33,9 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class UserServiceImpl implements UserService{
-
+	@Autowired
+	private ImageMapper imageMapper;
+	
 	private UserRepository userRepo;
 	private RoleService roleService;
 	private PasswordEncoder passwordEncoder; //Bcrypt PasswordEncoder as configured in securityConfig
@@ -140,7 +145,7 @@ public class UserServiceImpl implements UserService{
 		/* If "current-password" does not match the "encoded-account-password" it will throw exception*/
 		passwordValidator.verifyCurrentPassword(userUpdateRequest.getCurrentPassword(), user.getPassword());
 		
-		/* Checking if user is asking to change a password*/
+		/* Checking if user is asking to change a password... if newPassword contains a text proceed to change password.*/
 		if(StringUtils.hasText(userUpdateRequest.getNewPassword())) {
 			/* throws error if newPassword and confirmPassword does not match. */
 			passwordValidator.validatePasswordMatch(userUpdateRequest.getNewPassword(), userUpdateRequest.getConfirmPassword()); 
@@ -154,19 +159,38 @@ public class UserServiceImpl implements UserService{
 
 	
 	/* This class is to update the userProfileImage */
+	@Transactional
 	public void updateUserProfileImage(String email, UserImageUploadRequest userImageUploadRequest) {
 		User user = findUserByEmail(email);
 		/*	Converting UserUpdateImage to ImageRequest because : 
 		 * 			imageService.saveImage(String, ImageRequest)
 		 * @param of saveImage in imageService is of type ImageRequest.
 		 * */
+		log.info("mapping Image: {}, UserImageUploadRequest to ImageRequest", userImageUploadRequest.getImageName());
 		ImageRequest imageRequest = userMapper.toImageRequestFromUserUpdateImage(userImageUploadRequest);
-		/* 
-		 * saving the image in the userRepository through imageService.
-		 * After passing ImageRequest we now get ImageResponse from user Response*/
-		ImageResponse imageResponse = imageService.saveImage(email, imageRequest); 
-		Image image = imageService.getImageById(imageResponse.getId()); // getting image from db using imageResponse.getId().
-		user.setProfileImage(image);
+		
+		/* Checking if the userImageUploadRequest contains the defaultImage-name */
+		boolean isDefaultImage = imageService.isDefaultImage(imageRequest);
+		
+		
+		if(isDefaultImage) {
+			/* This is for testing purpose only*/
+			log.info("Action: Image sent through request is a default image");
+			Image defaultImage = imageService.getDefaultProfileImage();
+			
+			user.setProfileImage(defaultImage);
+			userRepo.save(user);
+			return;
+		}
+			/* This is for the production.
+			 * saving the image in the userRepository through imageService.
+			 * After passing ImageRequest we now get ImageResponse from user Response
+			 */
+			ImageResponse imageResponse = imageService.saveImage(email, imageRequest); 
+			Image image = imageService.getImageById(imageResponse.getId()); // getting image from db using imageResponse.getId().
+			user.setProfileImage(image);
+			userRepo.save(user);
+		
 	}
 
 	

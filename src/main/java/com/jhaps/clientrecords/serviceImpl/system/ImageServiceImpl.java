@@ -1,6 +1,7 @@
 package com.jhaps.clientrecords.serviceImpl.system;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -90,6 +91,18 @@ public class ImageServiceImpl implements ImageService{
 		log.info("Action: Image: {} saved successfully by User_Email: {}.", imageRequest.getImageName(), userEmail);
 		imageRepo.save(image);
 		return imageMapper.toImageResponse(image);
+	}
+	
+	
+	
+	@Override
+	public boolean isDefaultImage(ImageRequest imageRequest) {
+		Image defaultImage = imageRepo.findByImageName("defaultImage.png")
+				.orElseThrow(() -> new ImageNotFoundException("Image not found with the name : " + imageRequest.getImageName()));
+			if ((defaultImage.getImageName()).equals(imageRequest.getImageName())) {
+				return true;
+			}
+			return false;
 	}
 	
 
@@ -182,9 +195,15 @@ public class ImageServiceImpl implements ImageService{
 	/* To get the default profileImage from the ImageRepository. */
 	@Override
 	public Image getDefaultProfileImage() {
-		Image defaultImage = imageRepo.findDefaultImage()
-						.orElseThrow(()-> new ImageNotFoundException("Default Image is not configured in the Database"));
-		return defaultImage;
+		final String DEFAULT_IMAGE = "defaultImage.png";
+			return imageRepo.findByImageName(DEFAULT_IMAGE)
+						.orElseGet(()->{
+							//if image doesn't exist create a new one.
+							Image defaultImage = new Image();
+							defaultImage.setImageName(DEFAULT_IMAGE);
+							defaultImage.setUser(null);
+							return imageRepo.save(defaultImage);
+						});
 	}
 
 	

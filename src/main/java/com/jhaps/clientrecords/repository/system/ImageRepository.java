@@ -42,6 +42,10 @@ public interface ImageRepository extends JpaRepository<Image, Integer> {
 	@Query("SELECT i FROM Image i WHERE i.imageName='defaultImage.png'")
 	Optional<Image> findDefaultImage();
 	
+	Optional<Image> findByImageName(String imageName);
+	
+	boolean existsByImageName(String imageName);
+	
 	
 	/*Authorized to delete only if the authenticated user is the owner of the image. */
 	@PreAuthorize("#image.user.email == authentication.name")

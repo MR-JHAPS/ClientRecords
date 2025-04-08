@@ -170,6 +170,7 @@ public class AuthServiceImpl implements AuthService {
 
 	@Override
 	public boolean validateToken(String token, UserDetails userDetails) {
+		log.info("Proceeding the validation. Inside ValidateTokenService.");
 		boolean isTokenValid = jwtServiceImpl.validateToken(token, userDetails);
 		
 		if(!isTokenValid) {

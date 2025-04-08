@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jhaps.clientrecords.apiResponse.ApiResponseBuilder;
 import com.jhaps.clientrecords.apiResponse.ApiResponseModel;
+import com.jhaps.clientrecords.dto.request.TokenValidateRequest;
 import com.jhaps.clientrecords.dto.request.user.UserAuthRequest;
 import com.jhaps.clientrecords.dto.request.user.UserRegisterRequest;
 import com.jhaps.clientrecords.enums.ResponseMessage;
@@ -70,11 +71,12 @@ public class AuthController {
 		@Operation(summary = "validate Token")
 		@PostMapping("/validate-token")
 		@PreAuthorize("permitAll()")
-		public ResponseEntity<ApiResponseModel<String>> validateToken(@NotBlank @RequestBody String token, @AuthenticationPrincipal UserDetails userDetails){
-			log.info("Requesting verification of userLogin Details | PublicController -->'/login' ");
-			 authService.validateToken(token, userDetails);
-			log.info("Inside the userLogin controller after token generation : {}", token);
-			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, "Token is Valid");
+		public ResponseEntity<ApiResponseModel<String>> validateToken(@Valid @RequestBody TokenValidateRequest request, @AuthenticationPrincipal UserDetails userDetails){
+			log.info("Requesting verification of userLogin Details | PublicController -->'/validateToken' ");
+			log.info("Token for validation : {}", request.getToken());
+			 authService.validateToken(request.getToken(), userDetails);
+			log.info("Inside the tokenValidate controller after token generation : {}", request.getToken());
+			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, "Token is Valid ");
 		}
 		
 		

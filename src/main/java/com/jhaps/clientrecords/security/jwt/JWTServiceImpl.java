@@ -15,8 +15,10 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class JWTServiceImpl {
 
 	/*
@@ -95,6 +97,7 @@ public class JWTServiceImpl {
 		if(username.equals(userDetails.getUsername()) && !isTokenExpired(token)) {
 			return true;
 		}else {
+			log.info("token validation Failed. Token expired or token does not belong to current user.");
 			return false;
 		}
 	}
