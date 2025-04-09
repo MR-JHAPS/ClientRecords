@@ -8,6 +8,7 @@ public enum ModificationType {
 
 	INSERT,
 	UPDATE,
+	REASSIGNMENT,
 	DELETE;
 	
 }//ends enum.

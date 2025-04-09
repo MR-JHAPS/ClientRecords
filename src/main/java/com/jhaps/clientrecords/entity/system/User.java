@@ -9,6 +9,7 @@ import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.jhaps.clientrecords.entity.BaseEntity;
+import com.jhaps.clientrecords.entity.client.Client;
 import com.jhaps.clientrecords.entity.client.ClientLog;
 
 import jakarta.persistence.CascadeType;
@@ -48,17 +49,20 @@ public class User extends BaseEntity{
 	
 	@Column(name = "lock_time")
 	private LocalDateTime lockTime;		//time when the account was locked.
-
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-	@JsonIgnore // This is the forward reference that will be serialized
-	private List<ClientLog> clientLogs = new ArrayList<>();
 	
-	@OneToOne
+	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "profile_image_id")
 	private Image profileImage; // this field is for the profile image
 	
-//	@OneToMany(mappedBy = "user")
-//	private List<Client> clientList;
+	@OneToMany(mappedBy = "user", 
+				cascade = CascadeType.ALL,
+				orphanRemoval = true,
+				fetch = FetchType.LAZY )
+	private List<Image> images;
+	
+	@OneToMany(mappedBy = "user")
+	private List<Client> clientList;
+	
 	
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(

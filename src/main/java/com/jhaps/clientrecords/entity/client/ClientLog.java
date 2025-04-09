@@ -34,10 +34,6 @@ public class ClientLog {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
-
-	@ManyToOne
-	@JoinColumn(name = "user_id", nullable = false)
-	private User user;
 	
 	@Column(name="client_id", unique = true)
 	private int clientId;
@@ -60,6 +56,9 @@ public class ClientLog {
 	
 	@Column(name="updated_at")
 	private LocalDateTime updatedAt;
+	
+	@Column(name = "user_email")
+	private String userEmail;
 	
 	//When a new clientLog is created automatically adds the modified date of the client.
 	//Automatically saves the updated time when the client Data  is inserted in this entity(LifeCycle Hook).

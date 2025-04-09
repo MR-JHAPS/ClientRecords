@@ -18,11 +18,14 @@ public interface RoleService {
 	
 	public Set<Role> findRoleByNames(Set<String> roleNames); //for multiple role.
 	
-	public Set<RoleResponse> findAllRoles();
+//	public Set<RoleResponse> findAllRoles();
+	public Set<Role> findAllRoles();
 	
 	public void saveNewRole(RoleSaveRequest roleSaveRequest);
 	
-	public void deleteRole(int id);
+	public void deleteRole(int id); // Deletes role by roleId
+	
+
 	
 	
 }

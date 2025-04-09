@@ -12,7 +12,7 @@ public interface UserService {
 	
 	User findUserById(int id); /* Return type is "User" | It is used for internal business logic --( Service classes )--*/ 
 	
-	UserGeneralResponse findUserDtoByEmail(String email); /* Returns "UserGeneralDto" this is for User-dashboard.*/
+//	UserGeneralResponse findUserDtoByEmail(String email); /* Returns "UserGeneralDto" this is for User-dashboard.*/
 	
 	User findUserByEmail(String email);
 	

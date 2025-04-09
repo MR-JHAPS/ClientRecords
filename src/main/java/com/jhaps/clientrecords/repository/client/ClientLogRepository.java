@@ -28,9 +28,8 @@ public interface ClientLogRepository extends JpaRepository<ClientLog, Integer> {
 /* ----------------------------FIND CLIENTLOG By ClientLogID.---------------------------- */		
 	
 	@Query("SELECT new com.jhaps.clientrecords.dto.response.ClientLogResponse(" +
-			"cl.id, cl.clientId, cl.firstName, cl.lastName, cl.dateOfBirth, cl.postalCode, u.email, cl.modificationType, cl.updatedAt) "+
+			"cl.id, cl.clientId, cl.firstName, cl.lastName, cl.dateOfBirth, cl.postalCode, cl.userEmail, cl.modificationType, cl.updatedAt) "+
 			"FROM ClientLog cl " +
-			"JOIN cl.user u " +
 			"WHERE cl.id= :clientLogId"
 		)
 	Optional<ClientLogResponse> getClientLogById(@Param("clientLogId")int clientLogId);
@@ -39,9 +38,7 @@ public interface ClientLogRepository extends JpaRepository<ClientLog, Integer> {
 /* ----------------------------FIND ALL CLIENTLOG USING PAGEABLE.---------------------------- */	
 	
 	@Query("SELECT new com.jhaps.clientrecords.dto.response.ClientLogResponse( " +
-			"cl.id, cl.clientId, cl.firstName, cl.lastName, cl.dateOfBirth, cl.postalCode, u.email, cl.modificationType, cl.updatedAt) "+
-			"FROM ClientLog cl " +
-			"JOIN cl.user u"
-			)
+			"cl.id, cl.clientId, cl.firstName, cl.lastName, cl.dateOfBirth, cl.postalCode, cl.userEmail, cl.modificationType, cl.updatedAt) "+
+			"FROM ClientLog cl ")
 	Page<ClientLogResponse> getAllClientLog(Pageable pageable);
 }

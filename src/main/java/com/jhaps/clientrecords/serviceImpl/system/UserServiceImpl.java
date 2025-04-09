@@ -19,8 +19,10 @@ import com.jhaps.clientrecords.entity.system.User;
 import com.jhaps.clientrecords.enums.RoleNames;
 import com.jhaps.clientrecords.exception.system.DuplicateDataException;
 import com.jhaps.clientrecords.exception.system.UserNotFoundException;
+import com.jhaps.clientrecords.repository.client.ClientRepository;
 import com.jhaps.clientrecords.repository.system.UserRepository;
 import com.jhaps.clientrecords.security.customAuth.PasswordValidator;
+import com.jhaps.clientrecords.service.client.ClientService;
 import com.jhaps.clientrecords.service.system.ImageService;
 import com.jhaps.clientrecords.service.system.RoleService;
 import com.jhaps.clientrecords.service.system.UserService;
@@ -28,10 +30,12 @@ import com.jhaps.clientrecords.util.mapper.ImageMapper;
 import com.jhaps.clientrecords.util.mapper.UserMapper;
 
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
+@AllArgsConstructor
 public class UserServiceImpl implements UserService{
 	@Autowired
 	private ImageMapper imageMapper;
@@ -42,19 +46,11 @@ public class UserServiceImpl implements UserService{
 	private UserMapper userMapper; 
 	private PasswordValidator passwordValidator; // handles password validation
 	private ImageService imageService;
+//	private ClientRepository clientRepo;
+	private ClientService clientService;
 
 	
-	public UserServiceImpl(UserRepository userRepo, RoleService roleService, 
-							PasswordEncoder passwordEncoder,
-							UserMapper userMapper, ImageService imageService,
-							PasswordValidator passwordValidator) {
-		this.userRepo = userRepo;
-		this.roleService = roleService;
-		this.passwordEncoder = passwordEncoder;
-		this.userMapper = userMapper;
-		this.passwordValidator = passwordValidator;
-		this.imageService = imageService;
-	}
+	
 
 //-------------------------------THESE ARE CRUD-----------------------------------------------------------------------------------------	
 	
@@ -62,6 +58,7 @@ public class UserServiceImpl implements UserService{
 	public User findUserByEmail(String email) {
 		User user = userRepo.findByEmail(email).orElseThrow(()->
 						 new UserNotFoundException("Unable to find the user with Email : " + email));
+		log.info("Action: User with email: {} found in the database.", email);
 		return user;					
 	}
 	
@@ -80,13 +77,6 @@ public class UserServiceImpl implements UserService{
 		userRepo.save(user);
 	}
 	
-	
-	/* Returns "UserGeneralDto" this is for User-Profile.*/
-	@Override			
-	public UserGeneralResponse findUserDtoByEmail(String email) {
-		User user = findUserByEmail(email);
-		return userMapper.toUserGeneralResponse(user);	
-	}
 	
 	
 	/* Saving/registering new user with logic. */
@@ -119,12 +109,27 @@ public class UserServiceImpl implements UserService{
 	//Deleting the User along with their existing images from imageRepo.
 	@Transactional
 	@Override
-	public void deleteUserByEmail(String email)  { 
-		log.info("Action: Preparing to delete user: {}", email);
-		User user = findUserByEmail(email);
-		imageService.deleteImagesByUserEmail(email); //deletes the images of the user before deleting the account.
-		userRepo.delete(user);
-		log.info("Action: user Deleted successfully");
+	public void deleteUserByEmail(String userEmail)  { 
+		log.info("Action: Preparing to delete user: {}", userEmail);
+		User user = findUserByEmail(userEmail);
+		try{
+			clientService.reassignClientToAdmin(userEmail); // this will reassign all the clients to admin before deleting the user.
+		
+		
+			user.getRoles().clear(); //removing the roles of this user.
+			userRepo.save(user); // saving the user without roles.
+			
+			imageService.deleteAllImagesOfGivenUser(user.getId());
+			
+			if(user.getProfileImage()!=null) {
+				imageService.deleteImageById(user.getProfileImage().getId());
+			}
+			userRepo.delete(user);
+			log.info("Action: user Deleted successfully");
+		}catch(Exception e) {
+			log.error("Error :  Unable to delete the user");
+		}
+		
 	}//ends method.
 	
 	
@@ -163,33 +168,23 @@ public class UserServiceImpl implements UserService{
 	public void updateUserProfileImage(String email, UserImageUploadRequest userImageUploadRequest) {
 		User user = findUserByEmail(email);
 		/*	Converting UserUpdateImage to ImageRequest because : 
-		 * 			imageService.saveImage(String, ImageRequest)
+		 * 					imageService.saveImage(String, ImageRequest).
 		 * @param of saveImage in imageService is of type ImageRequest.
 		 * */
 		log.info("mapping Image: {}, UserImageUploadRequest to ImageRequest", userImageUploadRequest.getImageName());
 		ImageRequest imageRequest = userMapper.toImageRequestFromUserUpdateImage(userImageUploadRequest);
-		
-		/* Checking if the userImageUploadRequest contains the defaultImage-name */
-		boolean isDefaultImage = imageService.isDefaultImage(imageRequest);
-		
-		
-		if(isDefaultImage) {
-			/* This is for testing purpose only*/
-			log.info("Action: Image sent through request is a default image");
-			Image defaultImage = imageService.getDefaultProfileImage();
-			
-			user.setProfileImage(defaultImage);
+		/* If the image exists in the database by given imageName and userEmail we set that image as user profile. */
+		if(imageService.doesImageExistsByImageNameAndUserEmail(imageRequest.getImageName(), user.getEmail())) {
+			/* we fetch that image and save it as the current userProfile-picture.*/
+			Image foundImage = imageService.findByImageNameAndUserEmail(imageRequest.getImageName(), email);			
+			user.setProfileImage(foundImage);
 			userRepo.save(user);
 			return;
 		}
-			/* This is for the production.
-			 * saving the image in the userRepository through imageService.
-			 * After passing ImageRequest we now get ImageResponse from user Response
-			 */
-			ImageResponse imageResponse = imageService.saveImage(email, imageRequest); 
-			Image image = imageService.getImageById(imageResponse.getId()); // getting image from db using imageResponse.getId().
-			user.setProfileImage(image);
-			userRepo.save(user);
+		/* If requested Image is not found in the database then we save the image to the database. */
+		Image savedImage = imageService.saveImage(email, imageRequest); 
+		user.setProfileImage(savedImage);
+		userRepo.save(user);
 		
 	}
 
@@ -197,33 +192,6 @@ public class UserServiceImpl implements UserService{
 
 
 }//ends class	
-	
-//-------------------------------THESE ARE PRIVATE Methods----------------------------------------------------------------------------------------------------------
-	
-		
-//		//Checking if the role exists in the RoleNames.enum.(Single Role)
-//			private boolean isRoleValid(String roleName) {
-//				boolean isFound = false;
-//				for(RoleNames role : RoleNames.values()) {
-//					if(roleName.equals(role.getRole())) {
-//						 isFound=true;
-//						 break;
-//					}
-//				}//ends for-Loop.
-//				return isFound;
-//			}
-
-//			//this is for the validation of Set<String> roles. (Multiple Roles at once)
-//			private boolean isRoleValid(Set<String> roleNames) {
-//				Set<String> validRoles = Arrays.stream(RoleNames.values())
-//										.map(RoleNames::getRole)
-//										.collect(Collectors.toSet());
-//				
-//				return roleNames.stream()
-//								.allMatch(r->validRoles.contains(r));
-//			}
-			
-
 
 
 	

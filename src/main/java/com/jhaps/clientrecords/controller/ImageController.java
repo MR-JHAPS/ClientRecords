@@ -24,10 +24,12 @@ import com.jhaps.clientrecords.apiResponse.ApiResponseModel;
 import com.jhaps.clientrecords.dto.request.BulkImageDeleteRequest;
 import com.jhaps.clientrecords.dto.request.ImageRequest;
 import com.jhaps.clientrecords.dto.response.ImageResponse;
+import com.jhaps.clientrecords.entity.system.Image;
 import com.jhaps.clientrecords.enums.ResponseMessage;
 import com.jhaps.clientrecords.service.system.ImageService;
 import com.jhaps.clientrecords.service.system.PagedResourceAssemblerService;
 import com.jhaps.clientrecords.util.PageableUtils;
+import com.jhaps.clientrecords.util.mapper.ImageMapper;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -54,6 +56,7 @@ public class ImageController {
 	private ImageService imageService;
 	private ApiResponseBuilder apiResponseBuilder;
 	private PagedResourceAssemblerService<ImageResponse> pagedResourceAssemblerService;
+	private ImageMapper imageMapper;
 	
 	
 	@GetMapping("/current-user/get-all")
@@ -66,8 +69,10 @@ public class ImageController {
 						@AuthenticationPrincipal UserDetails userDetails){
 		String userEmail = userDetails.getUsername();
 		Pageable pageable = PageableUtils.createPageable(pageNumber, pageSize, sortBy, direction);
-		Page<ImageResponse> paginatedImages = imageService.getImagesByUserEmail(userEmail, pageable); 
-		PagedModel<EntityModel<ImageResponse>> pagedImageModel = pagedResourceAssemblerService.toPagedModel(paginatedImages);
+		Page<Image> paginatedImages = imageService.getImagesByUserEmail(userEmail, pageable);
+		/* Mapping : Page<Image> to Page<ImageResponse> Dto .*/
+		Page<ImageResponse> paginatedResponse = paginatedImages.map(imageMapper::toImageResponse);
+		PagedModel<EntityModel<ImageResponse>> pagedImageModel = pagedResourceAssemblerService.toPagedModel(paginatedResponse);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.IMAGE_OBTAINED, HttpStatus.OK, pagedImageModel);
 	}	
 	
@@ -76,7 +81,9 @@ public class ImageController {
 	@Operation(summary = "Get Image by Id.",
 	description = "This allows the users who have uploaded multiple images to select and view each images individually.")
 	public ResponseEntity<ApiResponseModel<ImageResponse>> getImageById(@PathVariable int id){
-		ImageResponse imageResponse = imageService.getImageResponseById(id);
+		Image image = imageService.getImageById(id);
+		/* Mapping : Image to ImageResponse Dto .*/
+		ImageResponse imageResponse = imageMapper.toImageResponse(image);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.IMAGE_SAVED, HttpStatus.OK, imageResponse);									
 	}
 	

@@ -19,6 +19,7 @@ import com.jhaps.clientrecords.dto.request.user.UserAuthRequest;
 import com.jhaps.clientrecords.dto.request.user.UserRegisterRequest;
 import com.jhaps.clientrecords.enums.ResponseMessage;
 import com.jhaps.clientrecords.security.customAuth.AuthService;
+import com.jhaps.clientrecords.service.client.ClientLogService;
 import com.jhaps.clientrecords.service.system.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -53,6 +54,8 @@ public class AuthController {
 		public ResponseEntity<ApiResponseModel<String>> userLogin(@Valid @RequestBody UserAuthRequest userAuthRequest){
 			log.info("Requesting verification of userLogin Details | PublicController -->'/login' ");
 			String token = authService.verifyUser(userAuthRequest);
+			
+			
 			log.info("Inside the userLogin controller after token generation : {}", token);
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, token);
 		}

@@ -20,7 +20,6 @@ public interface ImageRepository extends JpaRepository<Image, Integer> {
 
 	
 	
-	
 	/*
 	 * we are using "_" because we are accessing the field of User.
 	 * Example: Image has field User and of that User we are accessing it's field so we need "_".
@@ -30,6 +29,13 @@ public interface ImageRepository extends JpaRepository<Image, Integer> {
 	 *  for User Properties we need "_" because it is nested property.
 	 * */
 	
+	
+	/* Checking if the ImageName for the given user already Exists. */
+	@Query("SELECT i From Image i WHERE i.imageName=:imageName and i.user.email=:userEmail")
+	Optional<Image> findByImageNameAndUserEmail(@Param("imageName") String imageName, @Param("userEmail") String email);
+	
+	@Query("SELECT COUNT(i)>1 From Image i WHERE i.imageName=:imageName and i.user.email=:userEmail")
+	boolean existsByImageNameAndUserEmail(@Param("imageName") String imageName, @Param("userEmail") String email);
 	
 	Page<Image> findByUser_Email(String email, Pageable pageable); /* This is the main*/
 	
@@ -50,6 +56,10 @@ public interface ImageRepository extends JpaRepository<Image, Integer> {
 	/*Authorized to delete only if the authenticated user is the owner of the image. */
 	@PreAuthorize("#image.user.email == authentication.name")
 	void delete(@Param("image") Image image);
+	
+	
+	@Query("DELETE Image i WHERE i.user.id=:userId")
+	void deleteAllImagesByUserId(@Param("userId") int userId);
 	
 	
 	

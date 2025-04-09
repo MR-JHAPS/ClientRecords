@@ -1,9 +1,7 @@
 package com.jhaps.clientrecords.controller;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
@@ -26,10 +24,13 @@ import com.jhaps.clientrecords.apiResponse.ApiResponseModel;
 import com.jhaps.clientrecords.dto.request.RoleRequest;
 import com.jhaps.clientrecords.dto.request.user.AdminUpdateRequest;
 import com.jhaps.clientrecords.dto.response.user.UserAdminResponse;
+import com.jhaps.clientrecords.entity.system.User;
 import com.jhaps.clientrecords.enums.ResponseMessage;
 import com.jhaps.clientrecords.service.system.AdminService;
 import com.jhaps.clientrecords.service.system.PagedResourceAssemblerService;
 import com.jhaps.clientrecords.util.PageableUtils;
+import com.jhaps.clientrecords.util.mapper.UserMapper;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -46,12 +47,15 @@ public class AdminController {
 	private ApiResponseBuilder apiResponseBuilder;	
 	private AdminService adminService;
 	private PagedResourceAssemblerService<UserAdminResponse> pagedResourceAssemblerService;
+	private UserMapper userMapper;
 	
 	public AdminController(ApiResponseBuilder apiResponseBuilder, AdminService adminService,
-			PagedResourceAssemblerService<UserAdminResponse> pagedResourceAssemblerService) {
+			PagedResourceAssemblerService<UserAdminResponse> pagedResourceAssemblerService,
+			UserMapper userMapper) {
 		this.apiResponseBuilder = apiResponseBuilder;
 		this.pagedResourceAssemblerService = pagedResourceAssemblerService;
 		this.adminService = adminService;
+		this.userMapper = userMapper;
 	}
 	
 	
@@ -67,8 +71,10 @@ public class AdminController {
 								@RequestParam(required = false) String direction
 								){
 		Pageable pageable =  PageableUtils.createPageable(pageNumber, pageSize, sortBy, direction);
-		Page<UserAdminResponse> paginatedUsers = adminService.findAllUsers(pageable);
-		PagedModel<EntityModel<UserAdminResponse>> pagedUserModel = pagedResourceAssemblerService.toPagedModel(paginatedUsers);
+		Page<User> paginatedUsers = adminService.findAllUsers(pageable);
+		/* Mapping : Page<User> to Page<UserAdminResponse> */
+		Page<UserAdminResponse> paginatedResponse = paginatedUsers.map(userMapper::toUserAdminResponse);
+		PagedModel<EntityModel<UserAdminResponse>> pagedUserModel = pagedResourceAssemblerService.toPagedModel(paginatedResponse);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, pagedUserModel);
 	}
 	
@@ -77,8 +83,10 @@ public class AdminController {
 	@GetMapping("/user/{id}")
 	@PreAuthorize("hasAuthority('admin')")
 	public ResponseEntity<ApiResponseModel<UserAdminResponse>> getUserWithRolesByUserId(@PathVariable int id) {
-		UserAdminResponse userAdminResponse = adminService.findUserWithRolesById(id);
-		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, userAdminResponse);
+		User user = adminService.findUserWithRolesById(id);
+		/* Mapping : User to UserAdminResponse */
+		UserAdminResponse userResponse = userMapper.toUserAdminResponse(user);
+		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, userResponse );
 	}
 	
 	
@@ -98,8 +106,10 @@ public class AdminController {
 	@GetMapping("/search-by/email")
 	@PreAuthorize("hasAuthority('admin')")
 	public ResponseEntity<ApiResponseModel<UserAdminResponse>> getUserWithRolesByUserEmail(@RequestParam String email) {
-		UserAdminResponse userAdminResponse = adminService.searchUserByEmail(email);
-		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, userAdminResponse);
+		User user = adminService.searchUserByEmail(email);
+		/* Mapping : User to UserAdminResponse */
+		UserAdminResponse userResponse = userMapper.toUserAdminResponse(user);
+		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, userResponse);
 	}
 	
 	@Operation(summary = " Delete User By Id ")
@@ -122,8 +132,10 @@ public class AdminController {
 												@RequestParam(required = false) String direction){
 		
 		Pageable pageable =  PageableUtils.createPageable(pageNumber, pageSize, sortBy, direction);
-		Page<UserAdminResponse> paginatedUsers =adminService.findUsersByRoleName(role, pageable);
-		PagedModel<EntityModel<UserAdminResponse>> pagedUserModel = pagedResourceAssemblerService.toPagedModel(paginatedUsers);
+		Page<User> paginatedUsers = adminService.findUsersByRoleName(role, pageable);
+		/* Mapping : Page<User> to Page<UserAdminResponse> */
+		Page<UserAdminResponse> paginatedResponse = paginatedUsers.map(userMapper::toUserAdminResponse);
+		PagedModel<EntityModel<UserAdminResponse>> pagedUserModel = pagedResourceAssemblerService.toPagedModel(paginatedResponse);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, pagedUserModel);
 	}
 	

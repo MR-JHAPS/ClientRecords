@@ -29,21 +29,20 @@ public class ImageServiceImpl implements ImageService{
 
 	private ImageRepository imageRepo;
 	private UserRepository userRepo;
-	private ImageMapper imageMapper;
 	
 	
 	
 /*------------------------------------------------- IMAGES BY USER ---------------------------------------------------------------*/	
 	
 	
-	public ImageResponse getSelfProfilePicture(String email) {
+	public Image getProfileImageOfAuthenticatedUser(String email) {
 		Image image = imageRepo.findByUser_Email(email)
 				.orElseGet(()->{
 						log.info("Action: Profile Image for User: {} not found, falling back to defaultProfile picture.", email);
 						return getDefaultProfileImage();  //if custom ima
 						}
 					);
-		return imageMapper.toImageResponse(image);
+		return image;
 	}
 	
 	
@@ -53,7 +52,7 @@ public class ImageServiceImpl implements ImageService{
 	 *
 	 */
 	@Override
-	public ImageResponse getProfileImageOfUserByUserId(int id){
+	public Image getProfileImageByUserId(int id){
 		log.info("Action: Attempting to get the profile image of user with id: {}", id);
 		User user = userRepo.findById(id)
 					.orElseThrow(()-> new UserNotFoundException("User with id: " + id + " not found "));
@@ -62,26 +61,26 @@ public class ImageServiceImpl implements ImageService{
 							log.info("Unable to find an image for user with id: {}, email: {}", id, user.getEmail());
 							throw new ImageNotFoundException("Image for user with id "+ id +" not found");
 						});
-		return imageMapper.toImageResponse(userImage);
+		return userImage;
 	}
 	
 	
 	/* Gets all the images of the logged in user using userEmail */
 	@Override
-	public Page<ImageResponse> getImagesByUserEmail(String email, Pageable pageable) {
+	public Page<Image> getImagesByUserEmail(String email, Pageable pageable) {
 		log.info("Getting images for User_Email: {}", email);
 		Page<Image> images = imageRepo.findByUser_Email(email , pageable);
 		if(images.isEmpty()) {
 			log.info("Message: Images for User_Email : {} not found in Database.", email);
 		}
 		log.info("Message: {} Images for User_Email : {} fetched.", images.getNumberOfElements(), email);
-		return images.map(imageMapper::toImageResponse);
+		return images;
 	}
 
 	
 	@Override
 	@Transactional
-	public ImageResponse saveImage(String userEmail,ImageRequest imageRequest) {
+	public Image saveImage(String userEmail,ImageRequest imageRequest) {
 		log.info("Action: saving Image: {}", imageRequest.getImageName());
 		User user = userRepo.findByEmail(userEmail)
 				.orElseThrow(()-> new UserNotFoundException("Unable to find the User with email: " + userEmail));
@@ -90,68 +89,46 @@ public class ImageServiceImpl implements ImageService{
 		image.setUser(user);
 		log.info("Action: Image: {} saved successfully by User_Email: {}.", imageRequest.getImageName(), userEmail);
 		imageRepo.save(image);
-		return imageMapper.toImageResponse(image);
+		return image;
 	}
-	
-	
-	
-	@Override
-	public boolean isDefaultImage(ImageRequest imageRequest) {
-		Image defaultImage = imageRepo.findByImageName("defaultImage.png")
-				.orElseThrow(() -> new ImageNotFoundException("Image not found with the name : " + imageRequest.getImageName()));
-			if ((defaultImage.getImageName()).equals(imageRequest.getImageName())) {
-				return true;
-			}
-			return false;
-	}
-	
 
 
 	
-	/*
-	 * Deletes all the images of authenticated user.
-	 * It is used to delete all the image if the user Deletes their Account.
-	 * 
-	 */
-	@Override
-	@Transactional
-	public void deleteImagesByUserEmail(String email) {
-		List<Image> images = imageRepo.findAllByUser_Email(email);
-		if(images.isEmpty()) {
-			log.info("Message: unable to find the images for user: {} .", email);
-			return;
-		}
-		//safety checking the images contains the email of the user we want to delete.
-		images.forEach(img -> {
-				if(!img.getUser().getEmail().equals(email)) {
-					log.error("Security Violation: Attempted to delete image of id: {} belonging to wrong user, "
-							+ "expected User: {}, actual User: {}",img.getId(),email, img.getUser().getEmail());
-					throw new SecurityException("Verification failed for Image ownership");
-				}//ends if
-			}// ends lambda			
-		);//ends for each
-		try {
-			imageRepo.deleteAllInBatch(images);
-			log.info("Deleted {} images for user: {}", images.size(), email);
-		}catch(Exception e) {
-			log.error("Failed to delete images for user: {}", email, e);
-			throw new ImageDeletionException("Image Deletion failed for User: " + email );
-		}
-	}
+//	/*
+//	 * Deletes all the images of authenticated user.
+//	 * It is used to delete all the image if the user Deletes their Account.
+//	 * 
+//	 */
+//	@Override
+//	@Transactional
+//	public void deleteImagesByUserEmail(String email) {
+//		List<Image> images = imageRepo.findAllByUser_Email(email);
+//		if(images.isEmpty()) {
+//			log.info("Message: unable to find the images for user: {} .", email);
+//			return;
+//		}
+//		//safety checking the images contains the email of the user we want to delete.
+//		images.forEach(img -> {
+//				if(!img.getUser().getEmail().equals(email)) {
+//					log.error("Security Violation: Attempted to delete image of id: {} belonging to wrong user, "
+//							+ "expected User: {}, actual User: {}",img.getId(),email, img.getUser().getEmail());
+//					throw new SecurityException("Verification failed for Image ownership");
+//				}//ends if
+//			}// ends lambda			
+//		);//ends for each
+//		try {
+//			imageRepo.deleteAllInBatch(images);
+//			log.info("Deleted {} images for user: {}", images.size(), email);
+//		}catch(Exception e) {
+//			log.error("Failed to delete images for user: {}", email, e);
+//			throw new ImageDeletionException("Image Deletion failed for User: " + email );
+//		}
+//	}
 
 	
 	
 
 /*------------------------------------------------- IMAGE CRUD ---------------------------------------------------------------*/
-
-	@Override
-	public ImageResponse getImageResponseById(int id) {
-		log.info("Action: Getting image By Image_Id: {}", id);
-		Image image = imageRepo.findById(id)
-				.orElseThrow(() -> new ImageNotFoundException("Image with Id: " + id + " not found."));
-		return imageMapper.toImageResponse(image);
-	}
-
 
 	@Override
 	public Image getImageById(int id) {
@@ -206,8 +183,31 @@ public class ImageServiceImpl implements ImageService{
 						});
 	}
 
+
+	@Override
+	public Image findByImageNameAndUserEmail(String imageName, String email) {
+		Image image = imageRepo.findByImageNameAndUserEmail(imageName, email)
+				.orElseThrow(() -> new ImageNotFoundException("Error: Image with name: " + imageName + " and user-email: " + email + "not found"));
+		return image;
+	}
 	
 	
+	@Override
+	public boolean doesImageExistsByImageNameAndUserEmail(String imageName, String email) {
+		if(imageRepo.existsByImageNameAndUserEmail(imageName, email)) {
+			return true;
+		}
+		return false;
+	}
+
+	
+	@Override
+	public void deleteAllImagesOfGivenUser(int userId) {
+		Image profileImage = imageRepo.findByUser_Id(userId).orElseThrow(()-> new ImageNotFoundException("Image for userId: " + userId + " not found"));
+		log.info("profile Image {}", profileImage.getImageName());
+		imageRepo.deleteAllImagesByUserId(userId);
+		
+	}
 	
 	
 	

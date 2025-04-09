@@ -63,15 +63,28 @@ public class RoleServiceImpl implements RoleService {
 
 	
 	
+//	@Override
+//	public Set<RoleResponse> findAllRoles() {
+//		log.info("Getting the List of all the Roles.");
+//		List<Role> roleList = roleRepo.findAll();
+//		if(roleList.isEmpty()) {
+//			throw new RoleNotFoundException("Unable to find any roles in the Database.");
+//		}
+//		return roleList.stream().map(roleMapper::toRoleResponse).collect(Collectors.toSet());
+//	}
+	
+	
 	@Override
-	public Set<RoleResponse> findAllRoles() {
+	public Set<Role> findAllRoles() {
 		log.info("Getting the List of all the Roles.");
 		List<Role> roleList = roleRepo.findAll();
 		if(roleList.isEmpty()) {
 			throw new RoleNotFoundException("Unable to find any roles in the Database.");
 		}
-		return roleList.stream().map(roleMapper::toRoleResponse).collect(Collectors.toSet());
+		return roleList.stream().collect(Collectors.toSet());
+//		return roleList.stream().map(roleMapper::toRoleResponse).collect(Collectors.toSet());
 	}
+
 
 
 

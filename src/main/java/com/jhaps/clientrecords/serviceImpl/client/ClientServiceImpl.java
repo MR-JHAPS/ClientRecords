@@ -1,5 +1,8 @@
 package com.jhaps.clientrecords.serviceImpl.client;
 import java.time.LocalDate;
+import java.util.List;
+
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -10,13 +13,15 @@ import com.jhaps.clientrecords.entity.client.Client;
 import com.jhaps.clientrecords.entity.system.User;
 import com.jhaps.clientrecords.enums.ModificationType;
 import com.jhaps.clientrecords.exception.client.ClientNotFoundException;
+import com.jhaps.clientrecords.exception.system.UserNotFoundException;
 import com.jhaps.clientrecords.repository.client.ClientRepository;
+import com.jhaps.clientrecords.repository.system.UserRepository;
 import com.jhaps.clientrecords.service.client.ClientBinService;
 import com.jhaps.clientrecords.service.client.ClientLogService;
 import com.jhaps.clientrecords.service.client.ClientService;
-import com.jhaps.clientrecords.service.system.UserService;
 import com.jhaps.clientrecords.util.mapper.ClientMapper;
 
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,19 +39,18 @@ public class ClientServiceImpl implements ClientService  {
 	private ClientRepository clientRepo;
 	private ClientLogService clientLogService;
 	private ClientBinService clientBinService;	
-	private UserService userService;
+//	private UserService userService;
 	private ClientMapper clientMapper;
-
+	private EntityManager entityManager;
+	private UserRepository userRepo; // using repository to prevent circular dependency.
+	
 
 
 /*	------------------------------CRUD------------------------------------------------------------------------------------------------*/	
 	
-	/* Because the return type is Page<ClientDto>
-	   if we try to stream like normal :
-		**** clientList.stream().map(mapper::toClientDto).collect(Collectors.toList()).
-	   it converts to list but we want Page type collections not List so it won't work.
-	   Page is itself a type of collections. I didn't knew that. Page, list are type of collections.
-	 */
+	
+	
+	
 	@Override
 	public Page<ClientResponse> findAllClients(Pageable pageable) {		
 		log.info("Fetching clients with Pagination - page{} , size{}",pageable.getPageNumber(),pageable.getPageSize());
@@ -72,23 +76,25 @@ public class ClientServiceImpl implements ClientService  {
 	
 	@Override
 	public void saveClient(String userEmail, ClientRequest clientRequest) {
-		User currentUser = userService.findUserByEmail(userEmail);
+		User currentUser = userRepo.findUserByEmail(userEmail).orElseThrow(()-> new UserNotFoundException("ClientService: user not found: " + userEmail));
 		log.info("Saving Client with name {} .",clientRequest.getFirstName());
-		Client savedClient = clientRepo.save(clientMapper.toClientEntity(clientRequest));  //converting DTO to entity before saving to repository.
+		Client client = clientMapper.toClientEntity(clientRequest);
+		client.setUser(currentUser);
+		
+		Client savedClient = clientRepo.save(client);  //converting DTO to entity before saving to repository.
 		log.info("Client with name {} saved Successfully.",clientRequest.getFirstName());
 		//logging the client in the clientLog.
-		clientLogService.insertInClientLog(currentUser, savedClient, ModificationType.INSERT);
+		clientLogService.insertInClientLog(userEmail, savedClient, ModificationType.INSERT);
 	}
 
 	
 	@Override
 	public void deleteClientById(String userEmail, int clientId) {
 		log.warn("Action: Deleting the Client with ClientID: {}, user: {}", clientId, userEmail);
-		User currentUser = userService.findUserByEmail(userEmail);
 		Client client = clientRepo.findById(clientId).orElseThrow(()->
 			new ClientNotFoundException("Client with ID : " + clientId + " not found, to delete."));	
-		clientBinService.insertInClientBin(client); //inserting client to client been before deleting from the client.
-		clientLogService.insertInClientLog(currentUser, client, ModificationType.DELETE); // inserting client in client log before deleting.
+		clientBinService.insertInClientBin(client); //inserting client to client bin before deleting from the client.
+		clientLogService.insertInClientLog(userEmail, client, ModificationType.DELETE); // inserting client in client log before deleting.
 		clientRepo.delete(client);
 		log.info("Client with id {} deleted Successfully.",clientId);
 	}
@@ -98,7 +104,6 @@ public class ClientServiceImpl implements ClientService  {
 	@Override
 	public void updateClientById(String userEmail, int id, ClientRequest clientRequest) {
 		log.info("Action: Attempting to update a client: {}, by user: {}", id, userEmail);
-		User currentUser = userService.findUserByEmail(userEmail);
 		Client client = clientRepo.findById(id).orElseThrow(
 							()-> new ClientNotFoundException("Client with ID : " +id + "not found to update."));
 		client.setFirstName(clientRequest.getFirstName());
@@ -107,8 +112,7 @@ public class ClientServiceImpl implements ClientService  {
 		client.setPostalCode(clientRequest.getPostalCode());
 		clientRepo.save(client);	
 		log.info("Client with id :{} updated with new info",id);
-		
-		clientLogService.insertInClientLog(currentUser, client, ModificationType.UPDATE);
+		clientLogService.insertInClientLog(userEmail, client, ModificationType.UPDATE);
 	}
 
 //--------------------SEARCHING----------------------------------------------------------------------------------------------------------	
@@ -167,6 +171,81 @@ public class ClientServiceImpl implements ClientService  {
 			}
 			log.info("Finding Client By PostalCode :{} is Executed Successfully. and fetched :{} clients", postalCode, clientList.getNumberOfElements());
 			return clientList.map(clientMapper::toClientResponse);	
+	}
+
+
+	
+	
+	@Override
+	public void reassignClientToAdmin(int userId) {
+		String adminEmail = "admin@gmail.com";
+		User user = findUserById(userId); /* User : user whose clients are to be transferred/reassigned. */
+		User admin = findUserByEmail(adminEmail); /* Admin : selected user clients will be transferred/reassigned to admin. */
+		List<Client> clientListOfUser = clientRepo.findByUser_Id(userId);
+		if(clientListOfUser.isEmpty()) {
+			log.info("Info: No clients was assigned to admin as it was not found in Database for the userId :{}.", userId);
+			return;
+		}
+		int updated = clientRepo.bulkReassignClientsById(user.getId(), admin.getId());
+		log.info("Action: {} clients were assigned from user: {} to admin: {}", updated, user.getEmail(), admin.getEmail());		
+		
+		/* Inserting each clientList into the clientLog because we are modifying the user of the client list: Reassignment*/
+		clientListOfUser
+			.forEach( client ->
+						clientLogService.insertInClientLog(user.getEmail(), client, ModificationType.REASSIGNMENT)
+					);		
+	}
+	
+	
+	
+	@Transactional
+	@Override
+	public void reassignClientToAdmin(String userEmail) {
+		log.info("Action: Preparing to reassign Client from user : {} to admin.", userEmail);
+		String adminEmail = "admin@gmail.com";
+		User user = findUserByEmail(userEmail);/* User : user whose clients are to be transferred/reassigned. */
+		User admin = findUserByEmail(adminEmail);/* Admin : selected user clients will be transferred/reassigned to admin. */
+		
+		List<Client> clientListOfUser = clientRepo.findByUser_Email(userEmail);
+		/* Checking if the clientList is empty. */
+		if(clientListOfUser.isEmpty()) {
+			log.info("Info: No clients was assigned to admin as it was not found in Database for the userEmail: {}.", userEmail);
+			return;
+		}
+		
+		/* Logging the client.*/
+		clientListOfUser
+			.forEach( client ->
+						clientLogService.insertInClientLog(user.getEmail(), client, ModificationType.REASSIGNMENT)
+					);		
+		
+		try {
+			//Reassigning the clients from user to admin.
+			int updated = clientRepo.bulkReassignClientsById(user.getId(), admin.getId());
+			log.info("Action: {} clients were assigned from user: {} to admin: {}", updated, user.getEmail(), admin.getEmail());		
+		}catch(Exception e ) {
+			log.warn("Error occured while reassigning client to admin from user: {}", user.getEmail());
+			throw new RuntimeException(" Error while reassigning the client to admin from user : " + user.getEmail());
+		}
+		
+	}
+	
+	
+	
+	
+	
+	/* These are private methods that gets user from userRepository so that we do not need to be dependent on userService 
+	 * Using UserService will cause the circular Dependency issues.
+	 */
+	
+	private User findUserByEmail(String userEmail) {
+		return userRepo.findByEmail(userEmail)
+				.orElseThrow(()->  new UserNotFoundException("ClientServiceImpl: User with email: " + userEmail + " not found"));	
+	}
+	
+	private User findUserById(int userID) {
+		return userRepo.findById(userID)
+				.orElseThrow(()->  new UserNotFoundException("ClientServiceImpl: User with Id: " + userID + " not found"));	
 	}
 	
 	

@@ -9,13 +9,22 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 
 @Entity
-@Table(name = "images")
+/*
+ *	Multiple users can have sameImage name.
+ *			 Example:  user1 and user2 both may have image called "default.png".
+ *	But single user cannot have 2 images with same name. 
+ *			Example: user1 cannot have 2 images  with the name "default.png".
+ */
+@Table(name = "images",
+	uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "image_name"})
+)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
