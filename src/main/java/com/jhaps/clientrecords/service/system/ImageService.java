@@ -26,17 +26,12 @@ public interface ImageService {
 	/* Upload/save New Image */
 	Image saveImage(String email, ImageRequest request);
 	
-    /*	
-     *  When user deletes their account this method is also called from userService to delete all the images of that user.
-     *  For UserAccountDelete: Delete All Images of Selected User (i.e: By User email)
-     *  
-     *  @param email: email of the user whose images are to be deleted.
-     */
-//	void deleteImagesByUserEmail(String email);
+	void deleteAllImagesOfGivenUser(int userId);
 	
-	
-	
-	
+	/* Saves the default Image in image repository of that given user.
+	 * @param usedId is the id of the user that we want to save a new default image of.
+	 * */
+	Image saveDefaultProfileImageForGivenUser(int userId);
 /* ------------------------------------------- Image-CRUD --------------------------------------------*/
 	
 	
@@ -57,8 +52,7 @@ public interface ImageService {
 	/* Gets the default image from the ImageRepository. */
 	Image getDefaultProfileImage(); 
 	
-	
-	void deleteAllImagesOfGivenUser(int userId);
+
 	
 	
 	

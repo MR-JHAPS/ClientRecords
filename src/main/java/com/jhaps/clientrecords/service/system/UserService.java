@@ -16,7 +16,7 @@ public interface UserService {
 	
 	User findUserByEmail(String email);
 	
-	void saveUser(User user); /* No Logic just saving the user that is ready. */
+	User saveUser(User user); /* No Logic just saving the user that is ready. */
 	
 	void saveNewUser(UserRegisterRequest userRegisterRequest); /* Saving/registering new user with logic. */
 	

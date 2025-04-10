@@ -1,5 +1,6 @@
 package com.jhaps.clientrecords.serviceImpl.system;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,8 +38,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @AllArgsConstructor
 public class UserServiceImpl implements UserService{
-	@Autowired
-	private ImageMapper imageMapper;
 	
 	private UserRepository userRepo;
 	private RoleService roleService;
@@ -46,7 +45,6 @@ public class UserServiceImpl implements UserService{
 	private UserMapper userMapper; 
 	private PasswordValidator passwordValidator; // handles password validation
 	private ImageService imageService;
-//	private ClientRepository clientRepo;
 	private ClientService clientService;
 
 	
@@ -73,13 +71,14 @@ public class UserServiceImpl implements UserService{
 	
 	/* No Logic just saving the user that is ready. */
 	@Override
-	public void saveUser(User user) {
-		userRepo.save(user);
+	public User saveUser(User user) {
+		return userRepo.save(user);
 	}
 	
 	
 	
 	/* Saving/registering new user with logic. */
+	@Transactional
 	@Override
 	public void saveNewUser(UserRegisterRequest registrationDto) {
 		log.info("Action: Preparing to save new User: {} ", registrationDto.getEmail() );
@@ -87,22 +86,34 @@ public class UserServiceImpl implements UserService{
 			throw new DuplicateDataException("Unable to save user, User with email : " + registrationDto.getEmail() + " already exists.");
 		}
 		/* Mapping registrationDto to User-entity */
-		User user = userMapper.toUserEntity(registrationDto); 
+		User user = userMapper.toUserEntity(registrationDto);
+		
 		/* Validating the password and confirm password matches.*/
 		passwordValidator.validatePasswordMatch(registrationDto.getPassword(), registrationDto.getConfirmPassword()); 
 		String encodedPassword = passwordEncoder.encode(registrationDto.getPassword()); // encoding Password
 		user.setPassword(encodedPassword);
+		
+		/* Setting default Role ("user") */
 		log.info("Saving new User: {} with default Role: {}" , registrationDto.getEmail(), RoleNames.USER.getRole());
 		Role defaultRole = roleService.findRoleByName(RoleNames.USER.getRole()); //error is handled in roleService.
-		user.setRoles(Set.of(defaultRole));	/* The Role in User is of type Set<Role> setting the default value as set.of('user') */
+		user.setRoles(new HashSet<>(Set.of(defaultRole)) );	/* The Role in User is of type Set<Role> setting the default value as new HashSet<>(set.of('user')) */
+		
 		user.setAccountLocked(false);
 		user.setAttempts(0);
-		
-		Image defaultProfileImage = imageService.getDefaultProfileImage(); //getting default profile image from ImageService.
-		user.setProfileImage(defaultProfileImage); //setting default profile image when new account is created.
-		saveUser(user);	
+		// saving user without profile image
+		User savedUser = saveUser(user);	
+		//we get id of the user after we save and we pass that id to save a default image for that id.
+		log.info("Preparing to set new profile picture for user: {}", registrationDto.getEmail());
+		Image defaultProfileImage = imageService.saveDefaultProfileImageForGivenUser(savedUser.getId()); //getting default profile image from ImageService.
+		savedUser.setProfileImage(defaultProfileImage); //setting default profile image when new account is created.
+		//saving with profile image.
+		saveUser(savedUser);
 		log.info("Action: User with email: {} saved successfully", registrationDto.getEmail());
 	}
+	
+	
+	
+	
 	
 	
 	
@@ -115,22 +126,29 @@ public class UserServiceImpl implements UserService{
 		try{
 			clientService.reassignClientToAdmin(userEmail); // this will reassign all the clients to admin before deleting the user.
 		
+			if(user.getProfileImage() != null) {
+				user.setProfileImage(null); // removing the profile image from the user.
+				userRepo.save(user);
+			}
 		
+			//Deletes all the images of the given user.
+			imageService.deleteAllImagesOfGivenUser(user.getId());
+			
+			// Clears the roles of the given user.
 			user.getRoles().clear(); //removing the roles of this user.
 			userRepo.save(user); // saving the user without roles.
 			
-			imageService.deleteAllImagesOfGivenUser(user.getId());
-			
-			if(user.getProfileImage()!=null) {
-				imageService.deleteImageById(user.getProfileImage().getId());
-			}
+			//Delete the user.
 			userRepo.delete(user);
 			log.info("Action: user Deleted successfully");
 		}catch(Exception e) {
-			log.error("Error :  Unable to delete the user");
+			log.error("Error :  Unable to delete the user", e);
 		}
 		
 	}//ends method.
+	
+	
+	
 	
 	
 	

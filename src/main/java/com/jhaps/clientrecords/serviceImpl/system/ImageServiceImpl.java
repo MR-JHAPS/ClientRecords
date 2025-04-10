@@ -91,41 +91,6 @@ public class ImageServiceImpl implements ImageService{
 		imageRepo.save(image);
 		return image;
 	}
-
-
-	
-//	/*
-//	 * Deletes all the images of authenticated user.
-//	 * It is used to delete all the image if the user Deletes their Account.
-//	 * 
-//	 */
-//	@Override
-//	@Transactional
-//	public void deleteImagesByUserEmail(String email) {
-//		List<Image> images = imageRepo.findAllByUser_Email(email);
-//		if(images.isEmpty()) {
-//			log.info("Message: unable to find the images for user: {} .", email);
-//			return;
-//		}
-//		//safety checking the images contains the email of the user we want to delete.
-//		images.forEach(img -> {
-//				if(!img.getUser().getEmail().equals(email)) {
-//					log.error("Security Violation: Attempted to delete image of id: {} belonging to wrong user, "
-//							+ "expected User: {}, actual User: {}",img.getId(),email, img.getUser().getEmail());
-//					throw new SecurityException("Verification failed for Image ownership");
-//				}//ends if
-//			}// ends lambda			
-//		);//ends for each
-//		try {
-//			imageRepo.deleteAllInBatch(images);
-//			log.info("Deleted {} images for user: {}", images.size(), email);
-//		}catch(Exception e) {
-//			log.error("Failed to delete images for user: {}", email, e);
-//			throw new ImageDeletionException("Image Deletion failed for User: " + email );
-//		}
-//	}
-
-	
 	
 
 /*------------------------------------------------- IMAGE CRUD ---------------------------------------------------------------*/
@@ -202,13 +167,42 @@ public class ImageServiceImpl implements ImageService{
 
 	
 	@Override
-	public void deleteAllImagesOfGivenUser(int userId) {
-		Image profileImage = imageRepo.findByUser_Id(userId).orElseThrow(()-> new ImageNotFoundException("Image for userId: " + userId + " not found"));
-		log.info("profile Image {}", profileImage.getImageName());
-		imageRepo.deleteAllImagesByUserId(userId);
-		
+	public Image saveDefaultProfileImageForGivenUser(int userId) {
+		String defaultProfileImage = "defaultImage.png";
+		User user = findUserById(userId);
+		try {
+			Image defaultImage = new Image();
+			defaultImage.setImageName(defaultProfileImage);
+			defaultImage.setUser(user);
+			return imageRepo.save(defaultImage);
+		}catch (Exception e) {
+			log.error("Error: unable to save new Default ProfileImage for given user with id : {}", userId, e);
+			return null;
+		}		
 	}
 	
 	
 	
-}
+	
+	@Override
+	public void deleteAllImagesOfGivenUser(int userId) {		
+		try{
+			imageRepo.deleteAllImagesByUserId(userId);
+			log.info("Delete all images with userId successful.");
+		}catch (Exception e) {
+			log.error("Error deleting images for user {}", userId, e);
+			throw new RuntimeException("Delete All images by user id failed.");
+		}
+	}
+	
+	
+	/*--------------Private method of user for images ----------------------------*/
+	private User findUserById(int id) {
+		return userRepo.findById(id)
+				.orElseThrow(()-> new UserNotFoundException("User with id : " + id + " not found"));
+	}
+	
+	
+	
+	
+}//ends class.

@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -54,11 +55,12 @@ public interface ImageRepository extends JpaRepository<Image, Integer> {
 	
 	
 	/*Authorized to delete only if the authenticated user is the owner of the image. */
-	@PreAuthorize("#image.user.email == authentication.name")
-	void delete(@Param("image") Image image);
+//	@PreAuthorize("#image.user.email == authentication.name")
+//	void delete(@Param("image") Image image);
 	
 	
-	@Query("DELETE Image i WHERE i.user.id=:userId")
+	@Modifying
+	@Query("DELETE FROM Image i WHERE i.user.id=:userId")
 	void deleteAllImagesByUserId(@Param("userId") int userId);
 	
 	
