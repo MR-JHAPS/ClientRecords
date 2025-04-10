@@ -39,9 +39,7 @@ public class ClientServiceImpl implements ClientService  {
 	private ClientRepository clientRepo;
 	private ClientLogService clientLogService;
 	private ClientBinService clientBinService;	
-//	private UserService userService;
 	private ClientMapper clientMapper;
-	private EntityManager entityManager;
 	private UserRepository userRepo; // using repository to prevent circular dependency.
 	
 
@@ -146,9 +144,6 @@ public class ClientServiceImpl implements ClientService  {
 		}
 		log.info("Finding Client By LastName :{} is Executed Successfully. and fetched :{} clients", lastName, clientList.getNumberOfElements());
 		return clientList.map(clientMapper::toClientResponse); 
-		/* OR using Lambda : 
-		  return clientList.map(list -> mapper.toClientDto(list));
-		*/
 	}
 
 	
@@ -177,58 +172,77 @@ public class ClientServiceImpl implements ClientService  {
 	
 	
 	@Override
-	public void reassignClientToAdmin(int userId) {
+	@Transactional
+	public void reassignClientsToAdmin(int userId) {
 		String adminEmail = "admin@gmail.com";
-		User user = findUserById(userId); /* User : user whose clients are to be transferred/reassigned. */
-		User admin = findUserByEmail(adminEmail); /* Admin : selected user clients will be transferred/reassigned to admin. */
+		/* User :  whose clients are to be transferred/reassigned. */
+		User user = findUserById(userId);
+		/* Admin : To whom the client will be transferred/reassigned . */
+		User admin = findUserByEmail(adminEmail);
+		/* 
+		 * Getting the clientList for given user of userId & 
+		 *  Checking if the clientList is empty.
+		 */
 		List<Client> clientListOfUser = clientRepo.findByUser_Id(userId);
 		if(clientListOfUser.isEmpty()) {
-			log.info("Info: No clients was assigned to admin as it was not found in Database for the userId :{}.", userId);
+			log.info("Info: No clients was assigned to admin as it was not found in Database for the userEmail: {}.", user.getEmail());
 			return;
 		}
-		int updated = clientRepo.bulkReassignClientsById(user.getId(), admin.getId());
-		log.info("Action: {} clients were assigned from user: {} to admin: {}", updated, user.getEmail(), admin.getEmail());		
-		
-		/* Inserting each clientList into the clientLog because we are modifying the user of the client list: Reassignment*/
+		log.info("{} clients are found of the user: {}", clientListOfUser.size(), user.getEmail());
+		/*
+		 *  Logging the client before reassigning
+		 */
+		log.info("Logging: {} clients to ClientLog.", clientListOfUser.size());
 		clientListOfUser
-			.forEach( client ->
+			.forEach(client ->
 						clientLogService.insertInClientLog(user.getEmail(), client, ModificationType.REASSIGNMENT)
 					);		
-	}
-	
-	
-	
-	@Transactional
-	@Override
-	public void reassignClientToAdmin(String userEmail) {
-		log.info("Action: Preparing to reassign Client from user : {} to admin.", userEmail);
-		String adminEmail = "admin@gmail.com";
-		User user = findUserByEmail(userEmail);/* User : user whose clients are to be transferred/reassigned. */
-		User admin = findUserByEmail(adminEmail);/* Admin : selected user clients will be transferred/reassigned to admin. */
-		
-		List<Client> clientListOfUser = clientRepo.findByUser_Email(userEmail);
-		/* Checking if the clientList is empty. */
-		if(clientListOfUser.isEmpty()) {
-			log.info("Info: No clients was assigned to admin as it was not found in Database for the userEmail: {}.", userEmail);
-			return;
-		}
-		
-		/* Logging the client.*/
-		clientListOfUser
-			.forEach( client ->
-						clientLogService.insertInClientLog(user.getEmail(), client, ModificationType.REASSIGNMENT)
-					);		
-		
 		try {
-			//Reassigning the clients from user to admin.
+			/*
+			 * Reassigning the clients from user to admin.
+			 */
+			log.info("Action: Preparing to reassign Client from user : {} to admin.", user.getEmail());
 			int updated = clientRepo.bulkReassignClientsById(user.getId(), admin.getId());
 			log.info("Action: {} clients were assigned from user: {} to admin: {}", updated, user.getEmail(), admin.getEmail());		
 		}catch(Exception e ) {
 			log.warn("Error occured while reassigning client to admin from user: {}", user.getEmail());
 			throw new RuntimeException(" Error while reassigning the client to admin from user : " + user.getEmail());
-		}
-		
+		}	
 	}
+	
+	
+//	
+//	@Transactional
+//	@Override
+//	public void reassignClientToAdmin(String userEmail) {
+//		log.info("Action: Preparing to reassign Client from user : {} to admin.", userEmail);
+//		String adminEmail = "admin@gmail.com";
+//		User user = findUserByEmail(userEmail);/* User : user whose clients are to be transferred/reassigned. */
+//		User admin = findUserByEmail(adminEmail);/* Admin : selected user clients will be transferred/reassigned to admin. */
+//		
+//		List<Client> clientListOfUser = clientRepo.findByUser_Email(userEmail);
+//		/* Checking if the clientList is empty. */
+//		if(clientListOfUser.isEmpty()) {
+//			log.info("Info: No clients was assigned to admin as it was not found in Database for the userEmail: {}.", userEmail);
+//			return;
+//		}
+//		
+//		/* Logging the client.*/
+//		clientListOfUser
+//			.forEach( client ->
+//						clientLogService.insertInClientLog(user.getEmail(), client, ModificationType.REASSIGNMENT)
+//					);		
+//		
+//		try {
+//			//Reassigning the clients from user to admin.
+//			int updated = clientRepo.bulkReassignClientsById(user.getId(), admin.getId());
+//			log.info("Action: {} clients were assigned from user: {} to admin: {}", updated, user.getEmail(), admin.getEmail());		
+//		}catch(Exception e ) {
+//			log.warn("Error occured while reassigning client to admin from user: {}", user.getEmail());
+//			throw new RuntimeException(" Error while reassigning the client to admin from user : " + user.getEmail());
+//		}
+//		
+//	}
 	
 	
 	

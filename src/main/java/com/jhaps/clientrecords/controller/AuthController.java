@@ -52,11 +52,8 @@ public class AuthController {
 		@PostMapping("/login")
 		@PreAuthorize("permitAll()")
 		public ResponseEntity<ApiResponseModel<String>> userLogin(@Valid @RequestBody UserAuthRequest userAuthRequest){
-			log.info("Requesting verification of userLogin Details | PublicController -->'/login' ");
+			log.info("Requesting verification of userLogin Details.");
 			String token = authService.verifyUser(userAuthRequest);
-			
-			
-			log.info("Inside the userLogin controller after token generation : {}", token);
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, token);
 		}
 		

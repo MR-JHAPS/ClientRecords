@@ -24,6 +24,9 @@ public class CustomUserDetails implements UserDetails {
 		return user;
 	}
 	
+	public int getUserId() {
+		return user.getId();
+	}
 
 	//For Multiple Roles
 	@Override

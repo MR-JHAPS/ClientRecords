@@ -82,7 +82,7 @@ public class AdminServiceImpl implements AdminService{
 	//Getting the list of user by their role|Authority.
 	@Transactional
 	@Override
-	public Page<User> findUsersByRoleName(String roleName, Pageable pageable) {
+	public Page<User> searchUsersByRoleName(String roleName, Pageable pageable) {
 		//checking if the argument roleName is valid.
 		boolean isRoleFound = roleService.isRoleValid(roleName); 
 		if(!isRoleFound) {
@@ -98,25 +98,25 @@ public class AdminServiceImpl implements AdminService{
 
 
 	@Override
-	public void updateAdmin(String currentUserEmail, AdminUpdateRequest adminUpdateRequest) {
-		User user = userService.findUserByEmail(currentUserEmail); //getting current User from securityContextHolder
+	public void updateCurrentAdmin(int userId, AdminUpdateRequest request) {
+		User user = userService.findUserById(userId); //getting current User from securityContextHolder
 		// For Safety: to check if the user has Role: admin. 
 		Set<String> userRoles = user.getRoles().stream().map(role -> role.getName()).collect(Collectors.toSet());
 		if(!userRoles.contains(RoleNames.ADMIN.getRole())) {
 			throw new AccessDeniedException("Error: You are not admin and cannot update this account");
 		}
 		/* If "current-password" does not match the "encoded-account-password" it will throw exception*/
-		passwordValidator.verifyCurrentPassword(adminUpdateRequest.getCurrentPassword(), user.getPassword());
+		passwordValidator.verifyCurrentPassword(request.getCurrentPassword(), user.getPassword());
 		
 		/* Checking if user is asking to change a password*/
-		if(StringUtils.hasText(adminUpdateRequest.getNewPassword())) {
+		if(StringUtils.hasText(request.getNewPassword())) {
 			/* throws error if newPassword and confirmPassword does not match. */
-			passwordValidator.validatePasswordMatch(adminUpdateRequest.getNewPassword(), adminUpdateRequest.getConfirmPassword()); 
-			String encodedNewPassword = passwordEncoder.encode(adminUpdateRequest.getNewPassword());
+			passwordValidator.validatePasswordMatch(request.getNewPassword(), request.getConfirmPassword()); 
+			String encodedNewPassword = passwordEncoder.encode(request.getNewPassword());
 			user.setPassword(encodedNewPassword);
 		}
-		user.setEmail(adminUpdateRequest.getEmail());
-		Set<Role> roles = roleService.findRoleByNames(adminUpdateRequest.getRoles());
+		user.setEmail(request.getEmail());
+		Set<Role> roles = roleService.findRoleByNames(request.getRoles());
 		user.setRoles(roles);
 		userRepo.save(user);
 	}

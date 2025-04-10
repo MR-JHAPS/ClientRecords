@@ -80,6 +80,11 @@ public class User extends BaseEntity{
 	private Set<Role> roles;
 
 	
+	/* Helps to clear the roles.
+	 * This breaks the relationship with the roles and allows for user Deletion.*/
+	public void removeRoles() {
+		this.roles.clear();
+	}
 	
 	
 	

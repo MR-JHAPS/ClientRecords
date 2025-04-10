@@ -26,6 +26,7 @@ import com.jhaps.clientrecords.dto.request.user.AdminUpdateRequest;
 import com.jhaps.clientrecords.dto.response.user.UserAdminResponse;
 import com.jhaps.clientrecords.entity.system.User;
 import com.jhaps.clientrecords.enums.ResponseMessage;
+import com.jhaps.clientrecords.security.model.CustomUserDetails;
 import com.jhaps.clientrecords.service.system.AdminService;
 import com.jhaps.clientrecords.service.system.PagedResourceAssemblerService;
 import com.jhaps.clientrecords.util.PageableUtils;
@@ -93,10 +94,10 @@ public class AdminController {
 	@Operation(summary = " Update Admin info ")
 	@PutMapping("/update/me")
 	@PreAuthorize("hasAuthority('admin')")
-	public ResponseEntity<ApiResponseModel<String>> updateAdmin(@RequestBody AdminUpdateRequest adminUpdateRequest,
-											@AuthenticationPrincipal UserDetails userDetails){
-		String email = userDetails.getUsername();
-		adminService.updateAdmin(email, adminUpdateRequest);
+	public ResponseEntity<ApiResponseModel<String>> updateAdmin(@RequestBody AdminUpdateRequest request,
+											@AuthenticationPrincipal CustomUserDetails userDetails){
+		int userId = userDetails.getUser().getId();
+		adminService.updateCurrentAdmin(userId, request);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.ADMIN_UPDATED, HttpStatus.OK);
 	}
 
@@ -132,7 +133,7 @@ public class AdminController {
 												@RequestParam(required = false) String direction){
 		
 		Pageable pageable =  PageableUtils.createPageable(pageNumber, pageSize, sortBy, direction);
-		Page<User> paginatedUsers = adminService.findUsersByRoleName(role, pageable);
+		Page<User> paginatedUsers = adminService.searchUsersByRoleName(role, pageable);
 		/* Mapping : Page<User> to Page<UserAdminResponse> */
 		Page<UserAdminResponse> paginatedResponse = paginatedUsers.map(userMapper::toUserAdminResponse);
 		PagedModel<EntityModel<UserAdminResponse>> pagedUserModel = pagedResourceAssemblerService.toPagedModel(paginatedResponse);

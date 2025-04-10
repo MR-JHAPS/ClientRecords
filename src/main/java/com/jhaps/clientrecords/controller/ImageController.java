@@ -8,6 +8,7 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,6 +27,7 @@ import com.jhaps.clientrecords.dto.request.ImageRequest;
 import com.jhaps.clientrecords.dto.response.ImageResponse;
 import com.jhaps.clientrecords.entity.system.Image;
 import com.jhaps.clientrecords.enums.ResponseMessage;
+import com.jhaps.clientrecords.security.model.CustomUserDetails;
 import com.jhaps.clientrecords.service.system.ImageService;
 import com.jhaps.clientrecords.service.system.PagedResourceAssemblerService;
 import com.jhaps.clientrecords.util.PageableUtils;
@@ -66,15 +68,17 @@ public class ImageController {
 						@RequestParam(defaultValue="10") int pageSize,
 						@RequestParam(required = false) String sortBy,
 						@RequestParam(required = false) String direction,
-						@AuthenticationPrincipal UserDetails userDetails){
-		String userEmail = userDetails.getUsername();
+						@AuthenticationPrincipal CustomUserDetails userDetails){
+		int userId = userDetails.getUserId();
 		Pageable pageable = PageableUtils.createPageable(pageNumber, pageSize, sortBy, direction);
-		Page<Image> paginatedImages = imageService.getImagesByUserEmail(userEmail, pageable);
+		Page<Image> paginatedImages = imageService.getImagesOfCurrentUser(userId, pageable);
 		/* Mapping : Page<Image> to Page<ImageResponse> Dto .*/
 		Page<ImageResponse> paginatedResponse = paginatedImages.map(imageMapper::toImageResponse);
 		PagedModel<EntityModel<ImageResponse>> pagedImageModel = pagedResourceAssemblerService.toPagedModel(paginatedResponse);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.IMAGE_OBTAINED, HttpStatus.OK, pagedImageModel);
 	}	
+
+	
 	
 	
 	@GetMapping("/{id}")
@@ -99,11 +103,13 @@ public class ImageController {
 	}
 
 	
-	/* Deletes the single-selected Image by id*/
-	@DeleteMapping("delete/{id}")
+	/* Deletes the single-selected Image by id if it belongs to authenticated user. */
+	@PreAuthorize("@imageRepository.existsByIdAndUserId(#imageId, #userDetails.userId)")
+	@DeleteMapping("delete/{imageId}")
 	@Operation(summary = "Delete user's image(single) by ID")
-	public ResponseEntity<?> deleteImageById(@PathVariable int id){
-		imageService.deleteImageById(id);
+	public ResponseEntity<?> deleteImageById(@PathVariable int imageId, @AuthenticationPrincipal CustomUserDetails userDetails){
+		int userId = userDetails.getUser().getId();
+		imageService.deleteImageById(imageId, userId);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 	

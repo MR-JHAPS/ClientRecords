@@ -3,18 +3,23 @@ package com.jhaps.clientrecords.serviceImpl.system;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import com.jhaps.clientrecords.dto.request.ImageRequest;
 import com.jhaps.clientrecords.dto.response.ImageResponse;
 import com.jhaps.clientrecords.entity.system.Image;
 import com.jhaps.clientrecords.entity.system.User;
 import com.jhaps.clientrecords.exception.system.ImageDeletionException;
+import com.jhaps.clientrecords.exception.system.ImageException;
 import com.jhaps.clientrecords.exception.system.ImageNotFoundException;
 import com.jhaps.clientrecords.exception.system.UserNotFoundException;
 import com.jhaps.clientrecords.repository.system.ImageRepository;
 import com.jhaps.clientrecords.repository.system.UserRepository;
+import com.jhaps.clientrecords.security.model.CustomUserDetails;
 import com.jhaps.clientrecords.service.system.ImageService;
 import com.jhaps.clientrecords.util.mapper.ImageMapper;
 
@@ -35,47 +40,36 @@ public class ImageServiceImpl implements ImageService{
 /*------------------------------------------------- IMAGES BY USER ---------------------------------------------------------------*/	
 	
 	
-	public Image getProfileImageOfAuthenticatedUser(String email) {
-		Image image = imageRepo.findByUser_Email(email)
-				.orElseGet(()->{
-						log.info("Action: Profile Image for User: {} not found, falling back to defaultProfile picture.", email);
-						return getDefaultProfileImage();  //if custom ima
-						}
-					);
-		return image;
-	}
+//	public Image getProfileImageOfCurrentUser(int userId) {
+//		User currentUser = findUserById(userId);
+//		Image profileImage = currentUser.getProfileImage();
+//		return profileImage;
+//	}
 	
 	
-	/*	
-	 * While Registering new user a default profile image is set.
-	 * If the profile image(default/custom) for user is not found it will throw error.
-	 *
-	 */
+	
+//	@Override
+//	public Image getProfileImageByUserId(int userId){
+//		log.info("Action: Attempting to get the profile image of user with id: {}", userId);
+//		User user = findUserById(userId);
+//		Image profileImage = user.getProfileImage();
+//		return profileImage;
+//	}
+	
+	
+	
 	@Override
-	public Image getProfileImageByUserId(int id){
-		log.info("Action: Attempting to get the profile image of user with id: {}", id);
-		User user = userRepo.findById(id)
-					.orElseThrow(()-> new UserNotFoundException("User with id: " + id + " not found "));
-		Image userImage = imageRepo.findByUser_Id(id)
-						.orElseThrow(()-> {
-							log.info("Unable to find an image for user with id: {}, email: {}", id, user.getEmail());
-							throw new ImageNotFoundException("Image for user with id "+ id +" not found");
-						});
-		return userImage;
-	}
-	
-	
-	/* Gets all the images of the logged in user using userEmail */
-	@Override
-	public Page<Image> getImagesByUserEmail(String email, Pageable pageable) {
-		log.info("Getting images for User_Email: {}", email);
-		Page<Image> images = imageRepo.findByUser_Email(email , pageable);
+	public Page<Image> getImagesOfCurrentUser(int userId, Pageable pageable){
+		log.info("Getting images for User of ID : ", userId);
+		Page<Image> images = imageRepo.findByUser_Id(userId , pageable);
 		if(images.isEmpty()) {
-			log.info("Message: Images for User_Email : {} not found in Database.", email);
+			log.info("Message: Images for User_ID : {} not found in Database.", userId);
+		}else {
+			log.info("Message: Fetched {} Images for User_ID : {} fetched.", images.getNumberOfElements(), userId);	
 		}
-		log.info("Message: {} Images for User_Email : {} fetched.", images.getNumberOfElements(), email);
 		return images;
 	}
+	
 
 	
 	@Override
@@ -105,20 +99,20 @@ public class ImageServiceImpl implements ImageService{
 	
 	
 	/*
-	 * In ImageRepository I have used:
-	 * 				 @PreAuthorize("#image.user.email == authentication.name").
-	 * This allows the deletion only if the image belongs to the authenticated user.
-	 * 
-	 * */
+	 * Deletes image by id only if it belongs to the  current-authenticated-user.
+	 */
 	@Override
 	@Transactional
-	public void deleteImageById(int id) {
-		log.info("Action: Deleting Image of Id: {}", id);
-		Image image = imageRepo.findById(id)
-				.orElseThrow(() -> new ImageNotFoundException("Image with Id: " + id + " not found."));
-		log.info("Action: Image of Id:{} deleted Successfully.", id);
-		imageRepo.delete(image);
+	public void deleteImageById(int imageId, int userId) {
+		log.info("Action: Deleting Image of Id: {}", imageId);
+		if(!imageRepo.existsByIdAndUserId(imageId, userId)) {
+			 log.warn("Delete failed: Image {} not found or not owned by user {}", imageId, userId);
+			throw new ImageNotFoundException("Image with Id: " + imageId + " not found or you do not have permission to delete.");	
+		}
+		 imageRepo.deleteByIdAndUserId(imageId, userId);
+		 log.info("Action: Image of Id:{} deleted Successfully.", imageId);
 	}
+	
 
 	
 	@Override
@@ -133,67 +127,98 @@ public class ImageServiceImpl implements ImageService{
 		}
 	}
 
-	
-	/* To get the default profileImage from the ImageRepository. */
-	@Override
-	public Image getDefaultProfileImage() {
-		final String DEFAULT_IMAGE = "defaultImage.png";
-			return imageRepo.findByImageName(DEFAULT_IMAGE)
-						.orElseGet(()->{
-							//if image doesn't exist create a new one.
-							Image defaultImage = new Image();
-							defaultImage.setImageName(DEFAULT_IMAGE);
-							defaultImage.setUser(null);
-							return imageRepo.save(defaultImage);
-						});
-	}
 
 
-	@Override
-	public Image findByImageNameAndUserEmail(String imageName, String email) {
-		Image image = imageRepo.findByImageNameAndUserEmail(imageName, email)
-				.orElseThrow(() -> new ImageNotFoundException("Error: Image with name: " + imageName + " and user-email: " + email + "not found"));
-		return image;
-	}
-	
-	
-	@Override
-	public boolean doesImageExistsByImageNameAndUserEmail(String imageName, String email) {
-		if(imageRepo.existsByImageNameAndUserEmail(imageName, email)) {
-			return true;
-		}
-		return false;
-	}
+
+//	@Override
+//	public Image findByImageNameAndUserEmail(String imageName, String email) {
+//		Image image = imageRepo.findByImageNameAndUserEmail(imageName, email)
+//				.orElseThrow(() -> new ImageNotFoundException("Error: Image with name: " + imageName + " and user-email: " + email + "not found"));
+//		return image;
+//	}
+//	
+//	
+//	@Override
+//	public boolean doesImageExistsByImageNameAndUserEmail(String imageName, String email) {
+//		if(imageRepo.existsByImageNameAndUserEmail(imageName, email)) {
+//			return true;
+//		}
+//		return false;
+//	}
 
 	
 	@Override
-	public Image saveDefaultProfileImageForGivenUser(int userId) {
-		String defaultProfileImage = "defaultImage.png";
+	public Image updateProfileImage(String imageName, int userId) {
 		User user = findUserById(userId);
-		try {
-			Image defaultImage = new Image();
-			defaultImage.setImageName(defaultProfileImage);
-			defaultImage.setUser(user);
-			return imageRepo.save(defaultImage);
-		}catch (Exception e) {
-			log.error("Error: unable to save new Default ProfileImage for given user with id : {}", userId, e);
-			return null;
-		}		
+		Optional<Image> existingImage = imageRepo.findByImageNameAndUserId(imageName, userId);
+		/*
+		 * If the given imageName exists in DB it will return that
+		 * */
+		if(existingImage.isPresent()) {
+			return existingImage.get();
+		}
+		/*
+		 * If the given Image doesnot exists it will save a new Image for that user in the ImageRepository.
+		 */
+		Image newImage = new Image();
+			newImage.setImageName(imageName);
+			newImage.setUser(user);
+		imageRepo.save(newImage);
+		return newImage;
 	}
 	
 	
-	
-	
+	/* When new user is created it saves a default image for that user in imageRepository.
+	 * OR 
+	 * If the customProfile is removed we set the image back to default for that user.
+	 */
 	@Override
+	public Image saveDefaultProfileImageForGivenUser(int userId){
+		String defaultProfileImage = "defaultImage.png";
+		User user = findUserById(userId);		
+		/*
+		 * Checking if the default image is already present for this user in Image-Repository.
+		 */
+		Optional<Image> existingDefaultImage = imageRepo.findByImageNameAndUserId(defaultProfileImage, userId);
+		if(existingDefaultImage.isPresent()) {
+			return existingDefaultImage.get();
+		}
+		/*
+		 * If defaultImage is not present for the user create new DefaultImage.
+		 */
+		log.info("Saving Default profile picture for user : {}", user.getEmail());
+		Image defaultImage = new Image();
+		defaultImage.setImageName(defaultProfileImage);
+		defaultImage.setUser(user);
+		//saving new default image.
+		Image savedImage = imageRepo.save(defaultImage);
+		//if image saved return savedImage.
+		if(savedImage!=null && savedImage.getId()!=0) {
+			log.info("Successfully saved Default profile picture for user : {}", user.getEmail());
+			return savedImage;
+		}
+		log.info("Error: Unable to save Default profile picture for user : {}", user.getEmail());
+		throw new ImageException("ERROR: Unable to save Default Profile Image for the user: " + user.getEmail());	
+	}
+	
+		
+	
+	
+	/* Deletes all the images of given user from the imageRepository. */
+	@Override
+	@Transactional
 	public void deleteAllImagesOfGivenUser(int userId) {		
 		try{
 			imageRepo.deleteAllImagesByUserId(userId);
 			log.info("Delete all images with userId successful.");
 		}catch (Exception e) {
 			log.error("Error deleting images for user {}", userId, e);
-			throw new RuntimeException("Delete All images by user id failed.");
+			throw new DataIntegrityViolationException("Delete All images by user id failed.");
 		}
 	}
+	
+
+	
 	
 	
 	/*--------------Private method of user for images ----------------------------*/

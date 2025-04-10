@@ -12,33 +12,21 @@ public interface AdminService {
 	
 	
 	
-	public Page<User> findAllUsers(Pageable pageable); /* Returns the users with roles and all details so that admin can view in dashboard*/
+	Page<User> findAllUsers(Pageable pageable); /* Returns the users with roles and all details so that admin can view in dashboard*/
 	
-	public User findUserWithRolesById(int id); /* Returns user with role for admin to view. */
+	User findUserWithRolesById(int id); /* Returns user with role for admin to view. */
 	
-	public Page<User> findUsersByRoleName(String roleName, Pageable pageable);
+	Page<User> searchUsersByRoleName(String roleName, Pageable pageable);
 	
-	public void updateAdmin(String currentUserEmail,AdminUpdateRequest adminUpdateRequest); /* Updates the Admin acccount */
+	void updateCurrentAdmin(int userId, AdminUpdateRequest adminUpdateRequest); /* Updates the Admin acccount */
 	
-	public void updateUserRoleById(int id, RoleRequest roleRequest); /* We have the "id" of user and the "RoleDto" that contains the name of the roles.*/
+	void updateUserRoleById(int id, RoleRequest roleRequest); /* We have the "id" of user and the "RoleDto" that contains the name of the roles.*/
 	
-	public void deleteUserById(int id); /* Admin can delete any user By id */
+	void deleteUserById(int id); /* Admin can delete any user By id */
 	
 	User searchUserByEmail(String email);
 
-//	public Page<UserAdminResponse> findAllUsers(Pageable pageable); /* Returns the users with roles and all details so that admin can view in dashboard*/
-//	
-//	public UserAdminResponse findUserWithRolesById(int id); /* Returns user with role for admin to view. */
-//	
-//	public Page<UserAdminResponse> findUsersByRoleName(String roleName, Pageable pageable);
-//	
-//	public void updateAdmin(String currentUserEmail,AdminUpdateRequest adminUpdateRequest); /* Updates the Admin acccount */
-//	
-//	public void updateUserRoleById(int id, RoleRequest roleRequest); /* We have the "id" of user and the "RoleDto" that contains the name of the roles.*/
-//	
-//	public void deleteUserById(int id); /* Admin can delete any user By id */
-//	
-//	UserAdminResponse searchUserByEmail(String email);
+
 	
 	
 	

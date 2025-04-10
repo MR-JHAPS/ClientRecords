@@ -49,35 +49,13 @@ public class UserServiceImpl implements UserService{
 
 	
 	
+	
+	public User getCurrentUser(int userId) {
+		return findUserById(userId);
+	}
+	
 
-//-------------------------------THESE ARE CRUD-----------------------------------------------------------------------------------------	
-	
-	@Override
-	public User findUserByEmail(String email) {
-		User user = userRepo.findByEmail(email).orElseThrow(()->
-						 new UserNotFoundException("Unable to find the user with Email : " + email));
-		log.info("Action: User with email: {} found in the database.", email);
-		return user;					
-	}
-	
-	/* Return type is "User" | It is used for internal business logic. */
-	@Override
-	public User findUserById(int id) {
-		User user = userRepo.findById(id)
-				.orElseThrow( ()->new UserNotFoundException("Unable to find the user with ID : " + id) );
-		return user;	
-	}
-	
-	
-	/* No Logic just saving the user that is ready. */
-	@Override
-	public User saveUser(User user) {
-		return userRepo.save(user);
-	}
-	
-	
-	
-	/* Saving/registering new user with logic. */
+	/* Saving/registering new user  */
 	@Transactional
 	@Override
 	public void saveNewUser(UserRegisterRequest registrationDto) {
@@ -111,107 +89,104 @@ public class UserServiceImpl implements UserService{
 		log.info("Action: User with email: {} saved successfully", registrationDto.getEmail());
 	}
 	
-	
-	
-	
-	
-	
-	
-	//Deleting the User along with their existing images from imageRepo.
-	@Transactional
+
+
 	@Override
-	public void deleteUserByEmail(String userEmail)  { 
-		log.info("Action: Preparing to delete user: {}", userEmail);
-		User user = findUserByEmail(userEmail);
+	@Transactional
+	public void deleteCurrentUser(int userId) {
+		log.info("Action: Preparing to delete user: {}", userId);
+		User user = findUserById(userId);
 		try{
-			clientService.reassignClientToAdmin(userEmail); // this will reassign all the clients to admin before deleting the user.
-		
-			if(user.getProfileImage() != null) {
-				user.setProfileImage(null); // removing the profile image from the user.
-				userRepo.save(user);
-			}
-		
-			//Deletes all the images of the given user.
-			imageService.deleteAllImagesOfGivenUser(user.getId());
-			
-			// Clears the roles of the given user.
-			user.getRoles().clear(); //removing the roles of this user.
-			userRepo.save(user); // saving the user without roles.
-			
-			//Delete the user.
+			/* 
+			 * Reassigning all the clients of this user to admin before deleting the user.
+			 */
+			clientService.reassignClientsToAdmin(userId); 			
+			/* 
+			 * Clears the roles of the given user :
+			 */
+			user.removeRoles();
+			/* Delete the user once  */
 			userRepo.delete(user);
 			log.info("Action: user Deleted successfully");
 		}catch(Exception e) {
 			log.error("Error :  Unable to delete the user", e);
 		}
-		
-	}//ends method.
+	}
+
 	
 	
-	
-	
-	
-	
-	
-	/*
-	 * @param : email is used to find the user and udpate their Data.
-	 * @UserUpdate_dto contains, newPassword, confirmPassword and currentPassword and other details.
-	 * 
-	 * @userUpdate.getCurrentPassword : required to update the user for verifying if the account belongs to the user.
-	 * */
-	
-	@Transactional
 	@Override
-	public void updateUserByEmail(String email, UserUpdateRequest userUpdateRequest) {
-		log.info("Action: Preparing to update user: {}", email);
-		User user = findUserByEmail(email);  		
-		/* If "current-password" does not match the "encoded-account-password" it will throw exception*/
-		passwordValidator.verifyCurrentPassword(userUpdateRequest.getCurrentPassword(), user.getPassword());
+	public void updateCurrentUser(int userId, UserUpdateRequest request) {
+		User user = findUserById(userId);  		
+		log.info("Action: Preparing to update user: {}", user.getEmail());
 		
+		/* If "current-password" does not match the "encoded-account-password" it will throw exception*/
+		passwordValidator.verifyCurrentPassword(request.getCurrentPassword(), user.getPassword());
+
 		/* Checking if user is asking to change a password... if newPassword contains a text proceed to change password.*/
-		if(StringUtils.hasText(userUpdateRequest.getNewPassword())) {
+		if(StringUtils.hasText(request.getNewPassword())) {
 			/* throws error if newPassword and confirmPassword does not match. */
-			passwordValidator.validatePasswordMatch(userUpdateRequest.getNewPassword(), userUpdateRequest.getConfirmPassword()); 
-			String encodedNewPassword = passwordEncoder.encode(userUpdateRequest.getNewPassword());
+			passwordValidator.validatePasswordMatch(request.getNewPassword(), request.getConfirmPassword()); 
+			String encodedNewPassword = passwordEncoder.encode(request.getNewPassword());
 			user.setPassword(encodedNewPassword);
 		}
-		user.setEmail(userUpdateRequest.getEmail());
+		user.setEmail(request.getEmail());
 		userRepo.save(user);
-		log.info("Action: Update Successful for user: {}", email);
-	}
-
-	
-	/* This class is to update the userProfileImage */
-	@Transactional
-	public void updateUserProfileImage(String email, UserImageUploadRequest userImageUploadRequest) {
-		User user = findUserByEmail(email);
-		/*	Converting UserUpdateImage to ImageRequest because : 
-		 * 					imageService.saveImage(String, ImageRequest).
-		 * @param of saveImage in imageService is of type ImageRequest.
-		 * */
-		log.info("mapping Image: {}, UserImageUploadRequest to ImageRequest", userImageUploadRequest.getImageName());
-		ImageRequest imageRequest = userMapper.toImageRequestFromUserUpdateImage(userImageUploadRequest);
-		/* If the image exists in the database by given imageName and userEmail we set that image as user profile. */
-		if(imageService.doesImageExistsByImageNameAndUserEmail(imageRequest.getImageName(), user.getEmail())) {
-			/* we fetch that image and save it as the current userProfile-picture.*/
-			Image foundImage = imageService.findByImageNameAndUserEmail(imageRequest.getImageName(), email);			
-			user.setProfileImage(foundImage);
-			userRepo.save(user);
-			return;
-		}
-		/* If requested Image is not found in the database then we save the image to the database. */
-		Image savedImage = imageService.saveImage(email, imageRequest); 
-		user.setProfileImage(savedImage);
-		userRepo.save(user);
+		log.info("Action: Update Successful for user: {}, with new data", user.getEmail());
 		
 	}
-
+	
 	
 
+	@Override
+	public void updateCurrentUserProfileImage(int userId, UserImageUploadRequest request) {
+		User user = findUserById(userId);
+		/* If image with this name "is-found" in DB then it returns that image.
+		 * If image "is-not-found" in DB it saves the image and returns that image.  
+		 */
+		Image updatedProfileImage = imageService.updateProfileImage(request.getImageName(), userId);
+		user.setProfileImage(updatedProfileImage);
+		userRepo.save(user);
+	}
+
+	
+	/* To remove the custom user profile image and set the default-profile-image. */
+	public void removeCurrentUserCustomProfileImage(int userId) {
+		User user = findUserById(userId);
+		Image defaultImage = imageService.saveDefaultProfileImageForGivenUser(userId);
+		user.setProfileImage(defaultImage);
+	}
+	
+	
+	
+	
+	
+	/* PRIVATE METHODS:*/
+	
+	private User findUserByEmail(String email) {
+		User user = userRepo.findByEmail(email).orElseThrow(()->
+						 new UserNotFoundException("Unable to find the user with Email : " + email));
+		log.info("Action: User with email: {} found in the database.", email);
+		return user;					
+	}
+	
+	@Override
+	public User findUserById(int id) {
+		User user = userRepo.findById(id)
+				.orElseThrow( ()->new UserNotFoundException("Unable to find the user with ID : " + id) );
+		return user;	
+	}
+	
+	
+	@Override
+	public User saveUser(User user) {
+		return userRepo.save(user);
+	}
+
+	
+	
 
 }//ends class	
 
 
-	
-	
-//}//ends class
+

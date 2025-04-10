@@ -42,8 +42,8 @@ public interface ClientService {
 	 * @param userId : is the user whose clients are to be assigned to the admin.
 	 * Assign all the clients of 'user' param to the 'admin'.
 	 */
-	public void reassignClientToAdmin(int userId);
+	public void reassignClientsToAdmin(int userId);
 	/* @param userEmail : is the user whose clients are to be assigned to the admin. */
-	public void reassignClientToAdmin(String userEmail);
+//	public void reassignClientToAdmin(String userEmail);
 	
 }
