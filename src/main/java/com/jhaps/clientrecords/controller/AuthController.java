@@ -71,7 +71,8 @@ public class AuthController {
 		@Operation(summary = "validate Token")
 		@PostMapping("/validate-token")
 		@PreAuthorize("permitAll()")
-		public ResponseEntity<ApiResponseModel<String>> validateToken(@Valid @RequestBody TokenValidateRequest request, @AuthenticationPrincipal UserDetails userDetails){
+		public ResponseEntity<ApiResponseModel<String>> validateToken(@Valid @RequestBody TokenValidateRequest request,
+												@AuthenticationPrincipal UserDetails userDetails){
 			log.info("Requesting verification of userLogin Details | PublicController -->'/validateToken' ");
 			log.info("Token for validation : {}", request.getToken());
 			 authService.validateToken(request.getToken(), userDetails);

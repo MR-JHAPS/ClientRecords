@@ -30,7 +30,7 @@ public interface ImageService {
 	
 	
 	/* Upload/save New Image */
-	Image saveImage(String email, ImageRequest request);
+	Image saveImage(int userId , ImageRequest request);
 	
 	
 	/*
@@ -46,7 +46,7 @@ public interface ImageService {
 	 * Get image by Image_id.
 	 * This is selecting specific image from image gallery. 
 	 */
-	Image getImageById(int id); 
+	Image getImageById(int imageId, int userId); 
 	
 	
 	
@@ -59,30 +59,21 @@ public interface ImageService {
 //	Image removeCustomProfileImageOfUser(int id);
 	
 	
-	/* Delete single-image by image-id. */
+	/* Delete single-image of current-user by image-id. */
 	void deleteImageById(int imageId, int userId);
 	
-	/* Delete multiple-images by list of image-id's. */
-	void deleteMultipleImagesById(List<Integer> idList);
+	/* Delete multiple-images of current-user by list of image-id's. */
+	void deleteMultipleImagesById(List<Integer> imageIdList, int userId);
 	
 	/* Deletes all images of given user. 
 	 * @param userId is the given user. 
 	 */
 	void deleteAllImagesOfGivenUser(int userId);
 	
-	
-	
-	
-//	/* Get the Image from repository using image-name and user-email.*/
-//	Image findByImageNameAndUserEmail(String imageName, String email);
+
 	
 	
 	
 	
 	
-	
-	
-	
-	
-	
-}
+}//ends interface.

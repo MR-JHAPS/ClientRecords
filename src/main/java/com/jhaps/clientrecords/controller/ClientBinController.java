@@ -11,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,7 +28,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 
 @RestController
-@RequestMapping("/api/client-bin")
+@RequestMapping("/api/client-bins")
 @AllArgsConstructor
 @Tag(name = "Client Bin API's", description = "Manage Deleted Clients(Restore, Get, Delete)")
 public class ClientBinController {
@@ -37,7 +38,7 @@ public class ClientBinController {
 	private PagedResourceAssemblerService<ClientBinResponse> pagedResourceAssembler;
 	
 	
-	@GetMapping("/getAll")
+	@GetMapping
 	@Operation(summary = "Get all the Clients from ClientBin.")
 	public ResponseEntity<ApiResponseModel<PagedModel<EntityModel<ClientBinResponse>>>> getAllClientBin(
 			@RequestParam(defaultValue="0") int pageNumber,
@@ -51,7 +52,7 @@ public class ClientBinController {
 	}
 	
 	
-	@DeleteMapping("/delete/{id}")
+	@DeleteMapping("/{id}/delete")
 	@PreAuthorize("hasAuthority('admin')") // only admin can delete the client from the bin
 	@Operation(summary = "Delete the Selected client From ClientBin.")
 	public ResponseEntity<ApiResponseModel<String>> deleteClientFromClientBin(@PathVariable int id){
@@ -60,7 +61,7 @@ public class ClientBinController {
 	}
 	
 	
-	@GetMapping("/restore/{id}")
+	@PostMapping("/{id}/restore")
 	@Operation(summary = "Restore the Selected client From ClientBin to Client")
 	@PreAuthorize("hasAuthority('admin') or hasAuthority('user')")
 	public ResponseEntity<ApiResponseModel<String>> restoreClientFromBin(@PathVariable int id){

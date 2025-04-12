@@ -61,8 +61,8 @@ public class ImageController {
 	private ImageMapper imageMapper;
 	
 	
-	@GetMapping("/current-user/get-all")
-	@Operation(summary = "Gets All Images of logged in user.")
+	@GetMapping("/me")
+	@Operation(summary = "Get All Images(Paginated) of logged in user.")
 	public ResponseEntity<ApiResponseModel<PagedModel<EntityModel<ImageResponse>>>> getImagesOfActiveUser(
 						@RequestParam(defaultValue="0") int pageNumber,
 						@RequestParam(defaultValue="10") int pageSize,
@@ -81,23 +81,25 @@ public class ImageController {
 	
 	
 	
-	@GetMapping("/{id}")
+	@GetMapping("/{imageId}")
 	@Operation(summary = "Get Image by Id.",
 	description = "This allows the users who have uploaded multiple images to select and view each images individually.")
-	public ResponseEntity<ApiResponseModel<ImageResponse>> getImageById(@PathVariable int id){
-		Image image = imageService.getImageById(id);
+	@PreAuthorize("@imageRepository.existsByIdAndUserId(#imageId, #userDetails.userId) or hasAuthority('admin')")
+	public ResponseEntity<ApiResponseModel<ImageResponse>> getImageById(@PathVariable int imageId, @AuthenticationPrincipal CustomUserDetails userDetails){
+		int userId = userDetails.getUserId();
+		Image image = imageService.getImageById(imageId, userId);
 		/* Mapping : Image to ImageResponse Dto .*/
 		ImageResponse imageResponse = imageMapper.toImageResponse(image);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.IMAGE_SAVED, HttpStatus.OK, imageResponse);									
 	}
 	
 	
-	@PostMapping("/insert")
-	@Operation(summary = "Upload image for authenticated user")
+	@PostMapping
+	@Operation(summary = "Upload new Image")
 	public ResponseEntity<ApiResponseModel<String>> saveImage(@RequestBody ImageRequest request,
-			@AuthenticationPrincipal UserDetails userDetails){
-		String userEmail = userDetails.getUsername();
-		imageService.saveImage(userEmail, request);
+			@AuthenticationPrincipal CustomUserDetails userDetails){
+		int userId = userDetails.getUserId();
+		imageService.saveImage(userId, request);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.IMAGE_SAVED, HttpStatus.OK,
 						"Image: " + request.getImageName() + " saved successfully");
 	}
@@ -105,20 +107,23 @@ public class ImageController {
 	
 	/* Deletes the single-selected Image by id if it belongs to authenticated user. */
 	@PreAuthorize("@imageRepository.existsByIdAndUserId(#imageId, #userDetails.userId)")
-	@DeleteMapping("delete/{imageId}")
-	@Operation(summary = "Delete user's image(single) by ID")
-	public ResponseEntity<?> deleteImageById(@PathVariable int imageId, @AuthenticationPrincipal CustomUserDetails userDetails){
+	@DeleteMapping("/{imageId}")
+	@Operation(summary = "Delete user's image(single)")
+	public ResponseEntity<?> deleteImageById(@PathVariable int imageId,
+											@AuthenticationPrincipal CustomUserDetails userDetails){
 		int userId = userDetails.getUser().getId();
 		imageService.deleteImageById(imageId, userId);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 	
 	/* Deletes the multiple-selected Images by id */
-	@DeleteMapping("delete/multiple")
-	@Operation(summary = "Delete user's image(multiple) by ID's")
-	public ResponseEntity<?> deleteMultipleImagesById(@RequestBody BulkImageDeleteRequest request){
-		List<Integer> idList = request.getIdList();
-		imageService.deleteMultipleImagesById(idList);
+	@DeleteMapping
+	@Operation(summary = "Delete multiple Images by ID's")
+	public ResponseEntity<?> deleteMultipleImagesById(@RequestBody BulkImageDeleteRequest request,
+			@AuthenticationPrincipal CustomUserDetails userDetails){
+		int userId = userDetails.getUserId();
+		List<Integer> imageIdList = request.getIdList();
+		imageService.deleteMultipleImagesById(imageIdList, userId);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 	

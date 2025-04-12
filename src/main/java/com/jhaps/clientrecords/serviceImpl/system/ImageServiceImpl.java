@@ -13,6 +13,7 @@ import com.jhaps.clientrecords.dto.request.ImageRequest;
 import com.jhaps.clientrecords.dto.response.ImageResponse;
 import com.jhaps.clientrecords.entity.system.Image;
 import com.jhaps.clientrecords.entity.system.User;
+import com.jhaps.clientrecords.exception.system.DuplicateDataException;
 import com.jhaps.clientrecords.exception.system.ImageDeletionException;
 import com.jhaps.clientrecords.exception.system.ImageException;
 import com.jhaps.clientrecords.exception.system.ImageNotFoundException;
@@ -36,26 +37,27 @@ public class ImageServiceImpl implements ImageService{
 	private UserRepository userRepo;
 	
 	
+/*--------------------------------------------------- Private method of user for images ------------------------------------------------------------*/
 	
-/*------------------------------------------------- IMAGES BY USER ---------------------------------------------------------------*/	
+	private User findUserById(int id) {
+		return userRepo.findById(id)
+				.orElseThrow(()-> new UserNotFoundException("User with id : " + id + " not found"));
+	}
 	
-	
-//	public Image getProfileImageOfCurrentUser(int userId) {
-//		User currentUser = findUserById(userId);
-//		Image profileImage = currentUser.getProfileImage();
-//		return profileImage;
-//	}
-	
+/*--------------------------------------------------------------------------------------------------------------------------------------------------*/	
 	
 	
-//	@Override
-//	public Image getProfileImageByUserId(int userId){
-//		log.info("Action: Attempting to get the profile image of user with id: {}", userId);
-//		User user = findUserById(userId);
-//		Image profileImage = user.getProfileImage();
-//		return profileImage;
-//	}
-	
+	@Override
+	public Image getImageById(int imageId, int userId) {
+		log.info("Action: Getting image By Image_Id: {}", imageId);
+		Image image = imageRepo.findByIdAndUserId(imageId, userId)
+				.orElseThrow (() -> {
+					log.error("Image with imageID {} and userId {} not found in the database.", imageId, userId);
+					throw new ImageNotFoundException("Image with Image-Id: " + imageId + " and userId "+ userId +" not found.");
+				});
+		log.info("Image with imageID {} and userID {} fetched Successfully", imageId, userId);
+		return image;
+	}
 	
 	
 	@Override
@@ -74,103 +76,34 @@ public class ImageServiceImpl implements ImageService{
 	
 	@Override
 	@Transactional
-	public Image saveImage(String userEmail,ImageRequest imageRequest) {
-		log.info("Action: saving Image: {}", imageRequest.getImageName());
-		User user = userRepo.findByEmail(userEmail)
-				.orElseThrow(()-> new UserNotFoundException("Unable to find the User with email: " + userEmail));
+	public Image saveImage(int userId,ImageRequest request) {
+		log.info("Action: Saving Image: {}", request.getImageName());
+		User user = findUserById(userId);
+		/* 
+		 * Checking if the image with the name exists for this user in the imageRepository.
+		 */
+		Optional<Image> imageOnDb = imageRepo.findByImageNameAndUserId(request.getImageName(), userId);
+		if(imageOnDb.isPresent()) {
+			log.warn("Image with name: {} of user : {}, already exists in the database.", request.getImageName(), user.getEmail());
+			throw new DuplicateDataException("Image With name " + request.getImageName()
+							+ " for user "+ user.getEmail()+" already exists in the database.");
+		}
+		/* If image does not exists in the database then save that image. */
 		Image image = new Image();
-		image.setImageName(imageRequest.getImageName());
+		image.setImageName(request.getImageName());
 		image.setUser(user);
-		log.info("Action: Image: {} saved successfully by User_Email: {}.", imageRequest.getImageName(), userEmail);
+		log.info("Action: Image: {} saved successfully by User_Email: {}.", request.getImageName(), user.getEmail());
 		imageRepo.save(image);
 		return image;
 	}
 	
-
-/*------------------------------------------------- IMAGE CRUD ---------------------------------------------------------------*/
-
-	@Override
-	public Image getImageById(int id) {
-		log.info("Action: Getting image By Image_Id: {}", id);
-		Image image = imageRepo.findById(id)
-				.orElseThrow(() -> new ImageNotFoundException("Image with Id: " + id + " not found."));
-		return image;
-	}
 	
 	
-	/*
-	 * Deletes image by id only if it belongs to the  current-authenticated-user.
-	 */
-	@Override
-	@Transactional
-	public void deleteImageById(int imageId, int userId) {
-		log.info("Action: Deleting Image of Id: {}", imageId);
-		if(!imageRepo.existsByIdAndUserId(imageId, userId)) {
-			 log.warn("Delete failed: Image {} not found or not owned by user {}", imageId, userId);
-			throw new ImageNotFoundException("Image with Id: " + imageId + " not found or you do not have permission to delete.");	
-		}
-		 imageRepo.deleteByIdAndUserId(imageId, userId);
-		 log.info("Action: Image of Id:{} deleted Successfully.", imageId);
-	}
 	
-
-	
-	@Override
-	@Transactional
-	public void deleteMultipleImagesById(List<Integer> idList) {
-		log.info("Action: Deleting Multiple Images of Id's: {}", idList);		
-		for(Integer id : idList) {
-			Image image = imageRepo.findById(id)
-					.orElseThrow(() -> new ImageNotFoundException("Image with Id: " + id + " not found."));
-			log.info("Action: Image of Id:{} deleted Successfully.", id);
-			imageRepo.delete(image);
-		}
-	}
-
-
-
-
-//	@Override
-//	public Image findByImageNameAndUserEmail(String imageName, String email) {
-//		Image image = imageRepo.findByImageNameAndUserEmail(imageName, email)
-//				.orElseThrow(() -> new ImageNotFoundException("Error: Image with name: " + imageName + " and user-email: " + email + "not found"));
-//		return image;
-//	}
-//	
-//	
-//	@Override
-//	public boolean doesImageExistsByImageNameAndUserEmail(String imageName, String email) {
-//		if(imageRepo.existsByImageNameAndUserEmail(imageName, email)) {
-//			return true;
-//		}
-//		return false;
-//	}
-
-	
-	@Override
-	public Image updateProfileImage(String imageName, int userId) {
-		User user = findUserById(userId);
-		Optional<Image> existingImage = imageRepo.findByImageNameAndUserId(imageName, userId);
-		/*
-		 * If the given imageName exists in DB it will return that
-		 * */
-		if(existingImage.isPresent()) {
-			return existingImage.get();
-		}
-		/*
-		 * If the given Image doesnot exists it will save a new Image for that user in the ImageRepository.
-		 */
-		Image newImage = new Image();
-			newImage.setImageName(imageName);
-			newImage.setUser(user);
-		imageRepo.save(newImage);
-		return newImage;
-	}
-	
-	
-	/* When new user is created it saves a default image for that user in imageRepository.
-	 * OR 
-	 * If the customProfile is removed we set the image back to default for that user.
+	/* @Method: 
+	 * 		When new user is created it saves a default-image for that user in imageRepository.
+	 * 		OR 
+	 * 		If the customProfileImage is removed we set the image back to defaultImage for that user.
 	 */
 	@Override
 	public Image saveDefaultProfileImageForGivenUser(int userId){
@@ -200,8 +133,65 @@ public class ImageServiceImpl implements ImageService{
 		log.info("Error: Unable to save Default profile picture for user : {}", user.getEmail());
 		throw new ImageException("ERROR: Unable to save Default Profile Image for the user: " + user.getEmail());	
 	}
+
+
+	@Override
+	public Image updateProfileImage(String imageName, int userId) {
+		User user = findUserById(userId);
+		Optional<Image> existingImage = imageRepo.findByImageNameAndUserId(imageName, userId);
+		/*
+		 * If the given imageName exists in DB it will return that
+		 * */
+		if(existingImage.isPresent()) {
+			return existingImage.get();
+		}
+		/*
+		 * If the given Image doesnot exists it will save a new Image for that user in the ImageRepository.
+		 */
+		Image newImage = new Image();
+			newImage.setImageName(imageName);
+			newImage.setUser(user);
+		imageRepo.save(newImage);
+		return newImage;
+	}
 	
-		
+	
+	
+	/*
+	 * Deletes image by id only if it belongs to the  current-authenticated-user.
+	 */
+	@Override
+	@Transactional
+	public void deleteImageById(int imageId, int userId) {
+		log.info("Action: Deleting Image of Id: {}", imageId);
+		if(!imageRepo.existsByIdAndUserId(imageId, userId)) {
+			 log.warn("Delete failed: Image {} not found or not owned by user {}", imageId, userId);
+			throw new ImageNotFoundException("Image with Id: " + imageId + " not found or you do not have permission to delete.");	
+		}
+		 imageRepo.deleteByIdAndUserId(imageId, userId);
+		 log.info("Action: Image of Id:{} deleted Successfully.", imageId);
+	}
+	
+
+	
+	/*
+	 * Deletes Multiple images by id only if it belongs to the current-authenticated-user.
+	 */
+	@Override
+	@Transactional
+	public void deleteMultipleImagesById(List<Integer> imageIdList, int userId) {
+		log.info("Action: Deleting Multiple Images of Id's: {}", imageIdList);		
+		try{
+			for(Integer imageId : imageIdList) {
+				imageRepo.deleteByIdAndUserId(imageId, userId);
+			}
+			log.info("Action: Images, that of Id's:{} deleted Successfully.", imageIdList);
+		}catch (Exception e) {
+			log.error("Unable to Delete Multiple images with id's {}, of userId {}", imageIdList, userId);
+			throw new ImageDeletionException("Error occured. Unable to delete Mulptiple Images of Id's : " + imageIdList + " of userId : "+ userId);
+		}
+	}
+
 	
 	
 	/* Deletes all the images of given user from the imageRepository. */
@@ -216,16 +206,9 @@ public class ImageServiceImpl implements ImageService{
 			throw new DataIntegrityViolationException("Delete All images by user id failed.");
 		}
 	}
-	
 
 	
-	
-	
-	/*--------------Private method of user for images ----------------------------*/
-	private User findUserById(int id) {
-		return userRepo.findById(id)
-				.orElseThrow(()-> new UserNotFoundException("User with id : " + id + " not found"));
-	}
+
 	
 	
 	

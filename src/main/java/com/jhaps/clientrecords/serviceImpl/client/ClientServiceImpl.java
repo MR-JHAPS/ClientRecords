@@ -168,7 +168,7 @@ public class ClientServiceImpl implements ClientService  {
 			return clientList.map(clientMapper::toClientResponse);	
 	}
 
-
+//
 	
 	
 	@Override
@@ -209,42 +209,6 @@ public class ClientServiceImpl implements ClientService  {
 			throw new RuntimeException(" Error while reassigning the client to admin from user : " + user.getEmail());
 		}	
 	}
-	
-	
-//	
-//	@Transactional
-//	@Override
-//	public void reassignClientToAdmin(String userEmail) {
-//		log.info("Action: Preparing to reassign Client from user : {} to admin.", userEmail);
-//		String adminEmail = "admin@gmail.com";
-//		User user = findUserByEmail(userEmail);/* User : user whose clients are to be transferred/reassigned. */
-//		User admin = findUserByEmail(adminEmail);/* Admin : selected user clients will be transferred/reassigned to admin. */
-//		
-//		List<Client> clientListOfUser = clientRepo.findByUser_Email(userEmail);
-//		/* Checking if the clientList is empty. */
-//		if(clientListOfUser.isEmpty()) {
-//			log.info("Info: No clients was assigned to admin as it was not found in Database for the userEmail: {}.", userEmail);
-//			return;
-//		}
-//		
-//		/* Logging the client.*/
-//		clientListOfUser
-//			.forEach( client ->
-//						clientLogService.insertInClientLog(user.getEmail(), client, ModificationType.REASSIGNMENT)
-//					);		
-//		
-//		try {
-//			//Reassigning the clients from user to admin.
-//			int updated = clientRepo.bulkReassignClientsById(user.getId(), admin.getId());
-//			log.info("Action: {} clients were assigned from user: {} to admin: {}", updated, user.getEmail(), admin.getEmail());		
-//		}catch(Exception e ) {
-//			log.warn("Error occured while reassigning client to admin from user: {}", user.getEmail());
-//			throw new RuntimeException(" Error while reassigning the client to admin from user : " + user.getEmail());
-//		}
-//		
-//	}
-	
-	
 	
 	
 	

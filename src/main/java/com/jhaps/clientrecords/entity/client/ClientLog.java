@@ -35,7 +35,7 @@ public class ClientLog {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	
-	@Column(name="client_id", unique = true)
+	@Column(name="client_id")
 	private int clientId;
 	
 	@Column(name="client_first_name")

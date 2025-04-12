@@ -61,7 +61,7 @@ public class UserController {
 	
 	
 	@Operation(summary = "Delete authenticated user's profile")
-	@DeleteMapping("/delete/me")
+	@DeleteMapping("/me")
 	public ResponseEntity<ApiResponseModel<String>> deleteUser(@AuthenticationPrincipal CustomUserDetails userDetails ){			
 		int userId = userDetails.getUser().getId();
 		log.info("User {} initiated account deletion", userId);
@@ -71,7 +71,7 @@ public class UserController {
 	
 	
 	@Operation(summary = "Update authenticated user's profile" )
-	@PutMapping("/update/me")
+	@PutMapping("/me")
 	public ResponseEntity<ApiResponseModel<String>> updateAuthenticatedUser(@RequestBody UserUpdateRequest request ,
 					@AuthenticationPrincipal CustomUserDetails userDetails){
 		int userId = userDetails.getUser().getId();
@@ -82,7 +82,7 @@ public class UserController {
 	
 	
 	@Operation(summary = "Upload profile image for authenticated user")
-	@PostMapping("/image/save")
+	@PostMapping("/me/image")
 	public ResponseEntity<ApiResponseModel<String>> uploadImage(@RequestBody UserImageUploadRequest request ,
 					@AuthenticationPrincipal CustomUserDetails userDetails){
 		int userId = userDetails.getUser().getId();

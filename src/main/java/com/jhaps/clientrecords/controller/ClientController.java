@@ -70,7 +70,7 @@ public class ClientController {
 	
 	
 	@Operation(summary = "get all clients")
-	@GetMapping("/getAll")
+	@GetMapping
 	public ResponseEntity<ApiResponseModel<PagedModel<EntityModel<ClientResponse>>>> getAllClients(
 					@RequestParam(defaultValue = "0") int pageNumber,
 					@RequestParam(defaultValue = "10") int pageSize,
@@ -88,7 +88,7 @@ public class ClientController {
 	
 	
 	@Operation(summary = "get clients by id")
-	@GetMapping("/get/{id}")
+	@GetMapping("/{id}")
 	public ResponseEntity<ApiResponseModel<ClientResponse>> getClientById( @PathVariable @Positive(message = "Id must be a positive number") int id){
 		ClientResponse client = clientService.findClientById(id);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, client);
@@ -96,7 +96,7 @@ public class ClientController {
 	
 	
 	@Operation(summary = "create new client")
-	@PostMapping("/insert")
+	@PostMapping
 	public ResponseEntity<ApiResponseModel<String>> saveNewClient( @RequestBody @Valid ClientRequest clientRequest,
 			@AuthenticationPrincipal UserDetails userDetails){
 		String userEmail = userDetails.getUsername();
@@ -106,7 +106,7 @@ public class ClientController {
 	
 	
 	@Operation(summary = "delete client by id")
-	@DeleteMapping("/delete/{id}")
+	@DeleteMapping("/{id}")
 	public ResponseEntity<ApiResponseModel<String>> deleteClientById(
 			@PathVariable @Positive(message = "Id must be a positive number") int id,
 			@AuthenticationPrincipal UserDetails userDetails){
@@ -117,7 +117,7 @@ public class ClientController {
 	
 	
 	@Operation(summary = "update client by id")
-	@PutMapping("/update/{id}")
+	@PutMapping("/{id}")
 	public ResponseEntity<ApiResponseModel<String>> updateClientById(
 							@PathVariable @Positive(message = "Id must be a positive number") int id,
 							@RequestBody @Valid ClientRequest clientRequest,

@@ -54,7 +54,7 @@ public class RoleController {
 	
 	
 	@Operation(summary = "Save new role")
-	@PostMapping("/save")
+	@PostMapping
 	@PreAuthorize("hasAuthority('admin')")
 	public ResponseEntity<ApiResponseModel<String>> saveNewRole(@RequestBody @Valid RoleSaveRequest roleSaveRequest){
 		roleService.saveNewRole(roleSaveRequest);
@@ -64,7 +64,7 @@ public class RoleController {
 	
 	
 	@Operation(summary = "Delete role")
-	@DeleteMapping("/delete/{id}")
+	@DeleteMapping("/{id}")
 	@PreAuthorize("hasAuthority('admin')")
 	public ResponseEntity<?> deleteRole(@PathVariable int id){
 		roleService.deleteRole(id);
