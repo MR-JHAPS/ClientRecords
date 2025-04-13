@@ -1,5 +1,7 @@
 package com.jhaps.clientrecords.entity.system;
 
+import org.hibernate.annotations.processing.Exclude;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -13,6 +15,7 @@ import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 
 @Entity
@@ -25,7 +28,9 @@ import lombok.NoArgsConstructor;
 @Table(name = "images",
 	uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "image_name"})
 )
-@Data
+@Data 
+@ToString(exclude = "user")
+
 @NoArgsConstructor
 @AllArgsConstructor
 public class Image {

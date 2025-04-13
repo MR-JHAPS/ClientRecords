@@ -141,20 +141,24 @@ public class UserServiceImpl implements UserService{
 	@Override
 	public void updateCurrentUserProfileImage(int userId, UserImageUploadRequest request) {
 		User user = findUserById(userId);
+		log.info("Updating Profile Picture for user {}, imageName : {}", user.getEmail(), request.getImageName());
 		/* If image with this name "is-found" in DB then it returns that image.
 		 * If image "is-not-found" in DB it saves the image and returns that image.  
 		 */
 		Image updatedProfileImage = imageService.updateProfileImage(request.getImageName(), userId);
 		user.setProfileImage(updatedProfileImage);
 		userRepo.save(user);
+		log.info("New profile Image {} for user {} set Successfully.", request.getImageName(), user.getEmail());
 	}
 
 	
 	/* To remove the custom user profile image and set the default-profile-image. */
+	@Override
 	public void removeCurrentUserCustomProfileImage(int userId) {
 		User user = findUserById(userId);
 		Image defaultImage = imageService.saveDefaultProfileImageForGivenUser(userId);
 		user.setProfileImage(defaultImage);
+		userRepo.save(user);
 	}
 	
 	

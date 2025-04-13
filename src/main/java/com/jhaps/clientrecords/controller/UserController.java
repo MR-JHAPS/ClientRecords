@@ -83,13 +83,26 @@ public class UserController {
 	
 	@Operation(summary = "Upload profile image for authenticated user")
 	@PostMapping("/me/image")
-	public ResponseEntity<ApiResponseModel<String>> uploadImage(@RequestBody UserImageUploadRequest request ,
+	public ResponseEntity<ApiResponseModel<String>> uploadProfileImageOfCurrentUser(@RequestBody UserImageUploadRequest request ,
 					@AuthenticationPrincipal CustomUserDetails userDetails){
 		int userId = userDetails.getUser().getId();
 		userService.updateCurrentUserProfileImage(userId, request);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, 
 					"Image " + request.getImageName() + " saved Successfully");
 	}
+	
+	
+	@Operation(summary = "Remove profile image for authenticated user")
+	@DeleteMapping("/me/image")
+	public ResponseEntity<ApiResponseModel<String>> removeProfileImageOfCurrentUser(
+					@AuthenticationPrincipal CustomUserDetails userDetails){
+		int userId = userDetails.getUser().getId();
+		userService.removeCurrentUserCustomProfileImage(userId);
+		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, 
+					"Profile Image removed Successfully.");
+	}
+	
+	
 	
 	
 	

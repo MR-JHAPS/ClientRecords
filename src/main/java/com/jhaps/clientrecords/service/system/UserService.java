@@ -24,6 +24,7 @@ public interface UserService {
 	
 	void updateCurrentUserProfileImage(int id, UserImageUploadRequest request);
 	
+	void removeCurrentUserCustomProfileImage(int userId); 
 	
 	
 }//ends interface.

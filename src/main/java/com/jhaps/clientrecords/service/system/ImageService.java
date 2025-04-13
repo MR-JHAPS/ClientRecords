@@ -14,22 +14,15 @@ public interface ImageService {
 
 /* ------------------------------------------- User-Image-CRUD --------------------------------------------*/	
 	
-	/* Get the profile-picture of the users using user_Id. */
-//	Image getProfileImageByUserId(int id); 
-	
 	/*
 	 * Get All images of current-user.
 	 */
 	Page<Image> getImagesOfCurrentUser(int userId, Pageable pageable);	
 	
+	
 	/* 
-	 * Get the Profile-Image of Current-Authenticated-User
+	 * Upload/save New Image 
 	 */
-//	Image getProfileImageOfCurrentUser(int userId); 
-	
-	
-	
-	/* Upload/save New Image */
 	Image saveImage(int userId , ImageRequest request);
 	
 	
