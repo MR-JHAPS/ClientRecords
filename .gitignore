@@ -13,6 +13,9 @@ target/
 .springBeans
 .sts4-cache
 *.log
+/log/**
+/log
+log/**
 /ClientRecords/src/main/resources/application-prod.properties
 application-prod.properties
 
