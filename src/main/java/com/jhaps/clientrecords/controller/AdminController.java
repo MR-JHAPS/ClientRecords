@@ -1,9 +1,7 @@
 package com.jhaps.clientrecords.controller;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
@@ -26,10 +24,14 @@ import com.jhaps.clientrecords.apiResponse.ApiResponseModel;
 import com.jhaps.clientrecords.dto.request.RoleRequest;
 import com.jhaps.clientrecords.dto.request.user.AdminUpdateRequest;
 import com.jhaps.clientrecords.dto.response.user.UserAdminResponse;
+import com.jhaps.clientrecords.entity.system.User;
 import com.jhaps.clientrecords.enums.ResponseMessage;
+import com.jhaps.clientrecords.security.model.CustomUserDetails;
 import com.jhaps.clientrecords.service.system.AdminService;
 import com.jhaps.clientrecords.service.system.PagedResourceAssemblerService;
 import com.jhaps.clientrecords.util.PageableUtils;
+import com.jhaps.clientrecords.util.mapper.UserMapper;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -46,19 +48,22 @@ public class AdminController {
 	private ApiResponseBuilder apiResponseBuilder;	
 	private AdminService adminService;
 	private PagedResourceAssemblerService<UserAdminResponse> pagedResourceAssemblerService;
+	private UserMapper userMapper;
 	
 	public AdminController(ApiResponseBuilder apiResponseBuilder, AdminService adminService,
-			PagedResourceAssemblerService<UserAdminResponse> pagedResourceAssemblerService) {
+			PagedResourceAssemblerService<UserAdminResponse> pagedResourceAssemblerService,
+			UserMapper userMapper) {
 		this.apiResponseBuilder = apiResponseBuilder;
 		this.pagedResourceAssemblerService = pagedResourceAssemblerService;
 		this.adminService = adminService;
+		this.userMapper = userMapper;
 	}
 	
 	
 	
 	
-	@Operation(summary = "Get List Of All The Users")
-	@GetMapping("/user/find-all")
+	@Operation(summary = "Get List Of All The Users (Paginated)")
+	@GetMapping("/users")
 	@PreAuthorize("hasAuthority('admin')")
 	public ResponseEntity<ApiResponseModel<PagedModel<EntityModel<UserAdminResponse>>>> getAllUsers(
 								@RequestParam(defaultValue="0") int pageNumber,
@@ -67,43 +72,29 @@ public class AdminController {
 								@RequestParam(required = false) String direction
 								){
 		Pageable pageable =  PageableUtils.createPageable(pageNumber, pageSize, sortBy, direction);
-		Page<UserAdminResponse> paginatedUsers = adminService.findAllUsers(pageable);
-		PagedModel<EntityModel<UserAdminResponse>> pagedUserModel = pagedResourceAssemblerService.toPagedModel(paginatedUsers);
+		Page<User> paginatedUsers = adminService.findAllUsers(pageable);
+		/* Mapping : Page<User> to Page<UserAdminResponse> */
+		Page<UserAdminResponse> paginatedResponse = paginatedUsers.map(userMapper::toUserAdminResponse);
+		PagedModel<EntityModel<UserAdminResponse>> pagedUserModel = pagedResourceAssemblerService.toPagedModel(paginatedResponse);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, pagedUserModel);
 	}
 	
 	
-	@Operation(summary = "Get User along with Roles By ID")
-	@GetMapping("/user/{id}")
+	
+	@Operation(summary = "Get User-Details(including their roles) By ID")
+	@GetMapping("/users/{id}")
 	@PreAuthorize("hasAuthority('admin')")
 	public ResponseEntity<ApiResponseModel<UserAdminResponse>> getUserWithRolesByUserId(@PathVariable int id) {
-		UserAdminResponse userAdminResponse = adminService.findUserWithRolesById(id);
-		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, userAdminResponse);
+		User user = adminService.findUserWithRolesById(id);
+		/* Mapping : User to UserAdminResponse */
+		UserAdminResponse userResponse = userMapper.toUserAdminResponse(user);
+		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, userResponse );
 	}
 	
-	
-	@Operation(summary = " Update Admin info ")
-	@PutMapping("/update/me")
-	@PreAuthorize("hasAuthority('admin')")
-	public ResponseEntity<ApiResponseModel<String>> updateAdmin(@RequestBody AdminUpdateRequest adminUpdateRequest,
-											@AuthenticationPrincipal UserDetails userDetails){
-		String email = userDetails.getUsername();
-		adminService.updateAdmin(email, adminUpdateRequest);
-		return apiResponseBuilder.buildApiResponse(ResponseMessage.ADMIN_UPDATED, HttpStatus.OK);
-	}
-
 	
 
-	@Operation(summary = "Search user by user Email", description = "User-Email is unique so it will return only one data.")
-	@GetMapping("/search-by/email")
-	@PreAuthorize("hasAuthority('admin')")
-	public ResponseEntity<ApiResponseModel<UserAdminResponse>> getUserWithRolesByUserEmail(@RequestParam String email) {
-		UserAdminResponse userAdminResponse = adminService.searchUserByEmail(email);
-		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, userAdminResponse);
-	}
-	
 	@Operation(summary = " Delete User By Id ")
-	@DeleteMapping("/delete/{id}")
+	@DeleteMapping("/users/{id}")
 	@PreAuthorize("hasAuthority('admin')")
 	public ResponseEntity<ApiResponseModel<String>> deleteUserById(@PathVariable int id){
 		adminService.deleteUserById(id);
@@ -111,32 +102,63 @@ public class AdminController {
 	}
 	
 	
-	@Operation(summary = "Get List Of Users By Role Name")
-	@GetMapping("/search-by/role")
+	
+	 //=== Search Endpoints ===//
+	@Operation(summary = "Search user by user Email(Unique)", description = "User-Email is unique so it will return only one data.")
+	@GetMapping("/users/search")
+	@PreAuthorize("hasAuthority('admin')")
+	public ResponseEntity<ApiResponseModel<UserAdminResponse>> searchUserByEmail(@RequestParam String email) {
+		User user = adminService.searchUserByEmail(email);
+		/* Mapping : User to UserAdminResponse */
+		UserAdminResponse userResponse = userMapper.toUserAdminResponse(user);
+		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, userResponse);
+	}
+
+	
+	
+	@Operation(summary = "Get List Of Users By Role Name (Paginated)")
+	@GetMapping("/users/by-role")
 	@PreAuthorize("hasAuthority('admin')")
 	public ResponseEntity<ApiResponseModel<PagedModel<EntityModel<UserAdminResponse>>>> getUsersByRole(
-												@NotBlank @RequestParam String role,
-												@RequestParam(defaultValue="0") int pageNumber,
-												@RequestParam(defaultValue="10") int pageSize,
-												@RequestParam(required = false) String sortBy,
-												@RequestParam(required = false) String direction){
+							@NotBlank @RequestParam String role,
+							@RequestParam(defaultValue="0") int pageNumber,
+							@RequestParam(defaultValue="10") int pageSize,
+							@RequestParam(required = false) String sortBy,
+							@RequestParam(required = false) String direction){
 		
 		Pageable pageable =  PageableUtils.createPageable(pageNumber, pageSize, sortBy, direction);
-		Page<UserAdminResponse> paginatedUsers =adminService.findUsersByRoleName(role, pageable);
-		PagedModel<EntityModel<UserAdminResponse>> pagedUserModel = pagedResourceAssemblerService.toPagedModel(paginatedUsers);
+		Page<User> paginatedUsers = adminService.searchUsersByRoleName(role, pageable);
+		/* Mapping : Page<User> to Page<UserAdminResponse> */
+		Page<UserAdminResponse> paginatedResponse = paginatedUsers.map(userMapper::toUserAdminResponse);
+		PagedModel<EntityModel<UserAdminResponse>> pagedUserModel = pagedResourceAssemblerService.toPagedModel(paginatedResponse);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, pagedUserModel);
 	}
 	
 	
 	
-
-	@Operation(summary = "Update Role Of User By UserId : ADMIN ONLY")
-	@PutMapping("/user/update-role/{id}")
+	@Operation(summary = "Update Role Of Users.")
+	@PutMapping("/users/{id}/roles")
 	@PreAuthorize("hasAuthority('admin')")
 	public ResponseEntity<ApiResponseModel<String>> updateRoleByUserId(@PathVariable int id, @RequestBody @Valid RoleRequest roleRequest){
 		log.info("this is the roleDto from postman :{}", roleRequest);
 		adminService.updateUserRoleById(id, roleRequest);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, "User Role Updated Successfully");
 	}
+	
+	
+	
+	@Operation(summary = " Update Admin's own profile")
+	@PutMapping("/me")
+	@PreAuthorize("hasAuthority('admin')")
+	public ResponseEntity<ApiResponseModel<String>> updateAdmin(@RequestBody AdminUpdateRequest request,
+											@AuthenticationPrincipal CustomUserDetails userDetails){
+		int userId = userDetails.getUser().getId();
+		adminService.updateCurrentAdmin(userId, request);
+		return apiResponseBuilder.buildApiResponse(ResponseMessage.ADMIN_UPDATED, HttpStatus.OK);
+	}
+
+	
+	
+	
 	
 }//ends controller

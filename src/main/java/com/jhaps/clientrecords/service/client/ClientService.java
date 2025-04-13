@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import com.jhaps.clientrecords.dto.request.ClientRequest;
 import com.jhaps.clientrecords.dto.response.ClientResponse;
 import com.jhaps.clientrecords.entity.client.Client;
+import com.jhaps.clientrecords.entity.system.User;
 
 public interface ClientService {
 
@@ -37,5 +38,12 @@ public interface ClientService {
 	
 	public Page<ClientResponse> findClientsByPostalCode(String postalCode, Pageable pageable);
 	
+	/* 
+	 * @param userId : is the user whose clients are to be assigned to the admin.
+	 * Assign all the clients of 'user' param to the 'admin'.
+	 */
+	public void reassignClientsToAdmin(int userId);
+	/* @param userEmail : is the user whose clients are to be assigned to the admin. */
+//	public void reassignClientToAdmin(String userEmail);
 	
 }

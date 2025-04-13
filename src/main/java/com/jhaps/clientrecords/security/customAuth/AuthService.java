@@ -19,6 +19,6 @@ public interface AuthService {
 	String logOutUser(String authHeader, HttpServletRequest request, HttpServletResponse response, UserDetails userDetails);
 	
 	
-	
+	boolean validateToken(String token, UserDetails userDetails);
 	
 }

@@ -7,9 +7,12 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import com.jhaps.clientrecords.entity.system.Image;
 import com.jhaps.clientrecords.entity.system.Role;
 import com.jhaps.clientrecords.entity.system.User;
 import com.jhaps.clientrecords.enums.RoleNames;
+import com.jhaps.clientrecords.exception.system.ImageNotFoundException;
+import com.jhaps.clientrecords.repository.system.ImageRepository;
 import com.jhaps.clientrecords.repository.system.UserRepository;
 import com.jhaps.clientrecords.service.system.RoleService;
 
@@ -29,6 +32,8 @@ public class CreateDefaultAdmin implements CommandLineRunner {
 	
 	@Autowired
 	private RoleService roleService;
+	@Autowired
+	private ImageRepository imageRepo;
 	
 	@Autowired
 	private PasswordEncoder passwordEncoder;	
@@ -41,7 +46,7 @@ public class CreateDefaultAdmin implements CommandLineRunner {
 		/*					 Roles :				 */
 		Set<String> roles = Set.of(RoleNames.ADMIN.getRole(), RoleNames.USER.getRole()); /* set of roles we want to set in User*/ 
 		Set<Role> rolesOnDb = roleService.findRoleByNames(roles); /* Validating the roles from Database/repository. */
-		
+//		Image profileImage = imageRepo.findDefaultImage().orElseThrow( ()-> new ImageNotFoundException("Unable to find the default image."));
 		String adminEmail = "admin@gmail.com"; /* Default email for Admin*/
 		
 		boolean emailExistsInDb = userRepo.existsByEmail(adminEmail);  /* Checking if the email Exists in the Database. */
@@ -54,11 +59,18 @@ public class CreateDefaultAdmin implements CommandLineRunner {
 			String password = "1111";	/* Plain password without encoding*/ 
 			String encodedPassword = passwordEncoder.encode(password); /* Encoding the plain password*/ 
 			user.setPassword(encodedPassword);  /* Setting admin encoded password in DB*/ 
-			
+//			user.setProfileImage(profileImage);
 			user.setRoles(rolesOnDb);
 			user.setAccountLocked(false);
 			user.setAttempts(0);
 			userRepo.save(user); /* saving the Admin information */
+			
+			
+			
+			Image defaultProfileImage = new Image(0, "defaultImage.png", user);
+			imageRepo.save(defaultProfileImage);
+			user.setProfileImage(defaultProfileImage);
+			userRepo.save(user);
 		}
 		
 		

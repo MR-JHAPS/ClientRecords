@@ -2,11 +2,14 @@ package com.jhaps.clientrecords.entity.client;
 
 import java.time.LocalDate;
 
+import com.jhaps.clientrecords.entity.system.User;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -48,6 +51,10 @@ public class ClientBin {
 	
 	@Column(name="postal_code")
 	private String postalCode;
+	
+	
+	@Column(name="user_id")
+	private int userId;
 	
 	
 }// ends entity

@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,6 +27,10 @@ public class Client {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	public int id;
+	
+	@Version
+    @Column(nullable = false) // Ensure version can't be null
+    private Integer version = 0; // Initialize default value
 	
 	@Column(name="first_name", nullable = false)
 	private String firstName;

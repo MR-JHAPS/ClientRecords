@@ -1,6 +1,7 @@
 package com.jhaps.clientrecords.controller;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import com.jhaps.clientrecords.apiResponse.ApiResponseBuilder;
 import com.jhaps.clientrecords.apiResponse.ApiResponseModel;
 import com.jhaps.clientrecords.dto.request.RoleSaveRequest;
 import com.jhaps.clientrecords.dto.response.RoleResponse;
+import com.jhaps.clientrecords.entity.system.Role;
 import com.jhaps.clientrecords.enums.ResponseMessage;
 import com.jhaps.clientrecords.service.system.RoleService;
 import com.jhaps.clientrecords.util.mapper.RoleMapper;
@@ -32,23 +34,27 @@ public class RoleController {
 
 	private RoleService roleService;
 	private ApiResponseBuilder apiResponseBuilder;
+	private RoleMapper roleMapper;
 	
-	public RoleController(RoleService roleService, ApiResponseBuilder apiResponseBuilder) {
+	public RoleController(RoleService roleService, ApiResponseBuilder apiResponseBuilder, RoleMapper roleMapper) {
 		this.roleService = roleService;
 		this.apiResponseBuilder = apiResponseBuilder;
+		this.roleMapper = roleMapper;
 	}
 	
 	@Operation(summary = "Get all roles")
 	@GetMapping
 	@PreAuthorize("hasAuthority('admin')")
 	public ResponseEntity<ApiResponseModel<Set<RoleResponse>>> getAllRoles(){
-		Set<RoleResponse> roles = roleService.findAllRoles();
-		return apiResponseBuilder.buildApiResponse(ResponseMessage.ROLE_OBTAINED, HttpStatus.OK, roles);
+		Set<Role> roles = roleService.findAllRoles();
+		/* Mapping : Set<Role> to Set<RoleResponse>  */
+		Set<RoleResponse> rolesResponse =  roles.stream().map(roleMapper::toRoleResponse).collect(Collectors.toSet());
+		return apiResponseBuilder.buildApiResponse(ResponseMessage.ROLE_OBTAINED, HttpStatus.OK, rolesResponse);
 	}
 	
 	
 	@Operation(summary = "Save new role")
-	@PostMapping("/save")
+	@PostMapping
 	@PreAuthorize("hasAuthority('admin')")
 	public ResponseEntity<ApiResponseModel<String>> saveNewRole(@RequestBody @Valid RoleSaveRequest roleSaveRequest){
 		roleService.saveNewRole(roleSaveRequest);
@@ -58,7 +64,7 @@ public class RoleController {
 	
 	
 	@Operation(summary = "Delete role")
-	@DeleteMapping("/delete/{id}")
+	@DeleteMapping("/{id}")
 	@PreAuthorize("hasAuthority('admin')")
 	public ResponseEntity<?> deleteRole(@PathVariable int id){
 		roleService.deleteRole(id);

@@ -26,10 +26,10 @@ public class ClientLogServiceImpl implements ClientLogService{
 	
 	@Transactional
 	@Override
-	public void insertInClientLog(User user, Client client, ModificationType modificationType) {
+	public void insertInClientLog(String userEmail, Client client, ModificationType modificationType) {
 		log.info("Action: Inserting the Client_id: {} with FirstName: {} in the ClientLog", client.getId(), client.getFirstName());
 		ClientLog clientLog = new ClientLog();
-		clientLog.setUser(user);
+		clientLog.setUserEmail(userEmail);
 		clientLog.setClientId(client.getId());
 		clientLog.setFirstName(client.getFirstName());
 		clientLog.setLastName(client.getLastName());
@@ -65,4 +65,14 @@ public class ClientLogServiceImpl implements ClientLogService{
 		return clientLogList;
 	}
 
+	
+	@Override
+	public long totalClientsInLog() {
+		long total =  clientLogRepo.count();
+		return total;
+	}
+	
+	
+	
+	
 }

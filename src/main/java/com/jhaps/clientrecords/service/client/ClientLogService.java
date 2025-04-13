@@ -10,13 +10,13 @@ import com.jhaps.clientrecords.enums.ModificationType;
 
 public interface ClientLogService {
 
-	void insertInClientLog(User user, Client client, ModificationType modificationType); /* inserting the modified client for log purpose. */
+	void insertInClientLog(String userEmail, Client client, ModificationType modificationType); /* inserting the modified client for log purpose. */
 	
 	ClientLogResponse getClientLogById(int clientLogId); /* Getting the updatedClientLog by selected UpdatedClientLogID */
 	
 	Page<ClientLogResponse> getAllClientLog(Pageable pageable); /* @return all the updatedClientLog. */
 	
-	
+	long totalClientsInLog();
 	
 	
 	

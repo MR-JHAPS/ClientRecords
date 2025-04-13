@@ -2,6 +2,8 @@ package com.jhaps.clientrecords.exception;
 
 
 import java.util.HashMap;
+
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -80,6 +82,12 @@ public class GlobalExceptionHandler {
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.VALIDATION_FAILED, HttpStatus.BAD_REQUEST, validationErrors);
 	}
 
+	
+	@ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiResponseModel<String>> handleDataIntegrityViolation() {
+		log.error("DataIntegrityViolationException Occured.");
+		return apiResponseBuilder.buildApiResponse(ResponseMessage.DATA_INTEGRITY_VIOLATION, HttpStatus.CONFLICT);
+    }
 	
 	@ExceptionHandler(LockedException.class)
 	public ResponseEntity<ApiResponseModel<String>> handleLockedException(LockedException e){

@@ -1,5 +1,7 @@
 package com.jhaps.clientrecords.enums;
 
+import org.springframework.dao.DataIntegrityViolationException;
+
 public enum ResponseMessage {
 	
 	SUCCESS("Successfully Executed"),
@@ -41,7 +43,9 @@ public enum ResponseMessage {
 	ADMIN_UPDATED("Admin Updated Successfully"),
 	IMAGE_DELETION_FAILED("Failed to Delete image"),
 	
-	CLIENT_BIN_DELETED("client is deleted from clientBin")
+	CLIENT_BIN_DELETED("client is deleted from clientBin"),
+	
+	DATA_INTEGRITY_VIOLATION("DataIntegrityViolation")
 	;
 	
 	

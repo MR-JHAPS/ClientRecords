@@ -12,44 +12,61 @@ import com.jhaps.clientrecords.entity.system.Image;
 
 public interface ImageService {
 
-/* ------------------------------------------- User-Image-CRUD --------------------------------------------*/
+/* ------------------------------------------- User-Image-CRUD --------------------------------------------*/	
 	
-	Page<ImageResponse> getImagesByUserEmail(String email, Pageable pageable);	/* Fetches all images of selected User By email*/
-	
-	ImageResponse getSelfProfilePicture(String email); /* For user: to view their profile picture*/
-	
-	ImageResponse getProfileImageOfUserByUserId(int id); /* For admin: This is to get the profile picture of the user using user_Id. */
-	
-	ImageResponse saveImage(String email, ImageRequest request); /* Uploading/saving New Image */
-	
-	 /*	
-	  *  When user deletes their account this method is also called from userService to delete all the images of that user.
-	  *  For UserAccountDelete: Delete All Images of Selected User (i.e: By User email)
-	  *  
-	  *  @param email: email of the user whose images are to be deleted.
-	  */
-	void deleteImagesByUserEmail(String email);
-	
-	Image getDefaultProfileImage(); /* Gets the default image from the ImageRepository. */
+	/*
+	 * Get All images of current-user.
+	 */
+	Page<Image> getImagesOfCurrentUser(int userId, Pageable pageable);	
 	
 	
+	/* 
+	 * Upload/save New Image 
+	 */
+	Image saveImage(int userId , ImageRequest request);
+	
+	
+	/*
+	 * Main Usage : 1. When registering new user to set the default profile image.
+	 * 				2. When removing userProfile Image it is set to default image.
+	 *  Saves the default Image in image repository of that given user.
+	 * @param usedId is the id of the user that we want to save a new default image of.
+	 * */
+	Image saveDefaultProfileImageForGivenUser(int userId);
 /* ------------------------------------------- Image-CRUD --------------------------------------------*/
 	
-	ImageResponse getImageResponseById(int id); /* For user: Getting image by Image-Id*/
-	
-	Image getImageById(int id);
-	
-	void deleteImageById(int id); /* For user: Delete Image By image_Id*/
-	
-	void deleteMultipleImagesById(List<Integer> idList);
+	/* 
+	 * Get image by Image_id.
+	 * This is selecting specific image from image gallery. 
+	 */
+	Image getImageById(int imageId, int userId); 
 	
 	
 	
+	/*
+	 *  Checks for Existing image for that user
+	 * If not found it will save new image in imageRepository.
+	 */
+	Image updateProfileImage(String imageName, int userId);
+	
+//	Image removeCustomProfileImageOfUser(int id);
+	
+	
+	/* Delete single-image of current-user by image-id. */
+	void deleteImageById(int imageId, int userId);
+	
+	/* Delete multiple-images of current-user by list of image-id's. */
+	void deleteMultipleImagesById(List<Integer> imageIdList, int userId);
+	
+	/* Deletes all images of given user. 
+	 * @param userId is the given user. 
+	 */
+	void deleteAllImagesOfGivenUser(int userId);
+	
+
 	
 	
 	
 	
 	
-	
-	
-}
+}//ends interface.

@@ -46,25 +46,25 @@ public class AdminServiceImpl implements AdminService{
 	
 	
 	@Override
-	public Page<UserAdminResponse> findAllUsers(Pageable pageable) {
+	public Page<User> findAllUsers(Pageable pageable) {
 		Page<User> userList = userRepo.findAll(pageable);
 		if(userList.getContent().isEmpty()) {
 			throw new UserNotFoundException("No users Found in the Database");
 		}
 		log.info("Finding All Users is Executed Successfully. and fetched :{} clients", userList.getNumberOfElements());
-		return userList.map(userMapper::toUserAdminResponse);
+		return userList;
 	}
 	
 	
 	/* Returns "UserAdminDto" this contains userRoles to view in admin-Dashboard */
-	public UserAdminResponse findUserWithRolesById(int id) {
-		User user = userRepo.findById(id).orElseThrow( ()->
+	public User findUserWithRolesById(int id) {
+		return userRepo.findById(id).orElseThrow( ()->
 			new UserNotFoundException("Unable to find the user with ID : " + id) );
-		return userMapper.toUserAdminResponse(user);
 	}
 	
 	
 	@Override
+	@Transactional
 	@PreAuthorize("hasAuthority('admin')")
 	public void updateUserRoleById(int id, RoleRequest roleRequest) {
 		User user = userService.findUserById(id); 
@@ -82,7 +82,7 @@ public class AdminServiceImpl implements AdminService{
 	//Getting the list of user by their role|Authority.
 	@Transactional
 	@Override
-	public Page<UserAdminResponse> findUsersByRoleName(String roleName, Pageable pageable) {
+	public Page<User> searchUsersByRoleName(String roleName, Pageable pageable) {
 		//checking if the argument roleName is valid.
 		boolean isRoleFound = roleService.isRoleValid(roleName); 
 		if(!isRoleFound) {
@@ -92,31 +92,31 @@ public class AdminServiceImpl implements AdminService{
 		if(userList.getContent().isEmpty()) {
 			throw new UserNotFoundException("No users found in Database with given Role");
 		}
-		return userList.map(userMapper::toUserAdminResponse); //mapping user to userAdmin
+		return userList;
 	}
 
 
 
 	@Override
-	public void updateAdmin(String currentUserEmail, AdminUpdateRequest adminUpdateRequest) {
-		User user = userService.findUserByEmail(currentUserEmail); //getting current User from securityContextHolder
+	public void updateCurrentAdmin(int userId, AdminUpdateRequest request) {
+		User user = userService.findUserById(userId); //getting current User from securityContextHolder
 		// For Safety: to check if the user has Role: admin. 
 		Set<String> userRoles = user.getRoles().stream().map(role -> role.getName()).collect(Collectors.toSet());
 		if(!userRoles.contains(RoleNames.ADMIN.getRole())) {
 			throw new AccessDeniedException("Error: You are not admin and cannot update this account");
 		}
 		/* If "current-password" does not match the "encoded-account-password" it will throw exception*/
-		passwordValidator.verifyCurrentPassword(adminUpdateRequest.getCurrentPassword(), user.getPassword());
+		passwordValidator.verifyCurrentPassword(request.getCurrentPassword(), user.getPassword());
 		
 		/* Checking if user is asking to change a password*/
-		if(StringUtils.hasText(adminUpdateRequest.getNewPassword())) {
+		if(StringUtils.hasText(request.getNewPassword())) {
 			/* throws error if newPassword and confirmPassword does not match. */
-			passwordValidator.validatePasswordMatch(adminUpdateRequest.getNewPassword(), adminUpdateRequest.getConfirmPassword()); 
-			String encodedNewPassword = passwordEncoder.encode(adminUpdateRequest.getNewPassword());
+			passwordValidator.validatePasswordMatch(request.getNewPassword(), request.getConfirmPassword()); 
+			String encodedNewPassword = passwordEncoder.encode(request.getNewPassword());
 			user.setPassword(encodedNewPassword);
 		}
-		user.setEmail(adminUpdateRequest.getEmail());
-		Set<Role> roles = roleService.findRoleByNames(adminUpdateRequest.getRoles());
+		user.setEmail(request.getEmail());
+		Set<Role> roles = roleService.findRoleByNames(request.getRoles());
 		user.setRoles(roles);
 		userRepo.save(user);
 	}
@@ -133,11 +133,9 @@ public class AdminServiceImpl implements AdminService{
 
 	/* This is only for the search user By userEmail. Just for the searching of the user using email. */
 	@Override
-	public UserAdminResponse searchUserByEmail(String email) {
-		User user=userRepo.findUserByEmail(email)
+	public User searchUserByEmail(String email) {
+		return userRepo.findUserByEmail(email)
 					.orElseThrow(()-> new UserNotFoundException("Unable to find the user by email:" + email));
-		
-		return userMapper.toUserAdminResponse(user);
 	}
 		
 		

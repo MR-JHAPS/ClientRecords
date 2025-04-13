@@ -37,7 +37,7 @@ import lombok.AllArgsConstructor;
 
 
 @RestController
-@RequestMapping("/api/clientLog")
+@RequestMapping("/api/client-logs")
 @Tag(name = "Client-Log API's ",
 		description = "This api containst the manipulation done to the client (deleted, updated, created Client Informations)")
 @AllArgsConstructor
@@ -49,7 +49,7 @@ public class ClientLogController {
 	
 	
 	
-	@GetMapping("/getAll")
+	@GetMapping
 	@Operation(summary = "Get all the logs from the ClientLog.")
 	public ResponseEntity<ApiResponseModel<PagedModel<EntityModel<ClientLogResponse>>>> getAllClientLog(
 				@RequestParam(defaultValue="0") int pageNumber,
@@ -62,7 +62,7 @@ public class ClientLogController {
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, pagedClientLog);
 	}
 	
-	@GetMapping("/get/{id}")
+	@GetMapping("/{id}")
 	@Operation(summary = "Get the clientLog By Id.")
 	public ResponseEntity<ApiResponseModel<ClientLogResponse>> getClientLogById(@PathVariable int id){
 		ClientLogResponse clientLog = clientLogService.getClientLogById(id);

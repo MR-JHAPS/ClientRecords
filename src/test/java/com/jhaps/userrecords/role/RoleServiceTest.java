@@ -37,25 +37,22 @@ public class RoleServiceTest {
 		//setting up role test data. | arrange
 		Role role1 = new Role(1, "user");
 		Role role2 = new Role(2, "admin");
-		RoleResponse roleResponse1 = new RoleResponse(1, "user");
-		RoleResponse roleResponse2 = new RoleResponse(2, "admin");
+		
 		
 		//mock behaviour | act (logic's inside findAllMethods)
 		when(roleRepo.findAll()).thenReturn(List.of(role1, role2));
-		when(roleMapper.toRoleResponse(role1)).thenReturn(roleResponse1);
-		when(roleMapper.toRoleResponse(role2)).thenReturn(roleResponse2);
+		
 		
 		//running the roleServiceImpl.findAllRoles(). returns Set<RoleResponse>.
-		Set<RoleResponse> response = roleServiceImpl.findAllRoles();
+		Set<Role> response = roleServiceImpl.findAllRoles();
 		
 		//verification of result
 		assertEquals(2, response.size());
-		assertTrue(response.contains(roleResponse1));
-		assertTrue(response.contains(roleResponse2));
+		assertTrue(response.contains(role1));
+		assertTrue(response.contains(role2));
 		
 		//verifying mock interactions
 		verify(roleRepo).findAll();
-		verify(roleMapper).toRoleResponse(role1);
 
 	}
 	

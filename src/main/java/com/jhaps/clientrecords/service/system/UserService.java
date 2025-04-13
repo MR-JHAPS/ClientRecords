@@ -10,23 +10,21 @@ import com.jhaps.clientrecords.entity.system.User;
 
 public interface UserService {
 	
+	User getCurrentUser(int userId);
+	
 	User findUserById(int id); /* Return type is "User" | It is used for internal business logic --( Service classes )--*/ 
 	
-	UserGeneralResponse findUserDtoByEmail(String email); /* Returns "UserGeneralDto" this is for User-dashboard.*/
-	
-	User findUserByEmail(String email);
-	
-	void saveUser(User user); /* No Logic just saving the user that is ready. */
+	User saveUser(User user); /* No Logic just saving the user that is ready. */
 	
 	void saveNewUser(UserRegisterRequest userRegisterRequest); /* Saving/registering new user with logic. */
 	
-	void deleteUserByEmail(String email) ;
+	void deleteCurrentUser(int userId);
 	
-	void updateUserByEmail(String email, UserUpdateRequest userUpdateInfo);
-		
-	void updateUserProfileImage(String email, UserImageUploadRequest request);
+	void updateCurrentUser(int userId, UserUpdateRequest userUpdateInfo);
+	
+	void updateCurrentUserProfileImage(int id, UserImageUploadRequest request);
+	
+	void removeCurrentUserCustomProfileImage(int userId); 
 	
 	
-	
-	
-}
+}//ends interface.
