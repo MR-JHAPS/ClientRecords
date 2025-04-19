@@ -72,13 +72,13 @@ public class ClientController {
 	@Operation(summary = "get all clients")
 	@GetMapping
 	public ResponseEntity<ApiResponseModel<PagedModel<EntityModel<ClientResponse>>>> getAllClients(
-					@RequestParam(defaultValue = "0") int pageNumber,
-					@RequestParam(defaultValue = "10") int pageSize,
+					@RequestParam(defaultValue = "0") int page,
+					@RequestParam(defaultValue = "10") int size,
 					@RequestParam(required = false) String sortBy,
 					@RequestParam(required = false) String direction){
 			
 		
-		Pageable pageable =  PageableUtils.createPageable(pageNumber, pageSize, sortBy, direction);
+		Pageable pageable =  PageableUtils.createPageable(page, size, sortBy, direction);
 		
 		Page<ClientResponse> paginatedClients = clientService.findAllClients(pageable);
 		//converting the clientList To PagedClientList

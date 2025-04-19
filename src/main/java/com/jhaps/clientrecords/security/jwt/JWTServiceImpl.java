@@ -3,6 +3,7 @@ package com.jhaps.clientrecords.security.jwt;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
 import javax.crypto.SecretKey;
@@ -40,8 +41,9 @@ public class JWTServiceImpl {
 	}
 	
 	
-	public String generateJWTToken(String email) {
+	public String generateJWTToken(String email, Set<String> roles) {
 		Map<String, Object> claims = new HashMap<>();
+		claims.put("role", roles);
 		return Jwts.builder()
 				.claims()
 				.add(claims)
