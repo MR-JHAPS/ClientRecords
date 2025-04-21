@@ -12,6 +12,7 @@ public enum ResponseMessage {
 	
     CLIENT_ALREADY_EXISTS("Client already exists"),
     CLIENT_SAVE_FAILED("Failed to save the Client"),
+    CLIENT_DELETE_FAILED("Failed to delete the clients"),
     UNAUTHORIZED("Unauthorized access"),
     NOT_FOUND("Resource not found"),
     INTERNAL_SERVER_ERROR("Internal server error"),

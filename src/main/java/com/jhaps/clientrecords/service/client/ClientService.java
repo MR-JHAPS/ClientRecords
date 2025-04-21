@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import com.jhaps.clientrecords.dto.request.BulkClientDeleteRequest;
 import com.jhaps.clientrecords.dto.request.ClientRequest;
 import com.jhaps.clientrecords.dto.response.ClientResponse;
 import com.jhaps.clientrecords.entity.client.Client;
@@ -24,7 +25,9 @@ public interface ClientService {
 	
 	public void deleteClientById(String userEmail, int id); /*  @param userEmail to log the user in clientLog */
 	
-	public void updateClientById(String userEmail, int id, ClientRequest clientUpdateInfo ); /*  @param userEmail to log the user in clientLog */
+	public void deleteMultipleClientsById(String userEmail, List<Integer> clientIdList );
+	
+	public void updateClientById(String userEmail, int id, ClientRequest clientUpdateInfo ); /*  @param userEmail to log the user in clientLog in String Email Field.*/
 	
 	//THIS IS FOR THE SEARCH QUERY 
 

@@ -1,6 +1,7 @@
 package com.jhaps.clientrecords.serviceImpl.client;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
@@ -12,6 +13,7 @@ import com.jhaps.clientrecords.dto.response.ClientResponse;
 import com.jhaps.clientrecords.entity.client.Client;
 import com.jhaps.clientrecords.entity.system.User;
 import com.jhaps.clientrecords.enums.ModificationType;
+import com.jhaps.clientrecords.exception.client.ClientDeleteException;
 import com.jhaps.clientrecords.exception.client.ClientNotFoundException;
 import com.jhaps.clientrecords.exception.system.UserNotFoundException;
 import com.jhaps.clientrecords.repository.client.ClientRepository;
@@ -97,6 +99,44 @@ public class ClientServiceImpl implements ClientService  {
 		log.info("Client with id {} deleted Successfully.",clientId);
 	}
 
+	
+
+	@Transactional
+	@Override
+	public void deleteMultipleClientsById(String userEmail, List<Integer> clientIdList) {
+		try{
+			List<Client> clientListFound = clientRepo.findAllById(clientIdList);
+			clientListFound.forEach(client->{
+				clientBinService.insertInClientBin(client);
+				clientLogService.insertInClientLog(userEmail, client, ModificationType.DELETE);
+			});
+			
+			clientRepo.deleteAllInBatch(clientListFound);			
+			
+		}catch(Exception e ) {
+			log.error("Unable to delete the clients {}, by user {}", clientIdList, userEmail);	
+			throw new ClientDeleteException("Something Went Wrong! Unable to delete multiple clients");
+		}
+	}
+
+	
+//	@Transactional
+//	public void deleteMultipleClientsByIds(String userEmail, List<Integer> clientIdList) {
+//		try{
+//			clientIdList.forEach(id->{
+//				Optional<Client> optionalClient = clientRepo.findById(id);
+//				if(optionalClient.isPresent()) {
+//					clientBinService.insertInClientBin(optionalClient.get()); //inserting in clientBin
+//					clientLogService.insertInClientLog(userEmail, optionalClient.get(), ModificationType.DELETE); // logging the client
+//					clientRepo.delete(optionalClient.get());//deleting the clients.
+//				}
+//			});		
+//		}catch(Exception e ) {
+//			log.error("Unable to delete the clients {}, by user {}", clientIdList, userEmail);	
+//			throw new ClientDeleteException("Something Went Wrong! Unable to delete multiple clients");
+//		}
+//	}
+	
 	
 	@Transactional
 	@Override
