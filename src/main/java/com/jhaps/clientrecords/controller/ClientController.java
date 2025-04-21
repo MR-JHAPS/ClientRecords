@@ -123,7 +123,7 @@ public class ClientController {
 	@Operation(summary = "Delete Multiple clients by Client Id's List.")
 	@DeleteMapping
 	public ResponseEntity<ApiResponseModel<String>> deleteMultipleClientsById(
-			@PathVariable BulkClientDeleteRequest request,
+			@RequestBody BulkClientDeleteRequest request,
 			@AuthenticationPrincipal UserDetails userDetails){
 			String userEmail = userDetails.getUsername();
 			List<Integer> clientIdList = request.getIdList();
