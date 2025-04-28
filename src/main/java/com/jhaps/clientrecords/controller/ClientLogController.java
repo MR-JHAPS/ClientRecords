@@ -52,11 +52,11 @@ public class ClientLogController {
 	@GetMapping
 	@Operation(summary = "Get all the logs from the ClientLog.")
 	public ResponseEntity<ApiResponseModel<PagedModel<EntityModel<ClientLogResponse>>>> getAllClientLog(
-				@RequestParam(defaultValue="0") int pageNumber,
-				@RequestParam(defaultValue="10") int pageSize,
+				@RequestParam(defaultValue="0") int page,
+				@RequestParam(defaultValue="10") int size,
 				@RequestParam(required = false) String sortBy,
 				@RequestParam(required = false) String direction){
-		Pageable pageable =PageableUtils.createPageable(pageNumber, pageSize, sortBy, direction);
+		Pageable pageable =PageableUtils.createPageable(page, size, sortBy, direction);
 		Page<ClientLogResponse> paginatedClientLog = clientLogService.getAllClientLog(pageable);
 		PagedModel<EntityModel<ClientLogResponse>> pagedClientLog = pagedResourceAssembler.toPagedModel(paginatedClientLog);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, pagedClientLog);

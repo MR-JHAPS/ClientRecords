@@ -26,10 +26,12 @@ import com.jhaps.clientrecords.util.PageableUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/api/client-bins")
 @AllArgsConstructor
+@Slf4j
 @Tag(name = "Client Bin API's", description = "Manage Deleted Clients(Restore, Get, Delete)")
 public class ClientBinController {
 
@@ -41,11 +43,11 @@ public class ClientBinController {
 	@GetMapping
 	@Operation(summary = "Get all the Clients from ClientBin.")
 	public ResponseEntity<ApiResponseModel<PagedModel<EntityModel<ClientBinResponse>>>> getAllClientBin(
-			@RequestParam(defaultValue="0") int pageNumber,
-			@RequestParam(defaultValue="10") int pageSize,
+			@RequestParam(defaultValue="0") int page,
+			@RequestParam(defaultValue="10") int size,
 			@RequestParam(required = false) String sortBy,
 			@RequestParam(required = false) String direction){
-		Pageable pageable = PageableUtils.createPageable(pageNumber, pageSize, sortBy, direction);
+		Pageable pageable = PageableUtils.createPageable(page, size, sortBy, direction);
 		Page<ClientBinResponse> paginatedClient = clientBinService.getAllFromClientBin(pageable);
 		PagedModel<EntityModel<ClientBinResponse>> paged = pagedResourceAssembler.toPagedModel(paginatedClient);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, paged);
@@ -56,7 +58,9 @@ public class ClientBinController {
 	@PreAuthorize("hasAuthority('admin')") // only admin can delete the client from the bin
 	@Operation(summary = "Delete the Selected client From ClientBin.")
 	public ResponseEntity<ApiResponseModel<String>> deleteClientFromClientBin(@PathVariable int id){
+		log.info("Preparing to delete the Client from clientBin of Id: {}", id);
 		clientBinService.deleteFromClientBin(id);
+		log.info("After deleting the Client from clientBin of Id: {}", id);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.CLIENT_BIN_DELETED, HttpStatus.NO_CONTENT);
 	}
 	

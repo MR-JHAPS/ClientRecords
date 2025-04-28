@@ -30,10 +30,10 @@ import lombok.extern.slf4j.Slf4j;
 public class ClientBinServiceImpl implements ClientBinService{
 	
 	private ClientBinRepository clientBinRepo;
-	private ClientRepository clientRepo; //This is so that the clientBin client can be restored to client-Table/entity.
+//	private ClientRepository clientRepo; //This is so that the clientBin client can be restored to client-Table/entity.
 	private UserRepository userRepo;
 	private ClientMapper clientMapper;
-	private EntityManager entityManager;
+//	private EntityManager entityManager;
 	
 	
 	@Override
