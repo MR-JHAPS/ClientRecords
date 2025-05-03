@@ -1,15 +1,31 @@
 package com.jhaps.clientrecords.serviceImpl.system;
 
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
+import javax.management.RuntimeErrorException;
+
+import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.jhaps.clientrecords.dto.request.ImageRequest;
+import com.jhaps.clientrecords.dto.request.user.UserImageUploadRequest;
 import com.jhaps.clientrecords.dto.response.ImageResponse;
 import com.jhaps.clientrecords.entity.system.Image;
 import com.jhaps.clientrecords.entity.system.User;
@@ -22,6 +38,7 @@ import com.jhaps.clientrecords.repository.system.ImageRepository;
 import com.jhaps.clientrecords.repository.system.UserRepository;
 import com.jhaps.clientrecords.security.model.CustomUserDetails;
 import com.jhaps.clientrecords.service.system.ImageService;
+import com.jhaps.clientrecords.util.ImageUploadPath;
 import com.jhaps.clientrecords.util.mapper.ImageMapper;
 
 import jakarta.transaction.Transactional;
@@ -45,6 +62,8 @@ public class ImageServiceImpl implements ImageService{
 	}
 	
 /*--------------------------------------------------------------------------------------------------------------------------------------------------*/	
+	
+	
 	
 	
 	@Override
@@ -136,28 +155,144 @@ public class ImageServiceImpl implements ImageService{
 	}
 
 
+	
+	
+	
+	
+	
 	@Override
-	public Image updateProfileImage(String imageName, int userId) {
-		User user = findUserById(userId);
-		Optional<Image> existingImage = imageRepo.findByImageNameAndUserId(imageName, userId);
-		/*
-		 * If the given imageName exists in DB it will return that
-		 * */
-		if(existingImage.isPresent()) {
-			log.info("Image with name {} for user {} already exists in the Database. Setting that image to user profile", imageName, user.getEmail());
-			return existingImage.get();
+	public Image updateProfileImage(UserImageUploadRequest request, int userId) {
+		if(request.getImageFile()==null) {
+			log.warn("Image Multipart is null or not found in the UserImageUploadRequest.");
+			throw new ImageException("Image Multipart not found in the request");
 		}
-		/*
-		 * If the given Image doesnot exists it will save a new Image for that user in the ImageRepository.
-		 */
-		log.info("Image with name {} not present in Database so saving a new image in the Image Repository", imageName);
-		Image newImage = new Image();
-			newImage.setImageName(imageName);
-			newImage.setUser(user);
-		imageRepo.save(newImage);
-		log.info("Image {} saved successfully in the Image Repository for user {}.", imageName, user.getEmail());
-		return newImage;
+		User user = findUserById(userId);
+		
+		String contentType = request.getImageFile().getContentType();
+		String fileExtension = contentType.split("/")[1];
+		String originalImageName = request.getImageName();
+		String customFileName = getCustomFileName(user, fileExtension); //generates a custom fileName to save in DB.
+		String imageUrl = manageUploadPath(request.getImageFile(), customFileName, userId); //userId is for the unique folderName
+		
+		if(imageUrl==null) {
+			throw new ImageException("Unable to save the Image in the specified path. IO or Illegal State exception occured.");
+		}
+		Image image = Image.builder()
+							.imageName(originalImageName)
+							.storedFileName(customFileName)
+							.contentType(contentType)
+							.uploadTime(LocalDateTime.now())
+							.url(imageUrl)
+							.user(user)
+							.build();
+		
+		imageRepo.save(image);
+		log.info("Image {} with custom name {} saved successfully in the Image Repository for user {}.",
+							originalImageName, customFileName, user.getEmail());
+		return image;
+	}//ends method
+	
+	
+	
+	
+	
+	private String getCustomFileName(User user, String fileExtension) {
+		String rawEmailPrefix = user.getEmail().split("@")[0];
+		String sanitizedEmailPrefix = rawEmailPrefix
+									    .replaceAll("[^a-zA-Z0-9]", "_")  // Only allow alphanumeric + underscore
+									    .substring(0, Math.min(rawEmailPrefix.length(), 25));  // Limit length
+		String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmssSSS"));
+		String customFileName = sanitizedEmailPrefix + timestamp + "." + fileExtension;
+		return customFileName;
 	}
+	
+	
+	
+	//return the filePath (userFolder/fileName.jpg) or null
+		private String manageUploadPath(MultipartFile file, String customFileName, int folderName) {
+			//folderName is the userId.
+
+			String folderNameString = String.valueOf(folderName) ;
+			Path rootPath = Paths.get(ImageUploadPath.PATH.getPath());
+			try {
+//					String rootUploadPath = ImageUploadPath.PATH.getPath();
+					
+					Path userFolder = rootPath.resolve(folderNameString);
+					if(!Files.exists(userFolder)) {
+						log.info("Folder with name : {} currently does not exist. Creating the path {}.", folderName, userFolder);
+						Files.createDirectories(userFolder); //creating a folder if does not exists
+					}
+					Path destinationPath = userFolder.resolve(customFileName); //joins customFileName inside userFolderDirectory.
+						
+					InputStream inputStream = file.getInputStream();
+					Files.copy(inputStream, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+					return (folderName + "/" + customFileName); //this excludes the rootPath.
+					
+				} catch (IllegalStateException e) {
+					log.error("Illegal state exception. Cannot save the file in {}/{}/", rootPath, folderName);
+					return null;
+				} catch (IOException e) {
+					log.error("IO-exception. Cannot save the file in {}/{}/", rootPath, folderName);
+					return null;
+				}
+		}//ends method
+	
+	
+	
+	
+//	//return the filePath (userFolder/fileName.jpg) or null
+//	private String manageUploadPath(MultipartFile file, String customFileName, int folderName) {
+//		//folderName is the userId.
+//		String rootUploadPath = ImageUploadPath.PATH.getPath();
+//		File folder = new File(rootUploadPath + folderName);
+//		if(!folder.exists()) {
+//			log.info("Folder with name : {} currently does not exist. Creating the path {}.", folderName, folder);
+//			folder.mkdir();
+//		}
+//		Path destinationPath = Paths.get(folder.getAbsolutePath(), customFileName);
+//			try {
+//				Files.copy(file.getInputStream(),destinationPath, StandardCopyOption.REPLACE_EXISTING);
+//				return (folderName + File.separator + customFileName); //this excludes the rootPath.
+//			} catch (IllegalStateException e) {
+//				e.printStackTrace();
+//				log.error("Illegal state exception. Cannot save the file in {}", destinationPath);
+//				return null;
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//				log.error("IO-exception. Cannot save the file in {}", destinationPath);
+//				return null;
+//			}
+//	}//ends method
+	
+	
+	
+	
+	
+	
+	
+//	Updates the profile Image.
+//	@Override
+//	public Image updateProfileImage(String imageName, int userId) {
+//		User user = findUserById(userId);
+//		Optional<Image> existingImage = imageRepo.findByImageNameAndUserId(imageName, userId);
+//		/*
+//		 * If the given imageName exists in DB it will return that
+//		 * */
+//		if(existingImage.isPresent()) {
+//			log.info("Image with name {} for user {} already exists in the Database. Setting that image to user profile", imageName, user.getEmail());
+//			return existingImage.get();
+//		}
+//		/*
+//		 * If the given Image doesnot exists it will save a new Image for that user in the ImageRepository.
+//		 */
+//		log.info("Image with name {} not present in Database so saving a new image in the Image Repository", imageName);
+//		Image newImage = new Image();
+//			newImage.setImageName(imageName);
+//			newImage.setUser(user);
+//		imageRepo.save(newImage);
+//		log.info("Image {} saved successfully in the Image Repository for user {}.", imageName, user.getEmail());
+//		return newImage;
+//	}
 	
 	
 	
@@ -177,7 +312,7 @@ public class ImageServiceImpl implements ImageService{
 		/* If image id selected to delete is userProfile than we need to set the default profile picture before deleting the image.*/
 		Image imageToDelete = findImageById(imageId);
 		User currentUser = findUserById(userId);
-		Image userProfileImage = currentUser.getProfileImage();
+		Image userProfileImage = currentUser.getProfileImage().get();
 		/*If userToDelete is the current Profile Image then firstly: Set the default-profile-image of that user and then delete the image.*/
 		if(userProfileImage.equals(imageToDelete)) {
 			Image defaultProfileImage = saveDefaultProfileImageForGivenUser(userId);
@@ -198,7 +333,7 @@ public class ImageServiceImpl implements ImageService{
 	public void deleteMultipleImagesById(List<Integer> imageIdList, int userId) {
 		log.info("Action: Deleting Multiple Images of Id's: {}", imageIdList);	
 		User currentUser = findUserById(userId);
-		int userProfileImageId = currentUser.getProfileImage().getId();
+		int userProfileImageId = currentUser.getProfileImage().get().getId();
 		try{
 			for(Integer imageId : imageIdList) {
 				/* Checking if the id in imageIdList contains the userProfileImage ---> imageId. */
@@ -251,6 +386,13 @@ public class ImageServiceImpl implements ImageService{
 		return imageRepo.findById(imageId)
 					.orElseThrow(()-> new ImageNotFoundException("Error: Image with ID:" + imageId + " not found . "));
 	}
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	

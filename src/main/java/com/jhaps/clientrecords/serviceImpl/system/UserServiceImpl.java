@@ -1,5 +1,6 @@
 package com.jhaps.clientrecords.serviceImpl.system;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -139,17 +140,34 @@ public class UserServiceImpl implements UserService{
 	
 
 	@Override
-	public void updateCurrentUserProfileImage(int userId, UserImageUploadRequest request) {
+	public String updateCurrentUserProfileImage(int userId, UserImageUploadRequest request) {
 		User user = findUserById(userId);
 		log.info("Updating Profile Picture for user {}, imageName : {}", user.getEmail(), request.getImageName());
 		/* If image with this name "is-found" in DB then it returns that image.
 		 * If image "is-not-found" in DB it saves the image and returns that image.  
 		 */
-		Image updatedProfileImage = imageService.updateProfileImage(request.getImageName(), userId);
+		Image updatedProfileImage = imageService.updateProfileImage(request, userId);
 		user.setProfileImage(updatedProfileImage);
 		userRepo.save(user);
-		log.info("New profile Image {} for user {} set Successfully.", request.getImageName(), user.getEmail());
+		log.info("New profile Image {} of custom-name {} for user {} set Successfully.", 
+				request.getImageName(), updatedProfileImage.getStoredFileName(), user.getEmail());
+		return updatedProfileImage.getUrl();
 	}
+	
+	
+	
+//	@Override
+//	public void updateCurrentUserProfileImage(int userId, UserImageUploadRequest request) {
+//		User user = findUserById(userId);
+//		log.info("Updating Profile Picture for user {}, imageName : {}", user.getEmail(), request.getImageName());
+//		/* If image with this name "is-found" in DB then it returns that image.
+//		 * If image "is-not-found" in DB it saves the image and returns that image.  
+//		 */
+//		Image updatedProfileImage = imageService.updateProfileImage(request.getImageName(), userId);
+//		user.setProfileImage(updatedProfileImage);
+//		userRepo.save(user);
+//		log.info("New profile Image {} for user {} set Successfully.", request.getImageName(), user.getEmail());
+//	}
 
 	
 	/* To remove the custom user profile image and set the default-profile-image. */
@@ -186,6 +204,15 @@ public class UserServiceImpl implements UserService{
 	public User saveUser(User user) {
 		return userRepo.save(user);
 	}
+	
+	
+	
+	
+//	private void saveImageFile(File imageFile) {
+//		
+//		String path = "D:/"
+//		
+//	}
 
 	
 	

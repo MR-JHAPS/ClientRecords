@@ -31,7 +31,9 @@ public class JWTFilter extends OncePerRequestFilter{
 		return req.equals("/api/public/login") || 
 		req.equals("/api/public/signup") ||
 		req.contains("swagger-ui")||
-		req.contains("api-docs");
+		req.contains("api-docs")||
+		req.startsWith("/images/") /*This skips the image resources access. */
+		;
 	}
 
 	

@@ -32,6 +32,11 @@ public interface ImageRepository extends JpaRepository<Image, Integer> {
 	@Query("SELECT i From Image i WHERE i.imageName=:imageName and i.user.id=:userId")
 	Optional<Image> findByImageNameAndUserId(@Param("imageName") String imageName, @Param("userId") int userId);
 	
+	
+	@Query("SELECT i From Image i WHERE i.storedFileName=:storedFileName and i.user.id=:userId")
+	Optional<Image> findByStoredFileNameAndUserId(@Param("storedFileName") String storedFileName, @Param("userId") int userId);
+	
+	
 	// Check if image exists and belongs to user (for @PreAuthorize in controller method)
     @Query("SELECT COUNT(i) > 0 FROM Image i WHERE i.id = :imageId AND i.user.id = :userId")
     boolean existsByIdAndUserId(@Param("imageId") int imageId, @Param("userId") int userId);
