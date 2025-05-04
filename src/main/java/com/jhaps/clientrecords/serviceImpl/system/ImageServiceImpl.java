@@ -38,6 +38,7 @@ import com.jhaps.clientrecords.repository.system.ImageRepository;
 import com.jhaps.clientrecords.repository.system.UserRepository;
 import com.jhaps.clientrecords.security.model.CustomUserDetails;
 import com.jhaps.clientrecords.service.system.ImageService;
+import com.jhaps.clientrecords.util.ImageFileManager;
 import com.jhaps.clientrecords.util.ImageUploadPath;
 import com.jhaps.clientrecords.util.mapper.ImageMapper;
 
@@ -52,6 +53,7 @@ public class ImageServiceImpl implements ImageService{
 
 	private ImageRepository imageRepo;
 	private UserRepository userRepo;
+	private ImageFileManager imageFileManager;
 	
 	
 /*--------------------------------------------------- Private method of user for images ------------------------------------------------------------*/
@@ -169,10 +171,13 @@ public class ImageServiceImpl implements ImageService{
 		User user = findUserById(userId);
 		
 		String contentType = request.getImageFile().getContentType();
+		/*
+		 * Example : contentType = "image/jpeg", fileExtension will get = jpeg;
+		 */
 		String fileExtension = contentType.split("/")[1];
 		String originalImageName = request.getImageName();
-		String customFileName = getCustomFileName(user, fileExtension); //generates a custom fileName to save in DB.
-		String imageUrl = manageUploadPath(request.getImageFile(), customFileName, userId); //userId is for the unique folderName
+		String customFileName = imageFileManager.getCustomFileName(user, fileExtension); //generates a custom fileName to save in DB.
+		String imageUrl = imageFileManager.manageUploadPath(request.getImageFile(), customFileName, userId); //userId is for the unique folderName
 		
 		if(imageUrl==null) {
 			throw new ImageException("Unable to save the Image in the specified path. IO or Illegal State exception occured.");
@@ -196,105 +201,6 @@ public class ImageServiceImpl implements ImageService{
 	
 	
 	
-	private String getCustomFileName(User user, String fileExtension) {
-		String rawEmailPrefix = user.getEmail().split("@")[0];
-		String sanitizedEmailPrefix = rawEmailPrefix
-									    .replaceAll("[^a-zA-Z0-9]", "_")  // Only allow alphanumeric + underscore
-									    .substring(0, Math.min(rawEmailPrefix.length(), 25));  // Limit length
-		String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmssSSS"));
-		String customFileName = sanitizedEmailPrefix + timestamp + "." + fileExtension;
-		return customFileName;
-	}
-	
-	
-	
-	//return the filePath (userFolder/fileName.jpg) or null
-		private String manageUploadPath(MultipartFile file, String customFileName, int folderName) {
-			//folderName is the userId.
-
-			String folderNameString = String.valueOf(folderName) ;
-			Path rootPath = Paths.get(ImageUploadPath.PATH.getPath());
-			try {
-//					String rootUploadPath = ImageUploadPath.PATH.getPath();
-					
-					Path userFolder = rootPath.resolve(folderNameString);
-					if(!Files.exists(userFolder)) {
-						log.info("Folder with name : {} currently does not exist. Creating the path {}.", folderName, userFolder);
-						Files.createDirectories(userFolder); //creating a folder if does not exists
-					}
-					Path destinationPath = userFolder.resolve(customFileName); //joins customFileName inside userFolderDirectory.
-						
-					InputStream inputStream = file.getInputStream();
-					Files.copy(inputStream, destinationPath, StandardCopyOption.REPLACE_EXISTING);
-					return (folderName + "/" + customFileName); //this excludes the rootPath.
-					
-				} catch (IllegalStateException e) {
-					log.error("Illegal state exception. Cannot save the file in {}/{}/", rootPath, folderName);
-					return null;
-				} catch (IOException e) {
-					log.error("IO-exception. Cannot save the file in {}/{}/", rootPath, folderName);
-					return null;
-				}
-		}//ends method
-	
-	
-	
-	
-//	//return the filePath (userFolder/fileName.jpg) or null
-//	private String manageUploadPath(MultipartFile file, String customFileName, int folderName) {
-//		//folderName is the userId.
-//		String rootUploadPath = ImageUploadPath.PATH.getPath();
-//		File folder = new File(rootUploadPath + folderName);
-//		if(!folder.exists()) {
-//			log.info("Folder with name : {} currently does not exist. Creating the path {}.", folderName, folder);
-//			folder.mkdir();
-//		}
-//		Path destinationPath = Paths.get(folder.getAbsolutePath(), customFileName);
-//			try {
-//				Files.copy(file.getInputStream(),destinationPath, StandardCopyOption.REPLACE_EXISTING);
-//				return (folderName + File.separator + customFileName); //this excludes the rootPath.
-//			} catch (IllegalStateException e) {
-//				e.printStackTrace();
-//				log.error("Illegal state exception. Cannot save the file in {}", destinationPath);
-//				return null;
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//				log.error("IO-exception. Cannot save the file in {}", destinationPath);
-//				return null;
-//			}
-//	}//ends method
-	
-	
-	
-	
-	
-	
-	
-//	Updates the profile Image.
-//	@Override
-//	public Image updateProfileImage(String imageName, int userId) {
-//		User user = findUserById(userId);
-//		Optional<Image> existingImage = imageRepo.findByImageNameAndUserId(imageName, userId);
-//		/*
-//		 * If the given imageName exists in DB it will return that
-//		 * */
-//		if(existingImage.isPresent()) {
-//			log.info("Image with name {} for user {} already exists in the Database. Setting that image to user profile", imageName, user.getEmail());
-//			return existingImage.get();
-//		}
-//		/*
-//		 * If the given Image doesnot exists it will save a new Image for that user in the ImageRepository.
-//		 */
-//		log.info("Image with name {} not present in Database so saving a new image in the Image Repository", imageName);
-//		Image newImage = new Image();
-//			newImage.setImageName(imageName);
-//			newImage.setUser(user);
-//		imageRepo.save(newImage);
-//		log.info("Image {} saved successfully in the Image Repository for user {}.", imageName, user.getEmail());
-//		return newImage;
-//	}
-	
-	
 	
 	/*
 	 * Deletes image by id only if it belongs to the  current-authenticated-user.
@@ -312,16 +218,51 @@ public class ImageServiceImpl implements ImageService{
 		/* If image id selected to delete is userProfile than we need to set the default profile picture before deleting the image.*/
 		Image imageToDelete = findImageById(imageId);
 		User currentUser = findUserById(userId);
-		Image userProfileImage = currentUser.getProfileImage().get();
-		/*If userToDelete is the current Profile Image then firstly: Set the default-profile-image of that user and then delete the image.*/
-		if(userProfileImage.equals(imageToDelete)) {
-			Image defaultProfileImage = saveDefaultProfileImageForGivenUser(userId);
-			log.info("Action: Setting the Default Image as User Profile Image because it was selected to delete.");
-			currentUser.setProfileImage(defaultProfileImage); 
+		User imageOwner = imageToDelete.getUser();
+		if(imageOwner.getId() != currentUser.getId()) {
+			log.warn("Not Authorized to delete image of id: {} by user: {}. Image doesn't belong to user{}",
+					imageToDelete.getId(),currentUser.getId(), currentUser.getEmail());
+			throw new ImageDeletionException("Not Authorized to delete the Image. You are not the owner of the image.");
 		}
-		 imageRepo.deleteByIdAndUserId(imageId, userId);
-		 log.info("Action: Image of Id:{} deleted Successfully.", imageId);
+		
+		/*
+		 * Deleting the image from the FileDirectory.
+		 * @Args: imageToDelete.getUrl() is the path of image inside RootDirectory.
+		 */
+		imageFileManager.removeSingleImageFileFromStorage(imageToDelete.getUrl());
+		imageRepo.deleteByIdAndUserId(imageId, userId);
+		log.info("Action: Image of Id:{} deleted Successfully.", imageId);
 	}
+	
+	
+//	/*
+//	 * Deletes image by id only if it belongs to the  current-authenticated-user.
+//	 * And if the profile image is selected to delete it sets the current user profile
+//	 * to DefaultImage("defaultImage.png") and then deletes it to prevent Foreign Key Constraints issues.
+//	 */
+//	@Override
+//	@Transactional
+//	public void deleteImageById(int imageId, int userId) {
+//		log.info("Action: Deleting Image of Id: {}", imageId);
+//		if(!imageRepo.existsByIdAndUserId(imageId, userId)) {
+//			 log.warn("Delete failed: Image {} not found or not owned by user {}", imageId, userId);
+//			throw new ImageNotFoundException("Image with Id: " + imageId + " not found or you do not have permission to delete.");	
+//		}
+//		/* If image id selected to delete is userProfile than we need to set the default profile picture before deleting the image.*/
+//		Image imageToDelete = findImageById(imageId);
+//		User currentUser = findUserById(userId);
+//		Image userProfileImage = currentUser.getProfileImage().get();
+//		/*If userToDelete is the current Profile Image then firstly: Set the default-profile-image of that user and then delete the image.*/
+//		if(userProfileImage.equals(imageToDelete)) {
+//			Image defaultProfileImage = saveDefaultProfileImageForGivenUser(userId);
+//			log.info("Action: Setting the Default Image as User Profile Image because it was selected to delete.");
+//			currentUser.setProfileImage(defaultProfileImage); 
+//		}
+//		 imageRepo.deleteByIdAndUserId(imageId, userId);
+//		 log.info("Action: Image of Id:{} deleted Successfully.", imageId);
+//	}
+	
+	
 	
 
 	
@@ -360,7 +301,7 @@ public class ImageServiceImpl implements ImageService{
 		}
 	}
 
-	
+
 	
 	/* Deletes all the images of given user from the imageRepository. */
 	@Override
@@ -376,12 +317,9 @@ public class ImageServiceImpl implements ImageService{
 	}
 
 	
-
-	
 	
 	
 	/* Private Method to find image By id: */
-	
 	private Image findImageById(int imageId) {
 		return imageRepo.findById(imageId)
 					.orElseThrow(()-> new ImageNotFoundException("Error: Image with ID:" + imageId + " not found . "));

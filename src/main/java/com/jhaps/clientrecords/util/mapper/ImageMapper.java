@@ -21,6 +21,9 @@ public class ImageMapper {
 		ImageResponse response = new ImageResponse();
 		response.setId(image.getId());
 		response.setImageName(image.getImageName());
+		response.setImageUrl(image.getUrl());
+		response.setUploadedAt(image.getUploadTime());
+		response.setContentType(image.getContentType());
 		return response;
 	}
 	

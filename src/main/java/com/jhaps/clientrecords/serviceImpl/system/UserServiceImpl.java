@@ -28,6 +28,7 @@ import com.jhaps.clientrecords.service.client.ClientService;
 import com.jhaps.clientrecords.service.system.ImageService;
 import com.jhaps.clientrecords.service.system.RoleService;
 import com.jhaps.clientrecords.service.system.UserService;
+import com.jhaps.clientrecords.util.ImageFileManager;
 import com.jhaps.clientrecords.util.mapper.ImageMapper;
 import com.jhaps.clientrecords.util.mapper.UserMapper;
 
@@ -47,7 +48,7 @@ public class UserServiceImpl implements UserService{
 	private PasswordValidator passwordValidator; // handles password validation
 	private ImageService imageService;
 	private ClientService clientService;
-
+	private ImageFileManager imageFileManager;
 	
 	
 	
@@ -106,6 +107,12 @@ public class UserServiceImpl implements UserService{
 			 * Clears the roles of the given user :
 			 */
 			user.removeRoles();
+			/*
+			 * Deletes the userImage from the Directory 
+			 * @Args userId is the name of the Folder in the ImageDirectory.
+			 * All contents inside the userFolder including the userFolder will be deleted.
+			 */
+			imageFileManager.removeUserImageFolderFromStorage(userId);
 			/* Delete the user once  */
 			userRepo.delete(user);
 			log.info("Action: user Deleted successfully");
@@ -170,27 +177,36 @@ public class UserServiceImpl implements UserService{
 //	}
 
 	
-	/* To remove the custom user profile image and set the default-profile-image. */
+//	/* To remove the custom user profile image and set the default-profile-image. */
+//	@Override
+//	public void removeCurrentUserCustomProfileImage(int userId) {
+//		User user = findUserById(userId);
+//		Image defaultImage = imageService.saveDefaultProfileImageForGivenUser(userId);
+//		user.setProfileImage(defaultImage);
+//		userRepo.save(user);
+//	}
+	
+	
+	/* To remove the custom user profile image */
 	@Override
-	public void removeCurrentUserCustomProfileImage(int userId) {
+	public void removeCurrentUserProfileImage(int userId) {
 		User user = findUserById(userId);
-		Image defaultImage = imageService.saveDefaultProfileImageForGivenUser(userId);
-		user.setProfileImage(defaultImage);
+		/* Setting the userProfile Image to null. */
+		user.setProfileImage(null);
 		userRepo.save(user);
 	}
 	
 	
 	
 	
-	
 	/* PRIVATE METHODS:*/
 	
-	private User findUserByEmail(String email) {
-		User user = userRepo.findByEmail(email).orElseThrow(()->
-						 new UserNotFoundException("Unable to find the user with Email : " + email));
-		log.info("Action: User with email: {} found in the database.", email);
-		return user;					
-	}
+//	private User findUserByEmail(String email) {
+//		User user = userRepo.findByEmail(email).orElseThrow(()->
+//						 new UserNotFoundException("Unable to find the user with Email : " + email));
+//		log.info("Action: User with email: {} found in the database.", email);
+//		return user;					
+//	}
 	
 	@Override
 	public User findUserById(int id) {

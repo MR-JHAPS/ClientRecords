@@ -73,13 +73,12 @@ public class UserController {
 		int userId = userDetails.getUser().getId();
 		User user = userService.getCurrentUser(userId);
 		UserGeneralResponse userGeneralResponse = this.userMapper.toUserGeneralResponse(user);
-		
 
 	    // Use image URL if present, else use default image
 	    String imagePath = user.getProfileImage()
 	            .map(Image::getUrl)
 	            .orElse("defaultImage.png");
-	    userGeneralResponse.setImage("/images/" + imagePath);
+	    userGeneralResponse.setImageUrl("/images/" + imagePath);
 	    return apiResponseBuilder.buildApiResponse(
 	            ResponseMessage.SUCCESS,
 	            HttpStatus.OK,
@@ -88,65 +87,6 @@ public class UserController {
 	}
 	
 	
-	
-	
-//	@Operation(summary = "Serve Image")
-//	@GetMapping("/images/{imageEndpoint}")
-//	public ResponseEntity<Resource> serveImage(@PathVariable String imageEndpoint){
-//		log.info("I am inside the serve image.");
-//		 Path imageUrl;
-//		 if(imageEndpoint.equals("defaultImage.png")) {
-//			 imageUrl = Paths.get(ImageUploadPath.PATH.getPath() + imageEndpoint);	
-//			 return ResponseEntity.ok()
-//			           .contentType(MediaType.IMAGE_PNG)
-//			           .body(new FileSystemResource(imageUrl));
-//		 }else {
-//			 imageUrl = Paths.get(ImageUploadPath.PATH.getPath() + imageEndpoint);	
-//			 return ResponseEntity.ok()
-//		           .contentType(MediaType.ALL)
-//		           .body(new FileSystemResource(imageUrl));
-//		    
-//		}
-//	}
-	
-//	@Operation(summary = "Serve Image")
-//	@GetMapping("/api/images/{imagePath:^(?!.*\\.\\.).*}")
-//	public ResponseEntity<Resource> serveImage(@PathVariable String imagePath) {
-//	    return serveImageInternal(imagePath);
-//	}
-//
-//	@Operation(hidden = true)
-//	@GetMapping("/api/images/{folder}/{filename:.+}")
-//	public ResponseEntity<Resource> serveImageNested(@PathVariable String folder, @PathVariable String filename) {
-//	    String imagePath = folder + "/" + filename;
-//	    return serveImageInternal(imagePath);
-//	}
-//
-//	private ResponseEntity<Resource> serveImageInternal(String imagePath) {
-//	    // Prevent directory traversal
-//	    if (imagePath.contains("..") || imagePath.contains("\\") || imagePath.startsWith("/")) {
-//	        return ResponseEntity.badRequest().build();
-//	    }
-//
-//	    Path fullPath = Paths.get(ImageUploadPath.PATH.getPath(), imagePath).normalize();
-//	    File file = fullPath.toFile();
-//
-//	    if (!file.exists() || !file.isFile()) {
-//	        return ResponseEntity.notFound().build();
-//	    }
-//
-//	    MediaType mediaType;
-//	    try {
-//	        String mimeType = Files.probeContentType(fullPath);
-//	        mediaType = (mimeType != null) ? MediaType.parseMediaType(mimeType) : MediaType.APPLICATION_OCTET_STREAM;
-//	    } catch (IOException e) {
-//	        mediaType = MediaType.APPLICATION_OCTET_STREAM;
-//	    }
-//
-//	    return ResponseEntity.ok()
-//	            .contentType(mediaType)
-//	            .body(new FileSystemResource(file));
-//	}
 
 	
 
@@ -193,22 +133,13 @@ public class UserController {
 	public ResponseEntity<ApiResponseModel<String>> removeProfileImageOfCurrentUser(
 					@AuthenticationPrincipal CustomUserDetails userDetails){
 		int userId = userDetails.getUser().getId();
-		userService.removeCurrentUserCustomProfileImage(userId);
+		userService.removeCurrentUserProfileImage(userId);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, 
 					"Profile Image removed Successfully.");
 	}
 	
 	
 	
-//	@Operation(summary = "Get authenticated user's details")
-//	@GetMapping("/me")
-//	public ResponseEntity<ApiResponseModel<UserGeneralResponse>> getUserSelf(@AuthenticationPrincipal CustomUserDetails userDetails) {
-//		int userId = userDetails.getUser().getId();
-//		User user = userService.getCurrentUser(userId);
-//		UserGeneralResponse userGeneralResponse = this.userMapper.toUserGeneralResponse(user);
-//		userGeneralResponse.setImage(ImageUploadPath.PATH.getPath() + user.getProfileImage().get().getUrl());
-//		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, userGeneralResponse);
-//	}
 	
 	
 }// ends class

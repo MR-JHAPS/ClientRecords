@@ -1,6 +1,5 @@
 package com.jhaps.clientrecords.util.mapper;
 
-import java.io.File;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -13,7 +12,6 @@ import com.jhaps.clientrecords.dto.request.user.UserImageUploadRequest;
 import com.jhaps.clientrecords.dto.response.user.UserAdminResponse;
 import com.jhaps.clientrecords.dto.response.user.UserGeneralResponse;
 import com.jhaps.clientrecords.entity.system.User;
-import com.jhaps.clientrecords.util.ImageUploadPath;
 
 @Component
 public class UserMapper {
@@ -48,8 +46,7 @@ public class UserMapper {
 	public UserGeneralResponse toUserGeneralResponse(User user) {
 		UserGeneralResponse dto = new UserGeneralResponse();
 		dto.setId(user.getId());
-		dto.setImage(user.getProfileImageName());
-//		dto.setImage(ImageUploadPath.PATH.getPath() + "/"+ user.getId() + "/" + user.getProfileImage().get().getUrl());
+		dto.setImageUrl(user.getProfileImageUrl());
 		dto.setEmail(user.getEmail());
 		dto.setCreatedOn(user.getCreatedOn());
 		dto.setUpdatedOn(user.getUpdatedOn());
