@@ -33,7 +33,7 @@ public interface ImageService {
 	 *  Saves the default Image in image repository of that given user.
 	 * @param usedId is the id of the user that we want to save a new default image of.
 	 * */
-	Image saveDefaultProfileImageForGivenUser(int userId);
+//	Image saveDefaultProfileImageForGivenUser(int userId);
 /* ------------------------------------------- Image-CRUD --------------------------------------------*/
 	
 	/* 

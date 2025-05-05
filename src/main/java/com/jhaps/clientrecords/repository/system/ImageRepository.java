@@ -45,12 +45,36 @@ public interface ImageRepository extends JpaRepository<Image, Integer> {
     @Query("DELETE FROM Image i WHERE i.id = :imageId AND i.user.id = :userId")
     int deleteByIdAndUserId(@Param("imageId") int imageId, @Param("userId") int userId);
 
+    
+    /*
+     * Deletes all the Images of the given user.
+     */
 	@Modifying
 	@Query("DELETE FROM Image i WHERE i.user.id=:userId")
 	void deleteAllImagesByUserId(@Param("userId") int userId);
 	
 	
+	/* 
+	 * This gets the Image-Url from the given userId and List<Integer> imageId
+	 */
+	@Query("SELECT i.url from Image i WHERE i.id IN :ids AND i.user.id=:userId")
+	List<String> findUrlsByImageIds(@Param("ids") List<Integer> ids, @Param("userId") int userId);
 	
+	
+	
+	/*
+	 * Deletes the Images by List<Integer> imageIds and given userId. 
+	 */
+	@Modifying
+    @Query("DELETE FROM Image i WHERE i.id IN :imageIds AND i.user.id = :userId")
+    int deleteByIdsAndUserId(@Param("imageIds") List<Integer> imageIds, @Param("userId") int userId);
+	
+	
+	
+	/* Finding Image By Name and userId*/
+	Image findByImageNameAndUser_Id(String imageName, int userId);
+	
+	boolean existsByImageNameAndUser_Id(String imageName, int userId);
 	
 	
 	

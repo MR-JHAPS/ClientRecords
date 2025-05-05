@@ -81,13 +81,13 @@ public class UserServiceImpl implements UserService{
 		user.setAccountLocked(false);
 		user.setAttempts(0);
 		// saving user without profile image
-		User savedUser = saveUser(user);	
+		saveUser(user);	
 		//we get id of the user after we save and we pass that id to save a default image for that id.
 		log.info("Preparing to set new profile picture for user: {}", registrationDto.getEmail());
-		Image defaultProfileImage = imageService.saveDefaultProfileImageForGivenUser(savedUser.getId()); //getting default profile image from ImageService.
-		savedUser.setProfileImage(defaultProfileImage); //setting default profile image when new account is created.
+//		Image defaultProfileImage = imageService.saveDefaultProfileImageForGivenUser(savedUser.getId()); //getting default profile image from ImageService.
+//		savedUser.setProfileImage(defaultProfileImage); //setting default profile image when new account is created.
 		//saving with profile image.
-		saveUser(savedUser);
+//		saveUser(savedUser);
 		log.info("Action: User with email: {} saved successfully", registrationDto.getEmail());
 	}
 	

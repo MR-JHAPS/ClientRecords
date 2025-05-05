@@ -59,7 +59,8 @@ public class User extends BaseEntity{
 	@Column(name = "lock_time")
 	private LocalDateTime lockTime;		//time when the account was locked.
 	
-	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+//	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToOne
 	@JoinColumn(name = "profile_image_id", nullable= true)
 	@Nullable
 	private Image profileImage ; // this field is for the profile image

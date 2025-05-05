@@ -100,23 +100,48 @@ public class ImageServiceImpl implements ImageService{
 	public Image saveImage(int userId,ImageRequest request) {
 		log.info("Action: Saving Image: {}", request.getImageName());
 		User user = findUserById(userId);
-		/* 
-		 * Checking if the image with the name exists for this user in the imageRepository.
-		 */
-		Optional<Image> imageOnDb = imageRepo.findByImageNameAndUserId(request.getImageName(), userId);
-		if(imageOnDb.isPresent()) {
-			log.warn("Image with name: {} of user : {}, already exists in the database.", request.getImageName(), user.getEmail());
-			throw new DuplicateDataException("Image With name " + request.getImageName()
-							+ " for user "+ user.getEmail()+" already exists in the database.");
-		}
-		/* If image does not exists in the database then save that image. */
-		Image image = new Image();
-		image.setImageName(request.getImageName());
-		image.setUser(user);
+		MultipartFile imageFile = request.getImageFile();
+		String originalImageName = request.getImageName();
+		String contentType = imageFile.getContentType();
+		String fileExtension = imageFile.getContentType().split("/")[1];
+		String customImageName = imageFileManager.getCustomFileName(user, fileExtension );
+		String imageUrl = imageFileManager.manageUploadPath(imageFile, customImageName, userId);
+		Image image = Image.builder()
+							.imageName(originalImageName)
+							.storedFileName(customImageName)
+							.contentType(contentType)
+							.uploadTime(LocalDateTime.now())
+							.url(imageUrl)
+							.user(user)
+							.build();
 		log.info("Action: Image: {} saved successfully by User_Email: {}.", request.getImageName(), user.getEmail());
 		imageRepo.save(image);
 		return image;
 	}
+	
+	
+//	@Override
+//	@Transactional
+//	public Image saveImage(int userId,ImageRequest request) {
+//		log.info("Action: Saving Image: {}", request.getImageName());
+//		User user = findUserById(userId);
+//		/* 
+//		 * Checking if the image with the name exists for this user in the imageRepository.
+//		 */
+//		Optional<Image> imageOnDb = imageRepo.findByImageNameAndUserId(request.getImageName(), userId);
+//		if(imageOnDb.isPresent()) {
+//			log.warn("Image with name: {} of user : {}, already exists in the database.", request.getImageName(), user.getEmail());
+//			throw new DuplicateDataException("Image With name " + request.getImageName()
+//							+ " for user "+ user.getEmail()+" already exists in the database.");
+//		}
+//		/* If image does not exists in the database then save that image. */
+//		Image image = new Image();
+//		image.setImageName(request.getImageName());
+//		image.setUser(user);
+//		log.info("Action: Image: {} saved successfully by User_Email: {}.", request.getImageName(), user.getEmail());
+//		imageRepo.save(image);
+//		return image;
+//	}
 	
 	
 	
@@ -126,35 +151,35 @@ public class ImageServiceImpl implements ImageService{
 	 * 		OR 
 	 * 		If the customProfileImage is removed we set the image back to defaultImage for that user.
 	 */
-	@Override
-	public Image saveDefaultProfileImageForGivenUser(int userId){
-		String defaultProfileImage = "defaultImage.png";
-		User user = findUserById(userId);		
-		/*
-		 * Checking if the default image is already present for this user in Image-Repository.
-		 */
-		Optional<Image> existingDefaultImage = imageRepo.findByImageNameAndUserId(defaultProfileImage, userId);
-		if(existingDefaultImage.isPresent()) {
-			log.info("Existing default image {} is found for user: {}", existingDefaultImage.get(), user.getEmail());
-			return existingDefaultImage.get();
-		}
-		/*
-		 * If defaultImage is not present for the user create new DefaultImage.
-		 */
-		log.info("Existing Default Image is not found So, Saving new Default profile picture for user : {}", user.getEmail());
-		Image defaultImage = new Image();
-		defaultImage.setImageName(defaultProfileImage);
-		defaultImage.setUser(user);
-		//saving new default image.
-		Image savedImage = imageRepo.save(defaultImage);
-		//if image saved return savedImage.
-		if(savedImage!=null && savedImage.getId()!=0) {
-			log.info("Successfully saved Default profile picture for user : {}", user.getEmail());
-			return savedImage;
-		}
-		log.info("Error: Unable to save Default profile picture for user : {}", user.getEmail());
-		throw new ImageException("ERROR: Unable to save Default Profile Image for the user: " + user.getEmail());	
-	}
+//	@Override
+//	public Image saveDefaultProfileImageForGivenUser(int userId){
+//		String defaultProfileImage = "defaultImage.png";
+//		User user = findUserById(userId);		
+//		/*
+//		 * Checking if the default image is already present for this user in Image-Repository.
+//		 */
+//		Optional<Image> existingDefaultImage = imageRepo.findByImageNameAndUserId(defaultProfileImage, userId);
+//		if(existingDefaultImage.isPresent()) {
+//			log.info("Existing default image {} is found for user: {}", existingDefaultImage.get(), user.getEmail());
+//			return existingDefaultImage.get();
+//		}
+//		/*
+//		 * If defaultImage is not present for the user create new DefaultImage.
+//		 */
+//		log.info("Existing Default Image is not found So, Saving new Default profile picture for user : {}", user.getEmail());
+//		Image defaultImage = new Image();
+//		defaultImage.setImageName(defaultProfileImage);
+//		defaultImage.setUser(user);
+//		//saving new default image.
+//		Image savedImage = imageRepo.save(defaultImage);
+//		//if image saved return savedImage.
+//		if(savedImage!=null && savedImage.getId()!=0) {
+//			log.info("Successfully saved Default profile picture for user : {}", user.getEmail());
+//			return savedImage;
+//		}
+//		log.info("Error: Unable to save Default profile picture for user : {}", user.getEmail());
+//		throw new ImageException("ERROR: Unable to save Default Profile Image for the user: " + user.getEmail());	
+//	}
 
 
 	
@@ -182,6 +207,14 @@ public class ImageServiceImpl implements ImageService{
 		if(imageUrl==null) {
 			throw new ImageException("Unable to save the Image in the specified path. IO or Illegal State exception occured.");
 		}
+		/* Checking if the Image with "given name for current-user" Already exists in the Database*/
+		boolean existsOnDb = imageRepo.existsByImageNameAndUser_Id(originalImageName, userId);
+		
+		if(existsOnDb) {
+			Image imageOnDb = imageRepo.findByImageNameAndUser_Id(originalImageName, userId);
+			return imageOnDb;
+		}
+		
 		Image image = Image.builder()
 							.imageName(originalImageName)
 							.storedFileName(customFileName)
@@ -266,6 +299,43 @@ public class ImageServiceImpl implements ImageService{
 	
 
 	
+//	/*
+//	 * Deletes Multiple images by id only if it belongs to the current-authenticated-user.
+//	 */
+//	@Override
+//	@Transactional
+//	public void deleteMultipleImagesById(List<Integer> imageIdList, int userId) {
+//		log.info("Action: Deleting Multiple Images of Id's: {}", imageIdList);	
+//		User currentUser = findUserById(userId);
+//		int userProfileImageId = currentUser.getProfileImage().get().getId();
+//		try{
+//			for(Integer imageId : imageIdList) {
+//				/* Checking if the id in imageIdList contains the userProfileImage ---> imageId. */
+//					if(imageId.equals(userProfileImageId)) {
+//						currentUser.setProfileImage(null);
+//						userRepo.save(currentUser);
+//					}
+//					imageRepo.deleteByIdAndUserId(imageId, userId);
+//			}//ends-for
+//			log.info("Action: Images, that of Id's:{} deleted Successfully.", imageIdList);
+//			
+//			/*After deleting the images. If currentUser.getProfilePicture is null(i.e: deleted ),
+//			 *  Set the default profile for the image.*/
+//			if(currentUser.getProfileImage()==null) {
+//				Image defaultProfileImage = saveDefaultProfileImageForGivenUser(currentUser.getId());
+//				log.info("Action: Setting the Default Image as User Profile Image before deleting,"
+//										+ " because the profile image was also selected to delete.");
+//				currentUser.setProfileImage(defaultProfileImage); 
+//				userRepo.save(currentUser);
+//			}
+//		}catch (Exception e) {
+//			log.error("Unable to Delete Multiple images with id's {}, of userId {}", imageIdList, userId);
+//			throw new ImageDeletionException("Error occured. Unable to delete Mulptiple Images of Id's : " + imageIdList + " of userId : "+ userId);
+//		}
+//	}
+
+
+	
 	/*
 	 * Deletes Multiple images by id only if it belongs to the current-authenticated-user.
 	 */
@@ -275,39 +345,45 @@ public class ImageServiceImpl implements ImageService{
 		log.info("Action: Deleting Multiple Images of Id's: {}", imageIdList);	
 		User currentUser = findUserById(userId);
 		int userProfileImageId = currentUser.getProfileImage().get().getId();
+		
 		try{
 			for(Integer imageId : imageIdList) {
 				/* Checking if the id in imageIdList contains the userProfileImage ---> imageId. */
 					if(imageId.equals(userProfileImageId)) {
 						currentUser.setProfileImage(null);
 						userRepo.save(currentUser);
-					}
-					imageRepo.deleteByIdAndUserId(imageId, userId);
+					}//ends-if
 			}//ends-for
-			log.info("Action: Images, that of Id's:{} deleted Successfully.", imageIdList);
 			
-			/*After deleting the images. If currentUser.getProfilePicture is null(i.e: deleted ),
-			 *  Set the default profile for the image.*/
-			if(currentUser.getProfileImage()==null) {
-				Image defaultProfileImage = saveDefaultProfileImageForGivenUser(currentUser.getId());
-				log.info("Action: Setting the Default Image as User Profile Image before deleting,"
-										+ " because the profile image was also selected to delete.");
-				currentUser.setProfileImage(defaultProfileImage); 
-				userRepo.save(currentUser);
-			}
+		   /*
+			* Gets the ImageUrlPath from the ImageRepo using List<Integer> imageIds and userId. 
+			*/
+			List<String> imageUrlList = imageRepo.findUrlsByImageIds(imageIdList, userId);
+			/*
+			 * removing the images from the directory first
+			 */
+			imageFileManager.removeMultipleImageFileFromStorage(imageUrlList);
+			/*
+			 * Deleting the images from the imageRepo after removing from the Database.
+			 */
+			int totalDeleted = imageRepo.deleteByIdsAndUserId(imageIdList, userId);
+			
+			log.info("Action: Total {} Images, that of Id's:{} deleted Successfully.", totalDeleted, imageIdList);			
 		}catch (Exception e) {
 			log.error("Unable to Delete Multiple images with id's {}, of userId {}", imageIdList, userId);
 			throw new ImageDeletionException("Error occured. Unable to delete Mulptiple Images of Id's : " + imageIdList + " of userId : "+ userId);
 		}
 	}
-
-
+	
+	
+	
 	
 	/* Deletes all the images of given user from the imageRepository. */
 	@Override
 	@Transactional
 	public void deleteAllImagesOfGivenUser(int userId) {		
 		try{
+			imageFileManager.removeUserImageFolderFromStorage(userId);
 			imageRepo.deleteAllImagesByUserId(userId);
 			log.info("Delete all images with userId successful.");
 		}catch (Exception e) {

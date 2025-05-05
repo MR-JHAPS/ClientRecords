@@ -97,7 +97,7 @@ public class ImageFileManager {
 	
 	/* Removes Multiple Image Files from the File/directory */
 	@Transactional
-	private void removeMultipleImageFileFromStorage(List<String> imagePaths) {
+	public void removeMultipleImageFileFromStorage(List<String> imagePaths) {
 		/*User will send the List<String> of imagePath(url) from ImageDatabase. */
 		Path rootPath = Paths.get(ImageUploadPath.PATH.getPath());
 			imagePaths
