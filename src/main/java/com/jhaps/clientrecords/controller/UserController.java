@@ -78,7 +78,7 @@ public class UserController {
 	    String imagePath = user.getProfileImage()
 	            .map(Image::getUrl)
 	            .orElse("defaultImage.png");
-	    userGeneralResponse.setImageUrl("/images/" + imagePath);
+	    userGeneralResponse.setImageUrl(imagePath);
 	    return apiResponseBuilder.buildApiResponse(
 	            ResponseMessage.SUCCESS,
 	            HttpStatus.OK,

@@ -61,6 +61,15 @@ public interface ImageRepository extends JpaRepository<Image, Integer> {
 	List<String> findUrlsByImageIds(@Param("ids") List<Integer> ids, @Param("userId") int userId);
 	
 	
+	/* 
+	 * This is to required to delete the image From Cloudinary-Server.
+	 * This gets the Image-Pubic_Id from the given userId and List<Integer> imageId
+	 */
+	@Query("SELECT i.publicId from Image i WHERE i.id IN :ids AND i.user.id=:userId")
+	List<String> findPublicIdByImageIds(@Param("ids") List<Integer> ids, @Param("userId") int userId);
+	
+	
+	
 	
 	/*
 	 * Deletes the Images by List<Integer> imageIds and given userId. 

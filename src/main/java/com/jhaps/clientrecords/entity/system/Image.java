@@ -58,6 +58,10 @@ public class Image {
 	@Column(name = "uploadTime")
 	private LocalDateTime uploadTime;
 	
+	/* This is the id used to delete the images From the cloudinary. */	
+	@Column(name="public_id")
+	private String publicId;
+	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id")
 	private User user;

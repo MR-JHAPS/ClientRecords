@@ -34,13 +34,13 @@ public class ImageFileManager {
 	
 	/* Generates the Custom file name using given @Param. */
 	@Transactional
-	public String getCustomFileName(User user, String fileExtension) {
+	public String getCustomFileName(User user) {
 		String rawEmailPrefix = user.getEmail().split("@")[0];
 		String sanitizedEmailPrefix = rawEmailPrefix
 									    .replaceAll("[^a-zA-Z0-9]", "_")  // Only allow alphanumeric + underscore
 									    .substring(0, Math.min(rawEmailPrefix.length(), 25));  // Limit length
 		String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmssSSS"));
-		String customFileName = sanitizedEmailPrefix + timestamp + "." + fileExtension;
+		String customFileName = sanitizedEmailPrefix + timestamp ;
 		return customFileName;
 	}	
 	
