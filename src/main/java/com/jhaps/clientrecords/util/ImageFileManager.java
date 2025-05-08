@@ -106,7 +106,7 @@ public class ImageFileManager {
 					Path completeImagePath = rootPath.resolve(imagePath);
 					try {
 						Files.deleteIfExists(completeImagePath);
-						log.info("Image File {} deleted from the Directory ", imagePath);
+						log.info("Image File {} deleted from the Directory ", completeImagePath);
 					} catch (IOException e) {
 						log.error("Error deleting the Multiple Image Files from the upload Folder.");
 					}//ends-catch

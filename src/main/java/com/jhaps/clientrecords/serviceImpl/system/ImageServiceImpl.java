@@ -350,8 +350,11 @@ public class ImageServiceImpl implements ImageService{
 			for(Integer imageId : imageIdList) {
 				/* Checking if the id in imageIdList contains the userProfileImage ---> imageId. */
 					if(imageId.equals(userProfileImageId)) {
+						log.info("Selected Image {} is also a userProfile Image.", imageId);
 						currentUser.setProfileImage(null);
-						userRepo.save(currentUser);
+						log.info("Setting the user profileImage as null");
+						userRepo.saveAndFlush(currentUser);
+						log.info("Saving the userProfile After setting image to null.");
 					}//ends-if
 			}//ends-for
 			
