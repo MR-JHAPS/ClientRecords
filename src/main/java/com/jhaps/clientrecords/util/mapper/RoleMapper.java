@@ -1,5 +1,10 @@
 package com.jhaps.clientrecords.util.mapper;
 
+import java.util.Collection;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import com.jhaps.clientrecords.dto.response.RoleResponse;
@@ -18,5 +23,12 @@ public class RoleMapper {
 	}
 	
 
+	
+	// Converting to Set<String> of roles. This is to add to jwt Token for front-end.
+	public Set<String> roleToStringSet(Collection<? extends GrantedAuthority> roles){
+		Set<String> roleSet = roles.stream().map(role-> role.toString()).collect(Collectors.toSet());
+		return roleSet;
+	}
+	
 	
 }

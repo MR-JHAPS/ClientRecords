@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -12,6 +13,7 @@ import com.jhaps.clientrecords.entity.BaseEntity;
 import com.jhaps.clientrecords.entity.client.Client;
 import com.jhaps.clientrecords.entity.client.ClientLog;
 
+import io.micrometer.common.lang.Nullable;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -57,9 +59,11 @@ public class User extends BaseEntity{
 	@Column(name = "lock_time")
 	private LocalDateTime lockTime;		//time when the account was locked.
 	
-	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-	@JoinColumn(name = "profile_image_id")
-	private Image profileImage; // this field is for the profile image
+//	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToOne
+	@JoinColumn(name = "profile_image_id", nullable= true)
+	@Nullable
+	private Image profileImage ; // this field is for the profile image
 	
 	@OneToMany(mappedBy = "user", 
 				cascade = CascadeType.ALL,
@@ -86,6 +90,25 @@ public class User extends BaseEntity{
 		this.roles.clear();
 	}
 	
+	
+	public Optional<Image> getProfileImage() {
+		return Optional.ofNullable(this.profileImage);
+	}
+	
+	
+	//to cheking if the imageName is null .
+	public String getProfileImageName() {
+	    return getProfileImage()
+	           .map(Image::getImageName)
+	           .orElse(""); // or return Optional<String>
+	}
+	
+	//to cheking if the imageUrl is null .
+		public String getProfileImageUrl() {
+		    return getProfileImage()
+		           .map(Image::getUrl)
+		           .orElse(""); // or return Optional<String>
+		}
 	
 	
 }//ends class

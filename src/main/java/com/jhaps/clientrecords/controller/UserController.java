@@ -1,11 +1,23 @@
 package com.jhaps.clientrecords.controller;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,10 +29,12 @@ import com.jhaps.clientrecords.apiResponse.ApiResponseModel;
 import com.jhaps.clientrecords.dto.request.user.UserUpdateRequest;
 import com.jhaps.clientrecords.dto.request.user.UserImageUploadRequest;
 import com.jhaps.clientrecords.dto.response.user.UserGeneralResponse;
+import com.jhaps.clientrecords.entity.system.Image;
 import com.jhaps.clientrecords.entity.system.User;
 import com.jhaps.clientrecords.enums.ResponseMessage;
 import com.jhaps.clientrecords.security.model.CustomUserDetails;
 import com.jhaps.clientrecords.service.system.UserService;
+import com.jhaps.clientrecords.util.ImageUploadPath;
 import com.jhaps.clientrecords.util.mapper.UserMapper;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -49,6 +63,9 @@ public class UserController {
 	}
 
 	
+
+	
+	
 	
 	@Operation(summary = "Get authenticated user's details")
 	@GetMapping("/me")
@@ -56,8 +73,25 @@ public class UserController {
 		int userId = userDetails.getUser().getId();
 		User user = userService.getCurrentUser(userId);
 		UserGeneralResponse userGeneralResponse = this.userMapper.toUserGeneralResponse(user);
-		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, userGeneralResponse);
+
+	    // Use image URL if present, else use default image
+	    String imagePath = user.getProfileImage()
+	            .map(Image::getUrl)
+	            .orElse("defaultImage.png");
+	    userGeneralResponse.setImageUrl(imagePath);
+	    return apiResponseBuilder.buildApiResponse(
+	            ResponseMessage.SUCCESS,
+	            HttpStatus.OK,
+	            userGeneralResponse
+	    );
 	}
+	
+	
+
+	
+
+	
+	
 	
 	
 	@Operation(summary = "Delete authenticated user's profile")
@@ -83,12 +117,14 @@ public class UserController {
 	
 	@Operation(summary = "Upload profile image for authenticated user")
 	@PostMapping("/me/image")
-	public ResponseEntity<ApiResponseModel<String>> uploadProfileImageOfCurrentUser(@RequestBody UserImageUploadRequest request ,
+	public ResponseEntity<ApiResponseModel<String>> uploadProfileImageOfCurrentUser(@ModelAttribute UserImageUploadRequest request ,
 					@AuthenticationPrincipal CustomUserDetails userDetails){
 		int userId = userDetails.getUser().getId();
-		userService.updateCurrentUserProfileImage(userId, request);
+		String imageUrlEndpoint = userService.updateCurrentUserProfileImage(userId, request);
+		String fullUrl = ImageUploadPath.PATH.getPath() + File.separator + imageUrlEndpoint;
+		
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, 
-					"Image " + request.getImageName() + " saved Successfully");
+					fullUrl);
 	}
 	
 	
@@ -97,7 +133,7 @@ public class UserController {
 	public ResponseEntity<ApiResponseModel<String>> removeProfileImageOfCurrentUser(
 					@AuthenticationPrincipal CustomUserDetails userDetails){
 		int userId = userDetails.getUser().getId();
-		userService.removeCurrentUserCustomProfileImage(userId);
+		userService.removeCurrentUserProfileImage(userId);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, 
 					"Profile Image removed Successfully.");
 	}

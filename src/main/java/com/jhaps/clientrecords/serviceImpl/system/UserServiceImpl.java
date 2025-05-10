@@ -1,5 +1,6 @@
 package com.jhaps.clientrecords.serviceImpl.system;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -27,6 +28,7 @@ import com.jhaps.clientrecords.service.client.ClientService;
 import com.jhaps.clientrecords.service.system.ImageService;
 import com.jhaps.clientrecords.service.system.RoleService;
 import com.jhaps.clientrecords.service.system.UserService;
+import com.jhaps.clientrecords.util.ImageFileManager;
 import com.jhaps.clientrecords.util.mapper.ImageMapper;
 import com.jhaps.clientrecords.util.mapper.UserMapper;
 
@@ -46,7 +48,7 @@ public class UserServiceImpl implements UserService{
 	private PasswordValidator passwordValidator; // handles password validation
 	private ImageService imageService;
 	private ClientService clientService;
-
+	private ImageFileManager imageFileManager;
 	
 	
 	
@@ -79,13 +81,13 @@ public class UserServiceImpl implements UserService{
 		user.setAccountLocked(false);
 		user.setAttempts(0);
 		// saving user without profile image
-		User savedUser = saveUser(user);	
+		saveUser(user);	
 		//we get id of the user after we save and we pass that id to save a default image for that id.
 		log.info("Preparing to set new profile picture for user: {}", registrationDto.getEmail());
-		Image defaultProfileImage = imageService.saveDefaultProfileImageForGivenUser(savedUser.getId()); //getting default profile image from ImageService.
-		savedUser.setProfileImage(defaultProfileImage); //setting default profile image when new account is created.
+//		Image defaultProfileImage = imageService.saveDefaultProfileImageForGivenUser(savedUser.getId()); //getting default profile image from ImageService.
+//		savedUser.setProfileImage(defaultProfileImage); //setting default profile image when new account is created.
 		//saving with profile image.
-		saveUser(savedUser);
+//		saveUser(savedUser);
 		log.info("Action: User with email: {} saved successfully", registrationDto.getEmail());
 	}
 	
@@ -105,6 +107,12 @@ public class UserServiceImpl implements UserService{
 			 * Clears the roles of the given user :
 			 */
 			user.removeRoles();
+			/*
+			 * Deletes the userImage from the Directory 
+			 * @Args userId is the name of the Folder in the ImageDirectory.
+			 * All contents inside the userFolder including the userFolder will be deleted.
+			 */
+			imageFileManager.removeUserImageFolderFromStorage(userId);
 			/* Delete the user once  */
 			userRepo.delete(user);
 			log.info("Action: user Deleted successfully");
@@ -139,40 +147,66 @@ public class UserServiceImpl implements UserService{
 	
 
 	@Override
-	public void updateCurrentUserProfileImage(int userId, UserImageUploadRequest request) {
+	public String updateCurrentUserProfileImage(int userId, UserImageUploadRequest request) {
 		User user = findUserById(userId);
 		log.info("Updating Profile Picture for user {}, imageName : {}", user.getEmail(), request.getImageName());
 		/* If image with this name "is-found" in DB then it returns that image.
 		 * If image "is-not-found" in DB it saves the image and returns that image.  
 		 */
-		Image updatedProfileImage = imageService.updateProfileImage(request.getImageName(), userId);
+		Image updatedProfileImage = imageService.updateProfileImage(request, userId);
 		user.setProfileImage(updatedProfileImage);
 		userRepo.save(user);
-		log.info("New profile Image {} for user {} set Successfully.", request.getImageName(), user.getEmail());
+		log.info("New profile Image {} of custom-name {} for user {} set Successfully.", 
+				request.getImageName(), updatedProfileImage.getStoredFileName(), user.getEmail());
+		return updatedProfileImage.getUrl();
 	}
+	
+	
+	
+//	@Override
+//	public void updateCurrentUserProfileImage(int userId, UserImageUploadRequest request) {
+//		User user = findUserById(userId);
+//		log.info("Updating Profile Picture for user {}, imageName : {}", user.getEmail(), request.getImageName());
+//		/* If image with this name "is-found" in DB then it returns that image.
+//		 * If image "is-not-found" in DB it saves the image and returns that image.  
+//		 */
+//		Image updatedProfileImage = imageService.updateProfileImage(request.getImageName(), userId);
+//		user.setProfileImage(updatedProfileImage);
+//		userRepo.save(user);
+//		log.info("New profile Image {} for user {} set Successfully.", request.getImageName(), user.getEmail());
+//	}
 
 	
-	/* To remove the custom user profile image and set the default-profile-image. */
+//	/* To remove the custom user profile image and set the default-profile-image. */
+//	@Override
+//	public void removeCurrentUserCustomProfileImage(int userId) {
+//		User user = findUserById(userId);
+//		Image defaultImage = imageService.saveDefaultProfileImageForGivenUser(userId);
+//		user.setProfileImage(defaultImage);
+//		userRepo.save(user);
+//	}
+	
+	
+	/* To remove the custom user profile image */
 	@Override
-	public void removeCurrentUserCustomProfileImage(int userId) {
+	public void removeCurrentUserProfileImage(int userId) {
 		User user = findUserById(userId);
-		Image defaultImage = imageService.saveDefaultProfileImageForGivenUser(userId);
-		user.setProfileImage(defaultImage);
+		/* Setting the userProfile Image to null. */
+		user.setProfileImage(null);
 		userRepo.save(user);
 	}
-	
 	
 	
 	
 	
 	/* PRIVATE METHODS:*/
 	
-	private User findUserByEmail(String email) {
-		User user = userRepo.findByEmail(email).orElseThrow(()->
-						 new UserNotFoundException("Unable to find the user with Email : " + email));
-		log.info("Action: User with email: {} found in the database.", email);
-		return user;					
-	}
+//	private User findUserByEmail(String email) {
+//		User user = userRepo.findByEmail(email).orElseThrow(()->
+//						 new UserNotFoundException("Unable to find the user with Email : " + email));
+//		log.info("Action: User with email: {} found in the database.", email);
+//		return user;					
+//	}
 	
 	@Override
 	public User findUserById(int id) {
@@ -186,6 +220,15 @@ public class UserServiceImpl implements UserService{
 	public User saveUser(User user) {
 		return userRepo.save(user);
 	}
+	
+	
+	
+	
+//	private void saveImageFile(File imageFile) {
+//		
+//		String path = "D:/"
+//		
+//	}
 
 	
 	

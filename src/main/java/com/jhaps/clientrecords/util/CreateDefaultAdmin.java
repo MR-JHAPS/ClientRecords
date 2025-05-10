@@ -67,10 +67,10 @@ public class CreateDefaultAdmin implements CommandLineRunner {
 			
 			
 			
-			Image defaultProfileImage = new Image(0, "defaultImage.png", user);
-			imageRepo.save(defaultProfileImage);
-			user.setProfileImage(defaultProfileImage);
-			userRepo.save(user);
+//			Image defaultProfileImage = new Image(0, "defaultImage.png", user);
+//			imageRepo.save(defaultProfileImage);
+//			user.setProfileImage(defaultProfileImage);
+//			userRepo.save(user);
 		}
 		
 		

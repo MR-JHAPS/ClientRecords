@@ -3,6 +3,8 @@ package com.jhaps.clientrecords.security.customAuth;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,9 +25,11 @@ import com.jhaps.clientrecords.exception.system.UserNotFoundException;
 import com.jhaps.clientrecords.repository.system.UserRepository;
 import com.jhaps.clientrecords.security.jwt.JWTFilter;
 import com.jhaps.clientrecords.security.jwt.JWTServiceImpl;
+import com.jhaps.clientrecords.util.mapper.RoleMapper;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 /*
  * This is called from public controller ("/login")
@@ -42,6 +46,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
+@AllArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
 	private AuthenticationManager authManager;
@@ -49,16 +54,8 @@ public class AuthServiceImpl implements AuthService {
 	private JWTServiceImpl jwtServiceImpl;
 	private UserSecurityService userSecurityService;
 	private JWTFilter jwtFilter;
+	private RoleMapper roleMapper;
 	
-	public AuthServiceImpl(AuthenticationManager authManager, UserRepository userRepo, JWTServiceImpl jwtServiceImpl,
-			UserSecurityService userSecurityService, JWTFilter jwtFilter) {
-		super();
-		this.authManager = authManager;
-		this.userRepo = userRepo;
-		this.jwtServiceImpl = jwtServiceImpl;
-		this.userSecurityService = userSecurityService;
-		this.jwtFilter = jwtFilter;
-	}
 
 	
 	
@@ -93,12 +90,16 @@ public class AuthServiceImpl implements AuthService {
 			}
 			log.info("Action: verification_successful,  email: {}", userAuthRequest.getEmail());
 			userSecurityService.resetLoginAttempts(userAuthRequest.getEmail()); // resets the password if log in is successful. 
-			return jwtServiceImpl.generateJWTToken(userAuthRequest.getEmail());
+			/* Converting the roles to */
+			Set<String> roleSet = roleMapper.roleToStringSet(roles);
+			return jwtServiceImpl.generateJWTToken(userAuthRequest.getEmail(), roleSet );
  		}catch (BadCredentialsException e) {
  			userSecurityService.updateLoginAttempts(userAuthRequest);
  			throw new BadCredentialsException( "Error: wrong_Authentication/Credentials_Details, Email : " + userAuthRequest.getEmail() );
 		}	
 	}//ends method
+	
+	
 	
 	
 	

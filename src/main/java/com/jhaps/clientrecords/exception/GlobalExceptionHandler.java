@@ -21,6 +21,7 @@ import com.jhaps.clientrecords.apiResponse.ApiResponseBuilder;
 import com.jhaps.clientrecords.apiResponse.ApiResponseModel;
 import com.jhaps.clientrecords.enums.ResponseMessage;
 import com.jhaps.clientrecords.exception.client.ClientBinNotFoundException;
+import com.jhaps.clientrecords.exception.client.ClientDeleteException;
 import com.jhaps.clientrecords.exception.client.ClientLogNotFoundException;
 import com.jhaps.clientrecords.exception.client.ClientNotFoundException;
 import com.jhaps.clientrecords.exception.system.DuplicateDataException;
@@ -155,6 +156,12 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ApiResponseModel<String>> handleClientNotFoundException(ClientNotFoundException e){
 		log.error("Client Not Found Exception Occured : {} ",e.getMessage(), e);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.CLIENT_NOT_FOUND, HttpStatus.NOT_FOUND);
+	}
+	
+	@ExceptionHandler(ClientDeleteException.class)
+	public ResponseEntity<ApiResponseModel<String>> handleClientDeleteException(ClientDeleteException e){
+		log.error("Client Delete Exception Occured : {} ",e.getMessage(), e);
+		return apiResponseBuilder.buildApiResponse(ResponseMessage.CLIENT_DELETE_FAILED, HttpStatus.CONFLICT);
 	}
 	
 	

@@ -73,7 +73,9 @@ public class ImageController {
 		Pageable pageable = PageableUtils.createPageable(pageNumber, pageSize, sortBy, direction);
 		Page<Image> paginatedImages = imageService.getImagesOfCurrentUser(userId, pageable);
 		/* Mapping : Page<Image> to Page<ImageResponse> Dto .*/
+		/* In mapper utils i have added '/images/' in 'imageUrl' field as api-prefix for data access in front end*/
 		Page<ImageResponse> paginatedResponse = paginatedImages.map(imageMapper::toImageResponse);
+
 		PagedModel<EntityModel<ImageResponse>> pagedImageModel = pagedResourceAssemblerService.toPagedModel(paginatedResponse);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.IMAGE_OBTAINED, HttpStatus.OK, pagedImageModel);
 	}	

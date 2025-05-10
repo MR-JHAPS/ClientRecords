@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.jhaps.clientrecords.dto.request.ImageRequest;
+import com.jhaps.clientrecords.dto.request.user.UserImageUploadRequest;
 import com.jhaps.clientrecords.dto.response.ImageResponse;
 import com.jhaps.clientrecords.entity.system.Image;
 
@@ -32,7 +33,7 @@ public interface ImageService {
 	 *  Saves the default Image in image repository of that given user.
 	 * @param usedId is the id of the user that we want to save a new default image of.
 	 * */
-	Image saveDefaultProfileImageForGivenUser(int userId);
+//	Image saveDefaultProfileImageForGivenUser(int userId);
 /* ------------------------------------------- Image-CRUD --------------------------------------------*/
 	
 	/* 
@@ -47,7 +48,8 @@ public interface ImageService {
 	 *  Checks for Existing image for that user
 	 * If not found it will save new image in imageRepository.
 	 */
-	Image updateProfileImage(String imageName, int userId);
+//	Image updateProfileImage(String imageName, int userId);
+	Image updateProfileImage(UserImageUploadRequest request, int userId);
 	
 //	Image removeCustomProfileImageOfUser(int id);
 	

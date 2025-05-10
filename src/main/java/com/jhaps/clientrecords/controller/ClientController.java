@@ -1,5 +1,7 @@
 package com.jhaps.clientrecords.controller;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.EntityModel;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.jhaps.clientrecords.apiResponse.ApiResponseBuilder;
 import com.jhaps.clientrecords.apiResponse.ApiResponseModel;
+import com.jhaps.clientrecords.dto.request.BulkClientDeleteRequest;
 import com.jhaps.clientrecords.dto.request.ClientRequest;
 import com.jhaps.clientrecords.dto.response.ClientResponse;
 import com.jhaps.clientrecords.enums.ResponseMessage;
@@ -72,13 +75,13 @@ public class ClientController {
 	@Operation(summary = "get all clients")
 	@GetMapping
 	public ResponseEntity<ApiResponseModel<PagedModel<EntityModel<ClientResponse>>>> getAllClients(
-					@RequestParam(defaultValue = "0") int pageNumber,
-					@RequestParam(defaultValue = "10") int pageSize,
+					@RequestParam(defaultValue = "0") int page,
+					@RequestParam(defaultValue = "10") int size,
 					@RequestParam(required = false) String sortBy,
 					@RequestParam(required = false) String direction){
 			
 		
-		Pageable pageable =  PageableUtils.createPageable(pageNumber, pageSize, sortBy, direction);
+		Pageable pageable =  PageableUtils.createPageable(page, size, sortBy, direction);
 		
 		Page<ClientResponse> paginatedClients = clientService.findAllClients(pageable);
 		//converting the clientList To PagedClientList
@@ -86,10 +89,11 @@ public class ClientController {
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, pagedClientModel);
 	}
 	
+//	 @Positive(message = "Id must be a positive number")
 	
 	@Operation(summary = "get clients by id")
 	@GetMapping("/{id}")
-	public ResponseEntity<ApiResponseModel<ClientResponse>> getClientById( @PathVariable @Positive(message = "Id must be a positive number") int id){
+	public ResponseEntity<ApiResponseModel<ClientResponse>> getClientById( @PathVariable int id){
 		ClientResponse client = clientService.findClientById(id);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, client);
 	}
@@ -114,6 +118,20 @@ public class ClientController {
 			clientService.deleteClientById(userEmail, id);
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.NO_CONTENT);
 	}
+	
+	
+	@Operation(summary = "Delete Multiple clients by Client Id's List.")
+	@DeleteMapping
+	public ResponseEntity<ApiResponseModel<String>> deleteMultipleClientsById(
+			@RequestBody BulkClientDeleteRequest request,
+			@AuthenticationPrincipal UserDetails userDetails){
+			String userEmail = userDetails.getUsername();
+			List<Integer> clientIdList = request.getIdList();
+			clientService.deleteMultipleClientsById(userEmail, clientIdList);
+			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.NO_CONTENT);
+	}
+	
+	
 	
 	
 	@Operation(summary = "update client by id")

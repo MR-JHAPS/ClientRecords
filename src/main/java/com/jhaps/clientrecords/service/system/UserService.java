@@ -22,9 +22,11 @@ public interface UserService {
 	
 	void updateCurrentUser(int userId, UserUpdateRequest userUpdateInfo);
 	
-	void updateCurrentUserProfileImage(int id, UserImageUploadRequest request);
+//	void updateCurrentUserProfileImage(int id, UserImageUploadRequest request);
 	
-	void removeCurrentUserCustomProfileImage(int userId); 
+	String updateCurrentUserProfileImage(int id, UserImageUploadRequest request);
+	
+	void removeCurrentUserProfileImage(int userId); 
 	
 	
 }//ends interface.
