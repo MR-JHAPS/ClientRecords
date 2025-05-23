@@ -42,6 +42,17 @@ public class RoleController {
 		this.roleMapper = roleMapper;
 	}
 	
+//	@Operation(summary = "Get all roles")
+//	@GetMapping
+//	@PreAuthorize("hasAuthority('admin')")
+//	public ResponseEntity<ApiResponseModel<Set<RoleResponse>>> getAllRoles(){
+//		Set<Role> roles = roleService.findAllRoles();
+//		/* Mapping : Set<Role> to Set<RoleResponse>  */
+//		Set<RoleResponse> rolesResponse =  roles.stream().map(roleMapper::toRoleResponse).collect(Collectors.toSet());
+//		return apiResponseBuilder.buildApiResponse(ResponseMessage.ROLE_OBTAINED, HttpStatus.OK, rolesResponse);
+//	}
+	
+	
 	@Operation(summary = "Get all roles")
 	@GetMapping
 	@PreAuthorize("hasAuthority('admin')")
@@ -51,7 +62,6 @@ public class RoleController {
 		Set<RoleResponse> rolesResponse =  roles.stream().map(roleMapper::toRoleResponse).collect(Collectors.toSet());
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.ROLE_OBTAINED, HttpStatus.OK, rolesResponse);
 	}
-	
 	
 	@Operation(summary = "Save new role")
 	@PostMapping

@@ -47,7 +47,7 @@ public class CreateDefaultAdmin implements CommandLineRunner {
 		Set<String> roles = Set.of(RoleNames.ADMIN.getRole(), RoleNames.USER.getRole()); /* set of roles we want to set in User*/ 
 		Set<Role> rolesOnDb = roleService.findRoleByNames(roles); /* Validating the roles from Database/repository. */
 //		Image profileImage = imageRepo.findDefaultImage().orElseThrow( ()-> new ImageNotFoundException("Unable to find the default image."));
-		String adminEmail = "admin@gmail.com"; /* Default email for Admin*/
+		String adminEmail = "admin1@gmail.com"; /* Default email for Admin*/
 		
 		boolean emailExistsInDb = userRepo.existsByEmail(adminEmail);  /* Checking if the email Exists in the Database. */
 		

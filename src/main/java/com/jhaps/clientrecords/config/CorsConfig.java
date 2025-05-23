@@ -29,7 +29,8 @@ public class CorsConfig implements WebMvcConfigurer{
 	            .addMapping("/**") // apply to all endpoints
 	            .allowedOrigins(
 	                "http://localhost:4200",
-	                "https://playful-pony-0dfcda.netlify.app"
+	                "https://playful-pony-0dfcda.netlify.app",
+	                "https://nerazoli.netlify.app"	                
 	        )
 	            .allowedMethods("*") // GET, POST, PUT, DELETE, etc.
 	            .allowedHeaders("*")

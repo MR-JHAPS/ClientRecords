@@ -16,7 +16,19 @@ import lombok.NoArgsConstructor;
 @Data
 public class UserAdminResponse {
 
+//	private int id;
+//	
+//	private String email;
+//	
+//	private Set<String> roles;
+//	
+//	private LocalDateTime createdOn;
+//	
+//	private LocalDateTime updatedOn;
+	
 	private int id;
+	
+	private String profileImageUrl;
 	
 	private String email;
 	

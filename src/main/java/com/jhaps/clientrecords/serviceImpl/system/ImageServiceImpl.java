@@ -227,19 +227,25 @@ public class ImageServiceImpl implements ImageService{
 	public void deleteMultipleImagesById(List<Integer> imageIdList, int userId) {
 		log.info("Action: Deleting Multiple Images of Id's: {}", imageIdList);	
 		User currentUser = findUserById(userId);
-		int userProfileImageId = currentUser.getProfileImage().get().getId();
+			
 		
 		try{
-			for(Integer imageId : imageIdList) {
-				/* Checking if the id in imageIdList contains the userProfileImage ---> imageId. */
-					if(imageId.equals(userProfileImageId)) {
-						log.info("Selected Image {} is also a userProfile Image.", imageId);
-						currentUser.setProfileImage(null);
-						log.info("Setting the user profileImage as null");
-						userRepo.saveAndFlush(currentUser);
-						log.info("Saving the userProfile After setting image to null.");
-					}//ends-if
-			}//ends-for
+			/* Checking if the user has a profile Picture first.*/
+			if(currentUser.getProfileImage().isPresent()) {
+				int userProfileImageId = currentUser.getProfileImage().get().getId();
+			
+				for(Integer imageId : imageIdList) {
+					/* Checking if the id in imageIdList contains the userProfileImage ---> imageId. */
+						if(imageId.equals(userProfileImageId)) {
+							log.info("Selected Image {} is also a userProfile Image.", imageId);
+							currentUser.setProfileImage(null);
+							log.info("Setting the user profileImage as null");
+							userRepo.saveAndFlush(currentUser);
+							log.info("Saving the userProfile After setting image to null.");
+						}//ends-if
+				}//ends-for
+			
+			}//ends-if
 			
 		   /*
 			* Gets the ImagePublicIdPath from the ImageRepo using List<Integer> imageIds and userId. 

@@ -103,7 +103,7 @@ public class User extends BaseEntity{
 	           .orElse(""); // or return Optional<String>
 	}
 	
-	//to cheking if the imageUrl is null .
+	//to checking if the imageUrl is null .
 		public String getProfileImageUrl() {
 		    return getProfileImage()
 		           .map(Image::getUrl)

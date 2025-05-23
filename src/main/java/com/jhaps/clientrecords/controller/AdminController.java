@@ -24,6 +24,8 @@ import com.jhaps.clientrecords.apiResponse.ApiResponseModel;
 import com.jhaps.clientrecords.dto.request.RoleRequest;
 import com.jhaps.clientrecords.dto.request.user.AdminUpdateRequest;
 import com.jhaps.clientrecords.dto.response.user.UserAdminResponse;
+import com.jhaps.clientrecords.dto.response.user.UserGeneralResponse;
+import com.jhaps.clientrecords.entity.system.Image;
 import com.jhaps.clientrecords.entity.system.User;
 import com.jhaps.clientrecords.enums.ResponseMessage;
 import com.jhaps.clientrecords.security.model.CustomUserDetails;
@@ -60,6 +62,25 @@ public class AdminController {
 	}
 	
 	
+	
+	@Operation(summary = "Get authenticated admin's details")
+	@GetMapping("/me")
+	public ResponseEntity<ApiResponseModel<UserAdminResponse>> getUserSelf(@AuthenticationPrincipal CustomUserDetails userDetails) {
+		int userId = userDetails.getUser().getId();
+		User user = adminService.getCurrentAdmin(userId);
+		UserAdminResponse userAdminResponse = this.userMapper.toUserAdminResponse(user);
+
+	    // Use image URL if present, else use default image
+	    String imagePath = user.getProfileImage()
+	            .map(Image::getUrl)
+	            .orElse("defaultImage.png");
+	    userAdminResponse.setProfileImageUrl(imagePath);
+	    return apiResponseBuilder.buildApiResponse(
+	            ResponseMessage.SUCCESS,
+	            HttpStatus.OK,
+	            userAdminResponse
+	    );
+	}
 	
 	
 	@Operation(summary = "Get List Of All The Users (Paginated)")

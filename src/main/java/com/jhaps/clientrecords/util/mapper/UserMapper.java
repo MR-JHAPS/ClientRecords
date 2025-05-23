@@ -57,6 +57,7 @@ public class UserMapper {
 	public UserAdminResponse toUserAdminResponse(User user) {
 		UserAdminResponse dto = new UserAdminResponse();
 		dto.setId(user.getId());
+		dto.setProfileImageUrl(user.getProfileImageUrl());
 		dto.setEmail(user.getEmail());
 		dto.setCreatedOn(user.getCreatedOn());
 		dto.setUpdatedOn(user.getUpdatedOn());

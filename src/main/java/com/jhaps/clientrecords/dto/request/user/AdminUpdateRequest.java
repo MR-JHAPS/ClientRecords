@@ -41,12 +41,12 @@ public class AdminUpdateRequest {
 	private Set<String> roles;
 	
 	// Custom validation (called via @Valid)
-	public void validate() {
-		if (newPassword != null && !newPassword.equals(confirmPassword)) {
-            throw new IllegalArgumentException("New password and confirmation must match");
-        }
-	}
-	
+//	public void validate() {
+//		if (newPassword != null && !newPassword.equals(confirmPassword)) {
+//            throw new IllegalArgumentException("New password and confirmation must match");
+//        }
+//	}
+//	
 	
 	
 }

@@ -44,6 +44,14 @@ public class AdminServiceImpl implements AdminService{
 	private PasswordValidator passwordValidator;
 	
 	
+	@Override
+	public User getCurrentAdmin(int userId) {
+		return userRepo.findById(userId)
+				.orElseThrow(()-> 
+					new UserNotFoundException("unable to find the user"));
+	}
+	
+	
 	
 	@Override
 	public Page<User> findAllUsers(Pageable pageable) {
