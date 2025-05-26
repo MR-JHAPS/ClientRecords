@@ -26,7 +26,9 @@ import com.jhaps.clientrecords.exception.client.ClientLogNotFoundException;
 import com.jhaps.clientrecords.exception.client.ClientNotFoundException;
 import com.jhaps.clientrecords.exception.system.DuplicateDataException;
 import com.jhaps.clientrecords.exception.system.ImageDeletionException;
+import com.jhaps.clientrecords.exception.system.ImageException;
 import com.jhaps.clientrecords.exception.system.ImageNotFoundException;
+import com.jhaps.clientrecords.exception.system.PdfException;
 import com.jhaps.clientrecords.exception.system.RoleNotFoundException;
 import com.jhaps.clientrecords.exception.system.UnauthorizedCustomException;
 import com.jhaps.clientrecords.exception.system.UserNotFoundException;
@@ -216,6 +218,20 @@ public class GlobalExceptionHandler {
 			log.error("Image_Deletion_Exception Occured : {} ",e.getMessage(), e);
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.IMAGE_DELETION_FAILED, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+		
+		
+		@ExceptionHandler(PdfException.class)
+		public ResponseEntity<ApiResponseModel<String>> handlePdfException(PdfException e){
+			log.error("PdfException Occured : {} ",e.getMessage(), e);
+			return apiResponseBuilder.buildApiResponse(ResponseMessage.PDF_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+		@ExceptionHandler(ImageException.class)
+		public ResponseEntity<ApiResponseModel<String>> handleImageException(ImageException e){
+			log.error("ImageException Occured : {} ",e.getMessage(), e);
+			return apiResponseBuilder.buildApiResponse(ResponseMessage.IMAGE_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
 		
 		
 }//ends class

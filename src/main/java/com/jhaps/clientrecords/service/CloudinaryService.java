@@ -10,6 +10,8 @@ public interface CloudinaryService {
 	
 	Map<String, String> uploadFile(MultipartFile file, String folderName, String customFileName) ;
 	
+	Map<String, String> uploadPdf(MultipartFile pdfFile, String folderName, String customFileName);
+	
 	void deleteMultipleFiles(List<String> publicIdList);
 	
 	void deleteSingleFile(String publicId);

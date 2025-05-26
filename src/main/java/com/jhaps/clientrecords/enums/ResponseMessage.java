@@ -46,21 +46,27 @@ public enum ResponseMessage {
 	
 	CLIENT_BIN_DELETED("client is deleted from clientBin"),
 	
-	DATA_INTEGRITY_VIOLATION("DataIntegrityViolation")
+	DATA_INTEGRITY_VIOLATION("DataIntegrityViolation"),
+	
+	PDF_ERROR("Error while handling PDF FILE"),
+	
+	IMAGE_ERROR("Error while handling Image File")
 	;
 	
 	
 	
 	
 	
-	
+//	field
 	private final String message ;
 	
 	
+//	Constructor
 	ResponseMessage(String message){
 		this.message = message;
 	}
 	
+//	method
 	public String getMessage() {
 		return this.message;
 	}
