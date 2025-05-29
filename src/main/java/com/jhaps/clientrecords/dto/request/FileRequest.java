@@ -10,12 +10,12 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ImageRequest {
+public class FileRequest {
 
-	@NotBlank(message = "ImageRequest: imageName cannot be Empty")
-	private String imageName;
+	@NotBlank(message = "FileRequest: fileName cannot be Empty")
+	private String fileName;
 	
-	private MultipartFile imageFile;
+	private MultipartFile file;
 	
 	
 

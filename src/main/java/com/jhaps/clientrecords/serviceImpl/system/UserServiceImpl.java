@@ -2,6 +2,7 @@ package com.jhaps.clientrecords.serviceImpl.system;
 
 import java.io.File;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,13 +10,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.jhaps.clientrecords.dto.request.ImageRequest;
+import com.jhaps.clientrecords.dto.request.FileRequest;
 import com.jhaps.clientrecords.dto.request.user.UserRegisterRequest;
 import com.jhaps.clientrecords.dto.request.user.UserUpdateRequest;
 import com.jhaps.clientrecords.dto.request.user.UserImageUploadRequest;
-import com.jhaps.clientrecords.dto.response.ImageResponse;
+import com.jhaps.clientrecords.dto.response.FileResponse;
 import com.jhaps.clientrecords.dto.response.user.UserGeneralResponse;
-import com.jhaps.clientrecords.entity.system.Image;
+import com.jhaps.clientrecords.entity.system.UserFile;
 import com.jhaps.clientrecords.entity.system.Role;
 import com.jhaps.clientrecords.entity.system.User;
 import com.jhaps.clientrecords.enums.RoleNames;
@@ -25,11 +26,11 @@ import com.jhaps.clientrecords.repository.client.ClientRepository;
 import com.jhaps.clientrecords.repository.system.UserRepository;
 import com.jhaps.clientrecords.security.customAuth.PasswordValidator;
 import com.jhaps.clientrecords.service.client.ClientService;
-import com.jhaps.clientrecords.service.system.ImageService;
+import com.jhaps.clientrecords.service.system.FileService;
 import com.jhaps.clientrecords.service.system.RoleService;
 import com.jhaps.clientrecords.service.system.UserService;
-import com.jhaps.clientrecords.util.ImageFileManager;
-import com.jhaps.clientrecords.util.mapper.ImageMapper;
+import com.jhaps.clientrecords.util.CustomFileManager;
+import com.jhaps.clientrecords.util.mapper.FileMapper;
 import com.jhaps.clientrecords.util.mapper.UserMapper;
 
 import jakarta.transaction.Transactional;
@@ -46,9 +47,9 @@ public class UserServiceImpl implements UserService{
 	private PasswordEncoder passwordEncoder; //Bcrypt PasswordEncoder as configured in securityConfig
 	private UserMapper userMapper; 
 	private PasswordValidator passwordValidator; // handles password validation
-	private ImageService imageService;
+	private FileService fileService;
 	private ClientService clientService;
-	private ImageFileManager imageFileManager;
+	private CustomFileManager customFileManager;
 	
 	
 	
@@ -112,7 +113,7 @@ public class UserServiceImpl implements UserService{
 			 * @Args userId is the name of the Folder in the ImageDirectory.
 			 * All contents inside the userFolder including the userFolder will be deleted.
 			 */
-			imageFileManager.removeUserImageFolderFromStorage(userId);
+			customFileManager.removeUserImageFolderFromStorage(userId);
 			/* Delete the user once  */
 			userRepo.delete(user);
 			log.info("Action: user Deleted successfully");
@@ -147,50 +148,26 @@ public class UserServiceImpl implements UserService{
 	
 
 	@Override
-	public String updateCurrentUserProfileImage(int userId, UserImageUploadRequest request) {
+	public void updateCurrentUserProfileImage(int userId, UserImageUploadRequest request) {
 		User user = findUserById(userId);
 		log.info("Updating Profile Picture for user {}, imageName : {}", user.getEmail(), request.getImageName());
 		/* If image with this name "is-found" in DB then it returns that image.
 		 * If image "is-not-found" in DB it saves the image and returns that image.  
 		 */
-		Image updatedProfileImage = imageService.updateProfileImage(request, userId);
+		UserFile updatedProfileImage = fileService.updateProfileImage(request, userId);
+		log.info("Setting the profileImage to User now.");
 		user.setProfileImage(updatedProfileImage);
 		userRepo.save(user);
 		log.info("New profile Image {} of custom-name {} for user {} set Successfully.", 
 				request.getImageName(), updatedProfileImage.getStoredFileName(), user.getEmail());
-		return updatedProfileImage.getUrl();
 	}
-	
-	
-	
-//	@Override
-//	public void updateCurrentUserProfileImage(int userId, UserImageUploadRequest request) {
-//		User user = findUserById(userId);
-//		log.info("Updating Profile Picture for user {}, imageName : {}", user.getEmail(), request.getImageName());
-//		/* If image with this name "is-found" in DB then it returns that image.
-//		 * If image "is-not-found" in DB it saves the image and returns that image.  
-//		 */
-//		Image updatedProfileImage = imageService.updateProfileImage(request.getImageName(), userId);
-//		user.setProfileImage(updatedProfileImage);
-//		userRepo.save(user);
-//		log.info("New profile Image {} for user {} set Successfully.", request.getImageName(), user.getEmail());
-//	}
-
-	
-//	/* To remove the custom user profile image and set the default-profile-image. */
-//	@Override
-//	public void removeCurrentUserCustomProfileImage(int userId) {
-//		User user = findUserById(userId);
-//		Image defaultImage = imageService.saveDefaultProfileImageForGivenUser(userId);
-//		user.setProfileImage(defaultImage);
-//		userRepo.save(user);
-//	}
 	
 	
 	/* To remove the custom user profile image */
 	@Override
 	public void removeCurrentUserProfileImage(int userId) {
 		User user = findUserById(userId);
+//		Optional< UserFile> profileImage = user.getProfileImage();
 		/* Setting the userProfile Image to null. */
 		user.setProfileImage(null);
 		userRepo.save(user);
@@ -199,15 +176,7 @@ public class UserServiceImpl implements UserService{
 	
 	
 	
-	/* PRIVATE METHODS:*/
-	
-//	private User findUserByEmail(String email) {
-//		User user = userRepo.findByEmail(email).orElseThrow(()->
-//						 new UserNotFoundException("Unable to find the user with Email : " + email));
-//		log.info("Action: User with email: {} found in the database.", email);
-//		return user;					
-//	}
-	
+	/* PRIVATE METHODS:*/	
 	@Override
 	public User findUserById(int id) {
 		User user = userRepo.findById(id)
@@ -222,13 +191,7 @@ public class UserServiceImpl implements UserService{
 	}
 	
 	
-	
-	
-//	private void saveImageFile(File imageFile) {
-//		
-//		String path = "D:/"
-//		
-//	}
+
 
 	
 	

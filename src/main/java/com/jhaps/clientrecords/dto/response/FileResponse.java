@@ -9,13 +9,13 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ImageResponse {
+public class FileResponse {
 
 	private int id;
 	
-	private String imageName;
+	private String fileName;
 	
-	private String imageUrl;
+	private String fileUrl;
 	
 	private LocalDateTime uploadedAt;
 	

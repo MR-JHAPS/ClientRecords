@@ -29,7 +29,7 @@ import com.jhaps.clientrecords.apiResponse.ApiResponseModel;
 import com.jhaps.clientrecords.dto.request.user.UserUpdateRequest;
 import com.jhaps.clientrecords.dto.request.user.UserImageUploadRequest;
 import com.jhaps.clientrecords.dto.response.user.UserGeneralResponse;
-import com.jhaps.clientrecords.entity.system.Image;
+import com.jhaps.clientrecords.entity.system.UserFile;
 import com.jhaps.clientrecords.entity.system.User;
 import com.jhaps.clientrecords.enums.ResponseMessage;
 import com.jhaps.clientrecords.security.model.CustomUserDetails;
@@ -74,11 +74,6 @@ public class UserController {
 		User user = userService.getCurrentUser(userId);
 		UserGeneralResponse userGeneralResponse = this.userMapper.toUserGeneralResponse(user);
 
-	    // Use image URL if present, else use default image
-	    String imagePath = user.getProfileImage()
-	            .map(Image::getUrl)
-	            .orElse("defaultImage.png");
-	    userGeneralResponse.setImageUrl(imagePath);
 	    return apiResponseBuilder.buildApiResponse(
 	            ResponseMessage.SUCCESS,
 	            HttpStatus.OK,
@@ -120,11 +115,9 @@ public class UserController {
 	public ResponseEntity<ApiResponseModel<String>> uploadProfileImageOfCurrentUser(@ModelAttribute UserImageUploadRequest request ,
 					@AuthenticationPrincipal CustomUserDetails userDetails){
 		int userId = userDetails.getUser().getId();
-		String imageUrlEndpoint = userService.updateCurrentUserProfileImage(userId, request);
-		String fullUrl = ImageUploadPath.PATH.getPath() + File.separator + imageUrlEndpoint;
-		
+		userService.updateCurrentUserProfileImage(userId, request);		
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, 
-					fullUrl);
+					"Uploaded Successfully.");
 	}
 	
 	

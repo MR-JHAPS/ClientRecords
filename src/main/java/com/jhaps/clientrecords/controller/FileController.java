@@ -24,15 +24,15 @@ import org.springframework.web.bind.annotation.RestController;
 import com.jhaps.clientrecords.apiResponse.ApiResponseBuilder;
 import com.jhaps.clientrecords.apiResponse.ApiResponseModel;
 import com.jhaps.clientrecords.dto.request.BulkImageDeleteRequest;
-import com.jhaps.clientrecords.dto.request.ImageRequest;
-import com.jhaps.clientrecords.dto.response.ImageResponse;
-import com.jhaps.clientrecords.entity.system.Image;
+import com.jhaps.clientrecords.dto.request.FileRequest;
+import com.jhaps.clientrecords.dto.response.FileResponse;
+import com.jhaps.clientrecords.entity.system.UserFile;
 import com.jhaps.clientrecords.enums.ResponseMessage;
 import com.jhaps.clientrecords.security.model.CustomUserDetails;
-import com.jhaps.clientrecords.service.system.ImageService;
+import com.jhaps.clientrecords.service.system.FileService;
 import com.jhaps.clientrecords.service.system.PagedResourceAssemblerService;
 import com.jhaps.clientrecords.util.PageableUtils;
-import com.jhaps.clientrecords.util.mapper.ImageMapper;
+import com.jhaps.clientrecords.util.mapper.FileMapper;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -54,17 +54,17 @@ import lombok.AllArgsConstructor;
 @RequestMapping("/api/images")
 @Tag(name = "Image API's", description = "Insert, Delete, Get images of the User")
 @AllArgsConstructor
-public class ImageController {
+public class FileController {
 
-	private ImageService imageService;
+	private FileService fileService;
 	private ApiResponseBuilder apiResponseBuilder;
-	private PagedResourceAssemblerService<ImageResponse> pagedResourceAssemblerService;
-	private ImageMapper imageMapper;
+	private PagedResourceAssemblerService<FileResponse> pagedResourceAssemblerService;
+	private FileMapper fileMapper;
 	
 	
 	@GetMapping("/me")
 	@Operation(summary = "Get All Images(Paginated) of logged in user.")
-	public ResponseEntity<ApiResponseModel<PagedModel<EntityModel<ImageResponse>>>> getImagesOfActiveUser(
+	public ResponseEntity<ApiResponseModel<PagedModel<EntityModel<FileResponse>>>> getImagesOfActiveUser(
 						@RequestParam(defaultValue="0") int pageNumber,
 						@RequestParam(defaultValue="10") int pageSize,
 						@RequestParam(required = false) String sortBy,
@@ -72,13 +72,11 @@ public class ImageController {
 						@AuthenticationPrincipal CustomUserDetails userDetails){
 		int userId = userDetails.getUserId();
 		Pageable pageable = PageableUtils.createPageable(pageNumber, pageSize, sortBy, direction);
-		Page<Image> paginatedImages = imageService.getImagesOfCurrentUser(userId, pageable);
-		/* Mapping : Page<Image> to Page<ImageResponse> Dto .*/
-		/* In mapper utils i have added '/images/' in 'imageUrl' field as api-prefix for data access in front end*/
-		Page<ImageResponse> paginatedResponse = paginatedImages.map(imageMapper::toImageResponse);
 
-		PagedModel<EntityModel<ImageResponse>> pagedImageModel = pagedResourceAssemblerService.toPagedModel(paginatedResponse);
-		return apiResponseBuilder.buildApiResponse(ResponseMessage.IMAGE_OBTAINED, HttpStatus.OK, pagedImageModel);
+		Page<FileResponse> paginatedResponse = fileService.getFilesOfCurrentUser(userId, pageable);
+
+		PagedModel<EntityModel<FileResponse>> pagedImageModel = pagedResourceAssemblerService.toPagedModel(paginatedResponse);
+		return apiResponseBuilder.buildApiResponse(ResponseMessage.FILE_OBTAINED, HttpStatus.OK, pagedImageModel);
 	}	
 
 	
@@ -88,23 +86,22 @@ public class ImageController {
 	@Operation(summary = "Get Image by Id.",
 	description = "This allows the users who have uploaded multiple images to select and view each images individually.")
 	@PreAuthorize("@imageRepository.existsByIdAndUserId(#imageId, #userDetails.userId) or hasAuthority('admin')")
-	public ResponseEntity<ApiResponseModel<ImageResponse>> getImageById(@PathVariable int imageId, @AuthenticationPrincipal CustomUserDetails userDetails){
+	public ResponseEntity<ApiResponseModel<FileResponse>> getImageById(@PathVariable int imageId, @AuthenticationPrincipal CustomUserDetails userDetails){
 		int userId = userDetails.getUserId();
-		Image image = imageService.getImageById(imageId, userId);
-		/* Mapping : Image to ImageResponse Dto .*/
-		ImageResponse imageResponse = imageMapper.toImageResponse(image);
-		return apiResponseBuilder.buildApiResponse(ResponseMessage.IMAGE_SAVED, HttpStatus.OK, imageResponse);									
+		
+		FileResponse fileResponse = fileService.getFileById(imageId, userId);
+		return apiResponseBuilder.buildApiResponse(ResponseMessage.FILE_SAVED, HttpStatus.OK, fileResponse);									
 	}
 	
 	
 	@PostMapping
 	@Operation(summary = "Upload new Image")
-	public ResponseEntity<ApiResponseModel<String>> saveImage(@ModelAttribute ImageRequest request,
+	public ResponseEntity<ApiResponseModel<String>> saveFile(@ModelAttribute FileRequest request,
 			@AuthenticationPrincipal CustomUserDetails userDetails){
 		int userId = userDetails.getUserId();
-		imageService.saveImage(userId, request);
-		return apiResponseBuilder.buildApiResponse(ResponseMessage.IMAGE_SAVED, HttpStatus.OK,
-						"Image: " + request.getImageName() + " saved successfully");
+		fileService.saveFile(userId, request);
+		return apiResponseBuilder.buildApiResponse(ResponseMessage.FILE_SAVED, HttpStatus.OK,
+						"Image: " + request.getFileName() + " saved successfully");
 	}
 
 	
@@ -112,21 +109,21 @@ public class ImageController {
 	@PreAuthorize("@imageRepository.existsByIdAndUserId(#imageId, #userDetails.userId)")
 	@DeleteMapping("/{imageId}")
 	@Operation(summary = "Delete user's image(single)")
-	public ResponseEntity<?> deleteImageById(@PathVariable int imageId,
+	public ResponseEntity<?> deleteImageById(@PathVariable int fileId,
 											@AuthenticationPrincipal CustomUserDetails userDetails){
 		int userId = userDetails.getUser().getId();
-		imageService.deleteImageById(imageId, userId);
+		fileService.deleteFileById(fileId, userId);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 	
-	/* Deletes the multiple-selected Images by id */
+	/* Deletes the multiple-selected Files by id */
 	@DeleteMapping
-	@Operation(summary = "Delete multiple Images by ID's")
+	@Operation(summary = "Delete multiple Files by ID's")
 	public ResponseEntity<?> deleteMultipleImagesById(@RequestBody BulkImageDeleteRequest request,
 			@AuthenticationPrincipal CustomUserDetails userDetails){
 		int userId = userDetails.getUserId();
-		List<Integer> imageIdList = request.getIdList();
-		imageService.deleteMultipleImagesById(imageIdList, userId);
+		List<Integer> fileIdList = request.getIdList();
+		fileService.deleteMultipleFilesById(fileIdList, userId);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 	

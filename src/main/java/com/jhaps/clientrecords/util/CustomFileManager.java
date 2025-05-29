@@ -29,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
-public class ImageFileManager {
+public class CustomFileManager {
 
 	
 	/* Generates the Custom file name using given @Param. */

@@ -25,10 +25,9 @@ import com.jhaps.clientrecords.exception.client.ClientDeleteException;
 import com.jhaps.clientrecords.exception.client.ClientLogNotFoundException;
 import com.jhaps.clientrecords.exception.client.ClientNotFoundException;
 import com.jhaps.clientrecords.exception.system.DuplicateDataException;
-import com.jhaps.clientrecords.exception.system.ImageDeletionException;
-import com.jhaps.clientrecords.exception.system.ImageException;
-import com.jhaps.clientrecords.exception.system.ImageNotFoundException;
-import com.jhaps.clientrecords.exception.system.PdfException;
+import com.jhaps.clientrecords.exception.system.FileDeletionException;
+import com.jhaps.clientrecords.exception.system.FileException;
+import com.jhaps.clientrecords.exception.system.FileNotFoundException;
 import com.jhaps.clientrecords.exception.system.RoleNotFoundException;
 import com.jhaps.clientrecords.exception.system.UnauthorizedCustomException;
 import com.jhaps.clientrecords.exception.system.UserNotFoundException;
@@ -183,10 +182,10 @@ public class GlobalExceptionHandler {
 	
 	
 	//This is for the case the Image is not found in the Database.
-	@ExceptionHandler(ImageNotFoundException.class)
-	public ResponseEntity<ApiResponseModel<String>> handleImageNotFoundException(ImageNotFoundException e){
+	@ExceptionHandler(FileNotFoundException.class)
+	public ResponseEntity<ApiResponseModel<String>> handleImageNotFoundException(FileNotFoundException e){
 		log.error("Image Not Found Exception Occured : {} ",e.getMessage(), e);
-		return apiResponseBuilder.buildApiResponse(ResponseMessage.INVALID_IMAGE, HttpStatus.NOT_FOUND);
+		return apiResponseBuilder.buildApiResponse(ResponseMessage.INVALID_FILE, HttpStatus.NOT_FOUND);
 	}
 	
 	
@@ -213,23 +212,18 @@ public class GlobalExceptionHandler {
 		}
 		
 		
-		@ExceptionHandler(ImageDeletionException.class)
-		public ResponseEntity<ApiResponseModel<String>> handleImageDeletionException(ImageDeletionException e){
+		@ExceptionHandler(FileDeletionException.class)
+		public ResponseEntity<ApiResponseModel<String>> handleImageDeletionException(FileDeletionException e){
 			log.error("Image_Deletion_Exception Occured : {} ",e.getMessage(), e);
-			return apiResponseBuilder.buildApiResponse(ResponseMessage.IMAGE_DELETION_FAILED, HttpStatus.INTERNAL_SERVER_ERROR);
+			return apiResponseBuilder.buildApiResponse(ResponseMessage.FILE_DELETION_FAILED, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
 		
-		@ExceptionHandler(PdfException.class)
-		public ResponseEntity<ApiResponseModel<String>> handlePdfException(PdfException e){
-			log.error("PdfException Occured : {} ",e.getMessage(), e);
-			return apiResponseBuilder.buildApiResponse(ResponseMessage.PDF_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
 		
-		@ExceptionHandler(ImageException.class)
-		public ResponseEntity<ApiResponseModel<String>> handleImageException(ImageException e){
+		@ExceptionHandler(FileException.class)
+		public ResponseEntity<ApiResponseModel<String>> handleImageException(FileException e){
 			log.error("ImageException Occured : {} ",e.getMessage(), e);
-			return apiResponseBuilder.buildApiResponse(ResponseMessage.IMAGE_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
+			return apiResponseBuilder.buildApiResponse(ResponseMessage.FILE_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
 		

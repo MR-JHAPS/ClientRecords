@@ -24,7 +24,7 @@ public interface UserService {
 	
 //	void updateCurrentUserProfileImage(int id, UserImageUploadRequest request);
 	
-	String updateCurrentUserProfileImage(int id, UserImageUploadRequest request);
+	void updateCurrentUserProfileImage(int id, UserImageUploadRequest request);
 	
 	void removeCurrentUserProfileImage(int userId); 
 	

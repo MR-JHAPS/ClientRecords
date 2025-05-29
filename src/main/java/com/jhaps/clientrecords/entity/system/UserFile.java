@@ -23,13 +23,13 @@ import lombok.ToString;
 
 @Entity
 /*
- *	Multiple users can have sameImage name.
- *			 Example:  user1 and user2 both may have image called "default.png".
- *	But single user cannot have 2 images with same name. 
- *			Example: user1 cannot have 2 images  with the name "default.png".
+ *	Multiple users can have sameFile name.
+ *			 Example:  user1 and user2 both may have file called "default.png".
+ *	But single user cannot have 2 files with same name. 
+ *			Example: user1 cannot have 2 files  with the name "default.png".
  */
-@Table(name = "images",
-	uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "image_name"})
+@Table(name = "files",
+	uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "file_name"})
 )
 @Data 
 @ToString(exclude = "user")
@@ -37,23 +37,21 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Image {
+public class UserFile {
 
 	@Id 
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 
-	@Column(name = "image_name")
-	private String imageName;
+	@Column(name = "file_name")
+	private String fileName;
 	
 	@Column(name = "stored_file_name")
 	private String storedFileName;
 	
 	@Column(name = "content_type")
 	private String contentType;
-	
-	@Column(name = "url")
-	private String url;
+
 	
 	@Column(name = "uploadTime")
 	private LocalDateTime uploadTime;

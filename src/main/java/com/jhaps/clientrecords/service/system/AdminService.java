@@ -6,13 +6,14 @@ import org.springframework.data.domain.Pageable;
 import com.jhaps.clientrecords.dto.request.RoleRequest;
 import com.jhaps.clientrecords.dto.request.user.AdminUpdateRequest;
 import com.jhaps.clientrecords.dto.response.user.UserAdminResponse;
+import com.jhaps.clientrecords.dto.response.user.UserGeneralResponse;
 import com.jhaps.clientrecords.entity.system.User;
 
 public interface AdminService {
 	
 	
 	
-	Page<User> findAllUsers(Pageable pageable); /* Returns the users with roles and all details so that admin can view in dashboard*/
+	Page<UserAdminResponse> findAllUsers(Pageable pageable); /* Returns the users with roles and all details so that admin can view in dashboard*/
 	
 	User findUserWithRolesById(int id); /* Returns user with role for admin to view. */
 	
@@ -26,7 +27,9 @@ public interface AdminService {
 	
 	User searchUserByEmail(String email);
 	
-	User getCurrentAdmin(int userId);
+	UserAdminResponse getCurrentAdmin(int userId);
+	
+	User findUserById(int userId);
 
 
 	

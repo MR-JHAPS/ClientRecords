@@ -7,12 +7,12 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import com.jhaps.clientrecords.entity.system.Image;
+import com.jhaps.clientrecords.entity.system.UserFile;
 import com.jhaps.clientrecords.entity.system.Role;
 import com.jhaps.clientrecords.entity.system.User;
 import com.jhaps.clientrecords.enums.RoleNames;
-import com.jhaps.clientrecords.exception.system.ImageNotFoundException;
-import com.jhaps.clientrecords.repository.system.ImageRepository;
+import com.jhaps.clientrecords.exception.system.FileNotFoundException;
+import com.jhaps.clientrecords.repository.system.FileRepository;
 import com.jhaps.clientrecords.repository.system.UserRepository;
 import com.jhaps.clientrecords.service.system.RoleService;
 
@@ -33,7 +33,7 @@ public class CreateDefaultAdmin implements CommandLineRunner {
 	@Autowired
 	private RoleService roleService;
 	@Autowired
-	private ImageRepository imageRepo;
+	private FileRepository imageRepo;
 	
 	@Autowired
 	private PasswordEncoder passwordEncoder;	

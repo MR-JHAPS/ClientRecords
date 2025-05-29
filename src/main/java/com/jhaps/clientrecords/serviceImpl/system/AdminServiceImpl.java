@@ -1,9 +1,11 @@
 package com.jhaps.clientrecords.serviceImpl.system;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,6 +16,7 @@ import org.springframework.util.StringUtils;
 import com.jhaps.clientrecords.dto.request.RoleRequest;
 import com.jhaps.clientrecords.dto.request.user.AdminUpdateRequest;
 import com.jhaps.clientrecords.dto.response.user.UserAdminResponse;
+import com.jhaps.clientrecords.dto.response.user.UserGeneralResponse;
 import com.jhaps.clientrecords.entity.system.Role;
 import com.jhaps.clientrecords.entity.system.User;
 import com.jhaps.clientrecords.enums.RoleNames;
@@ -21,6 +24,7 @@ import com.jhaps.clientrecords.exception.system.RoleNotFoundException;
 import com.jhaps.clientrecords.exception.system.UserNotFoundException;
 import com.jhaps.clientrecords.repository.system.UserRepository;
 import com.jhaps.clientrecords.security.customAuth.PasswordValidator;
+import com.jhaps.clientrecords.service.CloudinaryService;
 import com.jhaps.clientrecords.service.system.AdminService;
 import com.jhaps.clientrecords.service.system.RoleService;
 import com.jhaps.clientrecords.service.system.UserService;
@@ -42,26 +46,68 @@ public class AdminServiceImpl implements AdminService{
 	private UserService userService;
 	private PasswordEncoder passwordEncoder;
 	private PasswordValidator passwordValidator;
+	private CloudinaryService cloudinaryService;
 	
 	
 	@Override
-	public User getCurrentAdmin(int userId) {
-		return userRepo.findById(userId)
-				.orElseThrow(()-> 
-					new UserNotFoundException("unable to find the user"));
+	public UserAdminResponse getCurrentAdmin(int userId) {
+		User user = findUserById(userId);
+		UserAdminResponse response = userMapper.toUserAdminResponse(user);
+		 user.getProfileImage().ifPresent((image)-> {
+			 String imageUrl = cloudinaryService.getSignedUrl(user.getId(), image.getStoredFileName());
+			 response.setProfileImageUrl(imageUrl);
+		 });
+		 return response;
 	}
 	
 	
 	
 	@Override
-	public Page<User> findAllUsers(Pageable pageable) {
+	public Page<UserAdminResponse> findAllUsers(Pageable pageable) {
 		Page<User> userList = userRepo.findAll(pageable);
 		if(userList.getContent().isEmpty()) {
 			throw new UserNotFoundException("No users Found in the Database");
 		}
 		log.info("Finding All Users is Executed Successfully. and fetched :{} clients", userList.getNumberOfElements());
-		return userList;
+		
+		/**
+		 * getting the signed profileImage url of all the user from cloudinaryService.
+		 */
+		List<UserAdminResponse> responseList = userList.stream()
+					.map((user)->{
+						String imageUrl = cloudinaryService.getSignedUrl(user.getId(), user.getProfileStoredImageName());
+						UserAdminResponse response = userMapper.toUserAdminResponse(user);
+						response.setProfileImageUrl(imageUrl);
+						return response;
+					})
+					.collect(Collectors.toList());
+		//		converting List<UserAdminResponse> to Page<UserAdminResponse>
+		return new PageImpl<UserAdminResponse>(responseList, pageable, userList.getTotalElements());
 	}
+	
+	
+	
+	
+	
+//	@Override
+//	public Page<User> findAllUsers(Pageable pageable) {
+//		Page<User> userList = userRepo.findAll(pageable);
+//		if(userList.getContent().isEmpty()) {
+//			throw new UserNotFoundException("No users Found in the Database");
+//		}
+//		log.info("Finding All Users is Executed Successfully. and fetched :{} clients", userList.getNumberOfElements());
+//		
+//		/**
+//		 * getting the url of 
+//		 * */
+//		
+//		
+//		
+//		
+//		
+//		
+//		return userList;
+//	}
 	
 	
 	/* Returns "UserAdminDto" this contains userRoles to view in admin-Dashboard */
@@ -147,5 +193,12 @@ public class AdminServiceImpl implements AdminService{
 	}
 		
 		
+	@Override
+	public User findUserById(int userId) {
+		return userRepo.findById(userId)
+				.orElseThrow(()-> 
+					new UserNotFoundException("unable to find the user"));
+	}
+	
 	
 }// ends class.

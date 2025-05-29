@@ -25,7 +25,7 @@ import com.jhaps.clientrecords.dto.request.RoleRequest;
 import com.jhaps.clientrecords.dto.request.user.AdminUpdateRequest;
 import com.jhaps.clientrecords.dto.response.user.UserAdminResponse;
 import com.jhaps.clientrecords.dto.response.user.UserGeneralResponse;
-import com.jhaps.clientrecords.entity.system.Image;
+import com.jhaps.clientrecords.entity.system.UserFile;
 import com.jhaps.clientrecords.entity.system.User;
 import com.jhaps.clientrecords.enums.ResponseMessage;
 import com.jhaps.clientrecords.security.model.CustomUserDetails;
@@ -67,14 +67,7 @@ public class AdminController {
 	@GetMapping("/me")
 	public ResponseEntity<ApiResponseModel<UserAdminResponse>> getUserSelf(@AuthenticationPrincipal CustomUserDetails userDetails) {
 		int userId = userDetails.getUser().getId();
-		User user = adminService.getCurrentAdmin(userId);
-		UserAdminResponse userAdminResponse = this.userMapper.toUserAdminResponse(user);
-
-	    // Use image URL if present, else use default image
-	    String imagePath = user.getProfileImage()
-	            .map(Image::getUrl)
-	            .orElse("defaultImage.png");
-	    userAdminResponse.setProfileImageUrl(imagePath);
+		UserAdminResponse userAdminResponse = adminService.getCurrentAdmin(userId);
 	    return apiResponseBuilder.buildApiResponse(
 	            ResponseMessage.SUCCESS,
 	            HttpStatus.OK,
@@ -93,9 +86,8 @@ public class AdminController {
 								@RequestParam(required = false) String direction
 								){
 		Pageable pageable =  PageableUtils.createPageable(page, size, sortBy, direction);
-		Page<User> paginatedUsers = adminService.findAllUsers(pageable);
 		/* Mapping : Page<User> to Page<UserAdminResponse> */
-		Page<UserAdminResponse> paginatedResponse = paginatedUsers.map(userMapper::toUserAdminResponse);
+		Page<UserAdminResponse> paginatedResponse = adminService.findAllUsers(pageable);
 		PagedModel<EntityModel<UserAdminResponse>> pagedUserModel = pagedResourceAssemblerService.toPagedModel(paginatedResponse);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, pagedUserModel);
 	}

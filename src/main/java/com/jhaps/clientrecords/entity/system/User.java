@@ -1,18 +1,12 @@
 package com.jhaps.clientrecords.entity.system;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.jhaps.clientrecords.entity.BaseEntity;
 import com.jhaps.clientrecords.entity.client.Client;
-import com.jhaps.clientrecords.entity.client.ClientLog;
-
 import io.micrometer.common.lang.Nullable;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -63,13 +57,13 @@ public class User extends BaseEntity{
 	@OneToOne
 	@JoinColumn(name = "profile_image_id", nullable= true)
 	@Nullable
-	private Image profileImage ; // this field is for the profile image
+	private UserFile profileImage ; // this field is for the profile image
 	
 	@OneToMany(mappedBy = "user", 
 				cascade = CascadeType.ALL,
 				orphanRemoval = true,
 				fetch = FetchType.LAZY )
-	private List<Image> images;
+	private List<UserFile> userFiles;
 	
 	@OneToMany(mappedBy = "user")
 	private List<Client> clientList;
@@ -91,7 +85,7 @@ public class User extends BaseEntity{
 	}
 	
 	
-	public Optional<Image> getProfileImage() {
+	public Optional<UserFile> getProfileImage() {
 		return Optional.ofNullable(this.profileImage);
 	}
 	
@@ -99,16 +93,17 @@ public class User extends BaseEntity{
 	//to cheking if the imageName is null .
 	public String getProfileImageName() {
 	    return getProfileImage()
-	           .map(Image::getImageName)
+	           .map(UserFile::getFileName)
 	           .orElse(""); // or return Optional<String>
 	}
 	
-	//to checking if the imageUrl is null .
-		public String getProfileImageUrl() {
+	//to cheking if the StoredimageName is null .
+		public String getProfileStoredImageName() {
 		    return getProfileImage()
-		           .map(Image::getUrl)
+		           .map(UserFile::getStoredFileName)
 		           .orElse(""); // or return Optional<String>
 		}
+
 	
 	
 }//ends class

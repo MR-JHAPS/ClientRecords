@@ -6,25 +6,25 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import com.jhaps.clientrecords.dto.request.ImageRequest;
+import com.jhaps.clientrecords.dto.request.FileRequest;
 import com.jhaps.clientrecords.dto.request.user.UserImageUploadRequest;
-import com.jhaps.clientrecords.dto.response.ImageResponse;
-import com.jhaps.clientrecords.entity.system.Image;
+import com.jhaps.clientrecords.dto.response.FileResponse;
+import com.jhaps.clientrecords.entity.system.UserFile;
 
-public interface ImageService {
+public interface FileService {
 
 /* ------------------------------------------- User-Image-CRUD --------------------------------------------*/	
 	
 	/*
 	 * Get All images of current-user.
 	 */
-	Page<Image> getImagesOfCurrentUser(int userId, Pageable pageable);	
+	Page<FileResponse> getFilesOfCurrentUser(int userId, Pageable pageable);	
 	
 	
 	/* 
 	 * Upload/save New Image 
 	 */
-	Image saveImage(int userId , ImageRequest request);
+	UserFile saveFile(int userId , FileRequest request);
 	
 	
 	/*
@@ -40,7 +40,7 @@ public interface ImageService {
 	 * Get image by Image_id.
 	 * This is selecting specific image from image gallery. 
 	 */
-	Image getImageById(int imageId, int userId); 
+	FileResponse getFileById(int imageId, int userId); 
 	
 	
 	
@@ -49,21 +49,21 @@ public interface ImageService {
 	 * If not found it will save new image in imageRepository.
 	 */
 //	Image updateProfileImage(String imageName, int userId);
-	Image updateProfileImage(UserImageUploadRequest request, int userId);
+	UserFile updateProfileImage(UserImageUploadRequest request, int userId);
 	
 //	Image removeCustomProfileImageOfUser(int id);
 	
 	
 	/* Delete single-image of current-user by image-id. */
-	void deleteImageById(int imageId, int userId);
+	void deleteFileById(int imageId, int userId);
 	
 	/* Delete multiple-images of current-user by list of image-id's. */
-	void deleteMultipleImagesById(List<Integer> imageIdList, int userId);
+	void deleteMultipleFilesById(List<Integer> imageIdList, int userId);
 	
 	/* Deletes all images of given user. 
 	 * @param userId is the given user. 
 	 */
-	void deleteAllImagesOfGivenUser(int userId);
+	void deleteAllFilesOfGivenUser(int userId);
 	
 
 	

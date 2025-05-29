@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
-import com.jhaps.clientrecords.dto.request.ImageRequest;
+import com.jhaps.clientrecords.dto.request.FileRequest;
 import com.jhaps.clientrecords.dto.request.user.UserAuthRequest;
 import com.jhaps.clientrecords.dto.request.user.UserRegisterRequest;
 import com.jhaps.clientrecords.dto.request.user.UserImageUploadRequest;
@@ -46,7 +46,6 @@ public class UserMapper {
 	public UserGeneralResponse toUserGeneralResponse(User user) {
 		UserGeneralResponse dto = new UserGeneralResponse();
 		dto.setId(user.getId());
-		dto.setImageUrl(user.getProfileImageUrl());
 		dto.setEmail(user.getEmail());
 		dto.setCreatedOn(user.getCreatedOn());
 		dto.setUpdatedOn(user.getUpdatedOn());
@@ -57,7 +56,6 @@ public class UserMapper {
 	public UserAdminResponse toUserAdminResponse(User user) {
 		UserAdminResponse dto = new UserAdminResponse();
 		dto.setId(user.getId());
-		dto.setProfileImageUrl(user.getProfileImageUrl());
 		dto.setEmail(user.getEmail());
 		dto.setCreatedOn(user.getCreatedOn());
 		dto.setUpdatedOn(user.getUpdatedOn());
@@ -77,13 +75,13 @@ public class UserMapper {
 /*----------------------FOR PROFILE PICTURE-------------------------------------------------------------*/
 	
 	/* For profilePicture update of User we need to convert :
-	 * 	UserUpdateProfile To ImageRequest 
+	 * 	UserUpdateProfile To FileRequest 
 	 */
 	
-	public ImageRequest toImageRequestFromUserUpdateImage(UserImageUploadRequest userImageUploadRequest) {
-		ImageRequest imageRequest = new ImageRequest();
-		imageRequest.setImageName(userImageUploadRequest.getImageName());
-		return imageRequest;
+	public FileRequest toImageRequestFromUserUpdateImage(UserImageUploadRequest userImageUploadRequest) {
+		FileRequest fileRequest = new FileRequest();
+		fileRequest.setFileName(userImageUploadRequest.getImageName());
+		return fileRequest;
 	}
 	
 	
