@@ -117,11 +117,13 @@ public class AuthServiceImpl implements AuthService {
 	
 	
 	private LoginResponse generateLoginResponse(UserAuthRequest userAuthRequest) {
+		
 		Set<String> roleSet = getUserRoles(userAuthRequest);
 		User user = validateUserEmail(userAuthRequest.getEmail());
+		boolean isEmailVerified = user.isEmailVerified();
 		String jwtToken = jwtService.generateJWTToken(userAuthRequest.getEmail(), roleSet ); //15 min valid.
 		String refreshToken = jwtService.generateRefreshToken(userAuthRequest.getEmail(), roleSet); // 12 hours valid
-		boolean isEmailVerified = user.isEmailVerified();
+//		boolean isEmailVerified = user.isEmailVerified();
 	
 		LoginResponse loginResponse = new LoginResponse()
 										.builder()
@@ -144,6 +146,7 @@ public class AuthServiceImpl implements AuthService {
 		Set<String> roleSet = roleMapper.roleToStringSet(roles);
 		return roleSet;
 	}
+	
 	
 	
 	

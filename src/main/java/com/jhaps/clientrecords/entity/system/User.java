@@ -80,8 +80,8 @@ public class User extends BaseEntity{
 	/**
 	 * This is for the registration status of the user.
 	 */
-	@Column(name = "is_email_verified")
-	private boolean isEmailVerified;
+	@Column(name = "is_email_verified", nullable = false)
+	private boolean isEmailVerified = false;
 	
 	@Column(name = "verification_code", nullable = true)
 	private String verificationCode;
