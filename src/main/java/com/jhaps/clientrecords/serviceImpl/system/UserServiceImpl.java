@@ -86,6 +86,8 @@ public class UserServiceImpl implements UserService{
 		user.setRoles(new HashSet<>(Set.of(defaultRole)) );	/* The Role in User is of type Set<Role> setting the default value as new HashSet<>(set.of('user')) */
 		
 		user.setAccountLocked(false);
+		user.setVerificationCode(null);
+		user.setEmailVerified(false);
 		user.setAttempts(0);
 		// saving user without profile image
 		saveUser(user);	

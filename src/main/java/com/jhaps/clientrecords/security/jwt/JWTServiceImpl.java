@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
-public class JWTServiceImpl {
+public class JWTServiceImpl implements JWTService {
 
 	/*
 	 *  @value Jwt-secret-key injected from application.properties.
@@ -41,6 +41,7 @@ public class JWTServiceImpl {
 	}
 	
 	
+	@Override
 	public String generateJWTToken(String email, Set<String> roles) {
 		Map<String, Object> claims = new HashMap<>();
 		claims.put("role", roles);
@@ -49,7 +50,23 @@ public class JWTServiceImpl {
 				.add(claims)
 				.subject(email)	
 				.issuedAt(new Date(System.currentTimeMillis()))
-				.expiration(new Date(System.currentTimeMillis() + 1000 * 60 *60)) // token valid for 60 minutes.
+				.expiration(new Date(System.currentTimeMillis() + 1000 * 60 *15)) // token valid for 15 minutes.
+				.and()
+				.signWith(generateKeyForTokenSignature())
+				.compact();
+	}
+	
+	
+	@Override
+	public String generateRefreshToken(String email, Set<String> roles) {
+		Map<String, Object> claims = new HashMap<>();
+		claims.put("role", roles);
+		return Jwts.builder()
+				.claims()
+				.add(claims)
+				.subject(email)	
+				.issuedAt(new Date(System.currentTimeMillis()))
+				.expiration(new Date(System.currentTimeMillis() + 1000 * 60 *60 * 12)) // token valid for 12 hours.
 				.and()
 				.signWith(generateKeyForTokenSignature())
 				.compact();

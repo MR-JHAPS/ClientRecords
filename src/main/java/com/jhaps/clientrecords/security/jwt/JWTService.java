@@ -1,6 +1,7 @@
 package com.jhaps.clientrecords.security.jwt;
 
 import java.util.Date;
+import java.util.Set;
 import java.util.function.Function;
 
 import javax.crypto.SecretKey;
@@ -13,16 +14,17 @@ public interface JWTService {
 
 	
 	
-	/*	@return a "SecretKey" type key generated using "final String value"
-	 *  		that is stored in "application.properties".
-	 *  
-	 *	@use to generate a JWTToken.
-	 */
-	SecretKey generateKeyForTokenSignature(); 
+
 	
 	
 	/*	@return a "String" type JWTToken */
-	String generateJWTToken(String email);
+	String generateJWTToken(String email, Set<String> roles);
+	
+	
+	/**
+	 * @returns : refreshToken with longer validity.
+	 */
+	String generateRefreshToken(String email, Set<String> roles);
 	
 	
 	/* Extracts claims from the token */

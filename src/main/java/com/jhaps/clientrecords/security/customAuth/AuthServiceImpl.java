@@ -3,6 +3,8 @@ package com.jhaps.clientrecords.security.customAuth;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -19,11 +21,14 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpClientErrorException.Unauthorized;
 
 import com.jhaps.clientrecords.dto.request.user.UserAuthRequest;
+import com.jhaps.clientrecords.dto.response.LoginResponse;
 import com.jhaps.clientrecords.entity.system.User;
+import com.jhaps.clientrecords.exception.system.CustomBadCredentialsException;
 import com.jhaps.clientrecords.exception.system.UnauthorizedCustomException;
 import com.jhaps.clientrecords.exception.system.UserNotFoundException;
 import com.jhaps.clientrecords.repository.system.UserRepository;
 import com.jhaps.clientrecords.security.jwt.JWTFilter;
+import com.jhaps.clientrecords.security.jwt.JWTService;
 import com.jhaps.clientrecords.security.jwt.JWTServiceImpl;
 import com.jhaps.clientrecords.util.mapper.RoleMapper;
 
@@ -51,18 +56,36 @@ public class AuthServiceImpl implements AuthService {
 
 	private AuthenticationManager authManager;
 	private UserRepository userRepo;
-	private JWTServiceImpl jwtServiceImpl;
+	private JWTService jwtService;
 	private UserSecurityService userSecurityService;
 	private JWTFilter jwtFilter;
 	private RoleMapper roleMapper;
 	
-
 	
 	
-	/* In verifyUser(UserDto userDto) :
-	 * 	 try-Catch block if the authentication is not successful it will catch the exception/error 
-	 * 	 and update the wrongPasswordAttempts of that user.
+	
+	
+	/**
+	 * This method is used to validate the current token. 
+	 * Checks if the token is tampered or expired.
+	 * @returns : "boolean" status of the token.
+	 */
+	@Override
+	public boolean validateToken(String token, UserDetails userDetails) {
+		log.info("Proceeding the validation. Inside ValidateTokenService.");
+		boolean isTokenValid = jwtService.validateToken(token, userDetails);
+		
+		if(!isTokenValid) {
+			throw new AccessDeniedException("Your Token is not valid");
+		}
+		return true;
+	}
+	
+	
+	
+	/** In verifyUser(UserDto userDto) :
 	 * 
+	 * @return : JWT-Token, refreshToken as String and isEmailVerified as Boolean.
 	 *	 We cannot use :
 	 * 	 'if(!auth.isAuthenticated() ){...}'
 	 * 			-- because if(!auth.isAuthenticated()) will never be reached because the exception would be thrown first.
@@ -72,35 +95,66 @@ public class AuthServiceImpl implements AuthService {
 
 
 	@Override
-	public String verifyUser(UserAuthRequest userAuthRequest) {
+	public LoginResponse verifyUser(UserAuthRequest userAuthRequest) {
 		log.info("Action: verify_user_initiated, email: {}", userAuthRequest.getEmail());
-		User user =  userRepo.findByEmail(userAuthRequest.getEmail())
-						.orElseThrow(()-> {
-							log.error("Error: user_not_found, email: {}", userAuthRequest.getEmail());
-							throw new UserNotFoundException("User with Email " + userAuthRequest.getEmail() + " not found.");
-							});
 		
+		int totalPossibleAttempts = 3;
+		User user = validateUserEmail(userAuthRequest.getEmail());
 		try{
 			manageLockedAccount(user); /* All business logic that is related to locked account is handled by this method */
-			Authentication auth = authManager.authenticate(new UsernamePasswordAuthenticationToken(userAuthRequest.getEmail(), userAuthRequest.getPassword()));
-			
-			Collection<? extends GrantedAuthority> roles = auth.getAuthorities(); /* Getting the user roles/authorities from Authentication auth.*/
-			if(roles.isEmpty()) {													/* Checking if the user Role is Empty while logging in.*/
-				throw new AccessDeniedException(userAuthRequest.getEmail() + "Error: You don't have required role to login");
-			}
 			log.info("Action: verification_successful,  email: {}", userAuthRequest.getEmail());
 			userSecurityService.resetLoginAttempts(userAuthRequest.getEmail()); // resets the password if log in is successful. 
-			/* Converting the roles to */
-			Set<String> roleSet = roleMapper.roleToStringSet(roles);
-			return jwtServiceImpl.generateJWTToken(userAuthRequest.getEmail(), roleSet );
+			LoginResponse loginResponse = generateLoginResponse(userAuthRequest);
+			return loginResponse;
  		}catch (BadCredentialsException e) {
  			userSecurityService.updateLoginAttempts(userAuthRequest);
- 			throw new BadCredentialsException( "Error: wrong_Authentication/Credentials_Details, Email : " + userAuthRequest.getEmail() );
+ 			int remainingAttempts = totalPossibleAttempts - user.getAttempts();
+ 			throw new CustomBadCredentialsException( "Error: wrong_Authentication/Credentials_Details, Email : " + userAuthRequest.getEmail(),
+ 														remainingAttempts );
 		}	
 	}//ends method
 	
 	
 	
+	private LoginResponse generateLoginResponse(UserAuthRequest userAuthRequest) {
+		Set<String> roleSet = getUserRoles(userAuthRequest);
+		User user = validateUserEmail(userAuthRequest.getEmail());
+		String jwtToken = jwtService.generateJWTToken(userAuthRequest.getEmail(), roleSet ); //15 min valid.
+		String refreshToken = jwtService.generateRefreshToken(userAuthRequest.getEmail(), roleSet); // 12 hours valid
+		boolean isEmailVerified = user.isEmailVerified();
+	
+		LoginResponse loginResponse = new LoginResponse()
+										.builder()
+										.token(jwtToken)
+										.refreshToken(refreshToken)
+										.isEmailVerified(isEmailVerified)
+										.build();
+		return loginResponse;
+	}
+	
+	
+	
+	/* Converting the roles to Set of String*/
+	private Set<String> getUserRoles(UserAuthRequest request){
+		Authentication auth = authManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+		Collection<? extends GrantedAuthority> roles = auth.getAuthorities(); /* Getting the user roles/authorities from Authentication auth.*/
+		if(roles.isEmpty()) {													/* Checking if the user Role is Empty while logging in.*/
+			throw new AccessDeniedException(request.getEmail() + "Error: You don't have required role to login");
+		}
+		Set<String> roleSet = roleMapper.roleToStringSet(roles);
+		return roleSet;
+	}
+	
+	
+	
+	private User validateUserEmail( String email) {
+		User user =  userRepo.findByEmail(email)
+				.orElseThrow(()-> {
+					log.error("Error: user_not_found, email: {}", email);
+					throw new UserNotFoundException("User with Email " + email + " not found.");
+					});
+		return user;
+	}
 	
 	
 	
@@ -140,45 +194,35 @@ public class AuthServiceImpl implements AuthService {
 	}
 
 
+	
+	
+	
+	
 
 	
 /*------------------------------------LOG OUT USER------------------------------------------------------------------------------------*/
 	
-	// need to underStand this further.
-	
-	@Override
-	public String logOutUser(String authHeader, HttpServletRequest request, HttpServletResponse response, UserDetails userDetails) {
-		
-		if(authHeader==null || !authHeader.startsWith("Bearer ")) {
-			throw new UnauthorizedCustomException(" Your auth-Header is either null or doesn't start with 'Bearer '. ");
-		}
-		
-		
-		
-		String token = authHeader.substring(7);
-		
-		boolean isTokenExpired = jwtServiceImpl.isTokenExpired(token);
-		boolean isTokenValid = jwtServiceImpl.validateToken(token, userDetails);
-		
-		if(isTokenExpired || !isTokenValid) {
-			response.setHeader("Authorization", null);
-	
-		}
-		return null;
-	}
+			// need to underStand this further.
+//			@Override
+//			public String logOutUser(String authHeader, HttpServletRequest request, HttpServletResponse response, UserDetails userDetails) {
+//				if(authHeader==null || !authHeader.startsWith("Bearer ")) {
+//					throw new UnauthorizedCustomException(" Your auth-Header is either null or doesn't start with 'Bearer '. ");
+//				}
+//				String token = authHeader.substring(7);
+//				
+//				boolean isTokenExpired = jwtServiceImpl.isTokenExpired(token);
+//				boolean isTokenValid = jwtServiceImpl.validateToken(token, userDetails);
+//				
+//				if(isTokenExpired || !isTokenValid) {
+//					response.setHeader("Authorization", null);
+//				}
+//				return null;
+//			}
+/*----------------------------------------------------------------------------------------------------------------------*/
 
 
 
-	@Override
-	public boolean validateToken(String token, UserDetails userDetails) {
-		log.info("Proceeding the validation. Inside ValidateTokenService.");
-		boolean isTokenValid = jwtServiceImpl.validateToken(token, userDetails);
-		
-		if(!isTokenValid) {
-			throw new AccessDeniedException("Your Token is not valid");
-		}
-		return true;
-	}
+
 
 		
 		

@@ -41,7 +41,7 @@ public class User extends BaseEntity{
 	@Column(name="email", nullable = false, unique = true)
 	private String email;
 	
-	@Column(name="password") //nullable for oauth2 
+	@Column(name="password") //nullable for oauth2 but i have not implemented that yet.
 	private String password;
 	
 	@Column(name = "wrong_password_attempts", nullable = false )
@@ -80,11 +80,11 @@ public class User extends BaseEntity{
 	/**
 	 * This is for the registration status of the user.
 	 */
-	@Column(name = "is_registered")
-	private boolean isRegistered;
+	@Column(name = "is_email_verified")
+	private boolean isEmailVerified;
 	
-	@Column(name = "registration_code", nullable = true)
-	private int registrationCode;
+	@Column(name = "verification_code", nullable = true)
+	private String verificationCode;
 
 	
 	

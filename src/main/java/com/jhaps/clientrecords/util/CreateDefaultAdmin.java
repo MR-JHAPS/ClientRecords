@@ -63,6 +63,8 @@ public class CreateDefaultAdmin implements CommandLineRunner {
 			user.setRoles(rolesOnDb);
 			user.setAccountLocked(false);
 			user.setAttempts(0);
+			user.setEmailVerified(true);
+			user.setVerificationCode(null);
 			userRepo.save(user); /* saving the Admin information */
 			
 			

@@ -1,9 +1,11 @@
 package com.jhaps.clientrecords.security.customAuth;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.annotation.ObjectIdGenerators.UUIDGenerator;
 import com.jhaps.clientrecords.dto.request.user.UserAuthRequest;
 import com.jhaps.clientrecords.entity.system.User;
 import com.jhaps.clientrecords.exception.system.UserNotFoundException;
@@ -94,7 +96,6 @@ public class UserSecurityServiceImpl implements UserSecurityService{
 		user.setAccountLocked(true);
 		userService.saveUser(user);
 	}
-
 	
 	
 	

@@ -19,11 +19,13 @@ import org.springframework.web.client.HttpClientErrorException.Unauthorized;
 
 import com.jhaps.clientrecords.apiResponse.ApiResponseBuilder;
 import com.jhaps.clientrecords.apiResponse.ApiResponseModel;
+import com.jhaps.clientrecords.dto.response.LoginFailureResponse;
 import com.jhaps.clientrecords.enums.ResponseMessage;
 import com.jhaps.clientrecords.exception.client.ClientBinNotFoundException;
 import com.jhaps.clientrecords.exception.client.ClientDeleteException;
 import com.jhaps.clientrecords.exception.client.ClientLogNotFoundException;
 import com.jhaps.clientrecords.exception.client.ClientNotFoundException;
+import com.jhaps.clientrecords.exception.system.CustomBadCredentialsException;
 import com.jhaps.clientrecords.exception.system.DuplicateDataException;
 import com.jhaps.clientrecords.exception.system.FileDeletionException;
 import com.jhaps.clientrecords.exception.system.FileException;
@@ -103,6 +105,18 @@ public class GlobalExceptionHandler {
 		log.error("Bad Credentials Exception Occured : {} ",e.getMessage(), e);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.BAD_CREDENTIALS, HttpStatus.UNAUTHORIZED);
 	}
+	
+	@ExceptionHandler(CustomBadCredentialsException.class)
+	public ResponseEntity<ApiResponseModel<LoginFailureResponse>> handleCustomBadCredentialsException(CustomBadCredentialsException e){
+		log.error("Custom_Bad_Credentials Exception Occured : {} ",e.getMessage(), e);
+		LoginFailureResponse responseData = new LoginFailureResponse()
+											.builder()
+												.remainingAttempts(e.getRemainingAttempts())
+												.build();
+		return new ApiResponseBuilder().buildApiResponse(ResponseMessage.BAD_CREDENTIALS, HttpStatus.UNAUTHORIZED, responseData);
+	}
+	
+	
 	
 	@ExceptionHandler(IllegalArgumentException.class)
 	public ResponseEntity<ApiResponseModel<String>> handleIllegalArgumentException(IllegalArgumentException e){

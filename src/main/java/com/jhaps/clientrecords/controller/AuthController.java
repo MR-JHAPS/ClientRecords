@@ -18,8 +18,12 @@ import com.jhaps.clientrecords.apiResponse.ApiResponseModel;
 import com.jhaps.clientrecords.dto.request.TokenValidateRequest;
 import com.jhaps.clientrecords.dto.request.user.UserAuthRequest;
 import com.jhaps.clientrecords.dto.request.user.UserRegisterRequest;
+import com.jhaps.clientrecords.dto.response.LoginResponse;
+import com.jhaps.clientrecords.entity.system.User;
 import com.jhaps.clientrecords.enums.ResponseMessage;
 import com.jhaps.clientrecords.security.customAuth.AuthService;
+import com.jhaps.clientrecords.security.model.CustomUserDetails;
+import com.jhaps.clientrecords.service.EmailVerificationService;
 import com.jhaps.clientrecords.service.system.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,13 +36,13 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api/public")
 @Tag(name = "Public API's" , description = "Log-In, refreshToken, Sign-Up API's") // this is for the swagger
 public class AuthController {
-		
-//	@Value("${cloudinary.api-key}")
-//	public String cloudinaryApiKey;  
 	
 		@Autowired
 		private AuthService authService;
-	
+		
+		@Autowired
+		private EmailVerificationService emailVerificationService;
+		
 		private UserService userService;
 		private ApiResponseBuilder apiResponseBuilder;
 		
@@ -49,14 +53,18 @@ public class AuthController {
 		
 	
 		
+		/**
+		 * @returns : LoginResponse
+		 * LoginResponse contains the "emailRegistrationStatus" and the "regular-token" and "refresh-token". 
+		 */
+		
 		@Operation(summary = "user Login")
 		@PostMapping("/login")
 		@PreAuthorize("permitAll()")
-		public ResponseEntity<ApiResponseModel<String>> userLogin(@Valid @RequestBody UserAuthRequest userAuthRequest){
-//			log.info("This is the CLOUDINARY_API_KEY : {}. ",cloudinaryApiKey);
+		public ResponseEntity<ApiResponseModel<LoginResponse>> userLogin(@Valid @RequestBody UserAuthRequest userAuthRequest){
 			log.info("Requesting verification of userLogin Details.");
-			String token = authService.verifyUser(userAuthRequest);
-			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, token);
+			LoginResponse responseBody =  authService.verifyUser(userAuthRequest);
+			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, responseBody);
 		}
 		
 		
@@ -83,6 +91,31 @@ public class AuthController {
 		}
 		
 		
+		
+		
+
+		@Operation(summary = "Send Verification Code To Email")
+		@GetMapping("/send-verification-email")
+		@PreAuthorize("hasAuthority('admin')")
+		public ResponseEntity<ApiResponseModel<String>> sendVerificationEmail(@AuthenticationPrincipal CustomUserDetails userDetails){
+			int userId = userDetails.getUserId();
+			emailVerificationService.sendVerificationEmail(userId);
+			
+			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, "Verification Email Sent Successfully.");
+			
+		}
+		
+		
+		
+		@Operation(summary = "verify Email")
+		@PostMapping("/verify-email")
+		@PreAuthorize("hasAuthority('admin')")
+		public ResponseEntity<ApiResponseModel<String>> verifyUserEmail(String verificationCode,
+																	@AuthenticationPrincipal CustomUserDetails userDetails){
+			int userId = userDetails.getUserId();
+			emailVerificationService.verifyUserEmailAddress(userId, verificationCode);
+			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, "Email Verified Successfully.");
+		}
 		
 		
 		

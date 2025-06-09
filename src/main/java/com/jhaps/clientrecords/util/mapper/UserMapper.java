@@ -49,6 +49,7 @@ public class UserMapper {
 		dto.setEmail(user.getEmail());
 		dto.setCreatedOn(user.getCreatedOn());
 		dto.setUpdatedOn(user.getUpdatedOn());
+		dto.setEmailVerified(user.isEmailVerified());
 		return dto;
 	}
 	
@@ -66,6 +67,7 @@ public class UserMapper {
 		 * */
 		Set<String> roles = user.getRoles().stream().map(role->role.getName()).collect(Collectors.toSet());
 		dto.setRoles(roles);
+		dto.setEmailVerified(user.isEmailVerified());
 		return dto;
 	}
 	
