@@ -20,6 +20,8 @@ public class UserGeneralResponse {
 
 		private String email;
 		
+		private boolean isRegistered; //This is to show in profile if the user is registered
+		
 		private LocalDateTime createdOn;
 		
 		private LocalDateTime updatedOn;

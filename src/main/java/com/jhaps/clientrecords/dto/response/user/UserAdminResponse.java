@@ -34,6 +34,8 @@ public class UserAdminResponse {
 	
 	private Set<String> roles;
 	
+	private boolean isRegistered;
+	
 	private LocalDateTime createdOn;
 	
 	private LocalDateTime updatedOn;

@@ -76,10 +76,28 @@ public class User extends BaseEntity{
 			inverseJoinColumns = @JoinColumn(name="role_id") //joins the relationedEntity(Role) FK.	
 	)
 	private Set<Role> roles;
+	
+	/**
+	 * This is for the registration status of the user.
+	 */
+	@Column(name = "is_registered")
+	private boolean isRegistered;
+	
+	@Column(name = "registration_code", nullable = true)
+	private int registrationCode;
 
 	
-	/* Helps to clear the roles.
-	 * This breaks the relationship with the roles and allows for user Deletion.*/
+	
+	
+	
+/**
+ * Helping methods.
+ */
+	
+	/**
+	 * Helps to clear the roles.
+	 * This breaks the relationship with the roles and allows for user Deletion.
+	 */
 	public void removeRoles() {
 		this.roles.clear();
 	}
@@ -97,7 +115,7 @@ public class User extends BaseEntity{
 	           .orElse(""); // or return Optional<String>
 	}
 	
-	//to cheking if the StoredimageName is null .
+	//to checking if the StoredimageName is null .
 		public String getProfileStoredImageName() {
 		    return getProfileImage()
 		           .map(UserFile::getStoredFileName)
