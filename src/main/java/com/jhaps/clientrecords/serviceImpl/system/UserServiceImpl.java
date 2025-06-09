@@ -25,6 +25,7 @@ import com.jhaps.clientrecords.exception.system.UserNotFoundException;
 import com.jhaps.clientrecords.repository.client.ClientRepository;
 import com.jhaps.clientrecords.repository.system.UserRepository;
 import com.jhaps.clientrecords.security.customAuth.PasswordValidator;
+import com.jhaps.clientrecords.service.CloudinaryService;
 import com.jhaps.clientrecords.service.client.ClientService;
 import com.jhaps.clientrecords.service.system.FileService;
 import com.jhaps.clientrecords.service.system.RoleService;
@@ -50,11 +51,16 @@ public class UserServiceImpl implements UserService{
 	private FileService fileService;
 	private ClientService clientService;
 	private CustomFileManager customFileManager;
+	private CloudinaryService cloudinaryService;
 	
 	
 	
-	public User getCurrentUser(int userId) {
-		return findUserById(userId);
+	public UserGeneralResponse getCurrentUser(int userId) {
+		User currentUser = findUserById(userId);
+		UserGeneralResponse response = userMapper.toUserGeneralResponse(currentUser);
+		String imageUrl = cloudinaryService.getSignedUrl(userId, currentUser.getProfileStoredImageName());
+		response.setImageUrl(imageUrl);
+		return response;
 	}
 	
 
@@ -83,12 +89,6 @@ public class UserServiceImpl implements UserService{
 		user.setAttempts(0);
 		// saving user without profile image
 		saveUser(user);	
-		//we get id of the user after we save and we pass that id to save a default image for that id.
-		log.info("Preparing to set new profile picture for user: {}", registrationDto.getEmail());
-//		Image defaultProfileImage = imageService.saveDefaultProfileImageForGivenUser(savedUser.getId()); //getting default profile image from ImageService.
-//		savedUser.setProfileImage(defaultProfileImage); //setting default profile image when new account is created.
-		//saving with profile image.
-//		saveUser(savedUser);
 		log.info("Action: User with email: {} saved successfully", registrationDto.getEmail());
 	}
 	

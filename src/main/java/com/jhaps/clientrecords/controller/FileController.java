@@ -51,8 +51,8 @@ import lombok.AllArgsConstructor;
 
 
 @RestController
-@RequestMapping("/api/images")
-@Tag(name = "Image API's", description = "Insert, Delete, Get images of the User")
+@RequestMapping("/api/files")
+@Tag(name = "File API's", description = "Insert, Delete, Get images/documents of the User")
 @AllArgsConstructor
 public class FileController {
 

@@ -66,7 +66,7 @@ public class AdminServiceImpl implements AdminService{
 	public Page<UserAdminResponse> findAllUsers(Pageable pageable) {
 		Page<User> userList = userRepo.findAll(pageable);
 		if(userList.getContent().isEmpty()) {
-			throw new UserNotFoundException("No users Found in the Database");
+			log.info("No users Found| UserList is empty in the Database.");
 		}
 		log.info("Finding All Users is Executed Successfully. and fetched :{} clients", userList.getNumberOfElements());
 		
@@ -84,30 +84,6 @@ public class AdminServiceImpl implements AdminService{
 		//		converting List<UserAdminResponse> to Page<UserAdminResponse>
 		return new PageImpl<UserAdminResponse>(responseList, pageable, userList.getTotalElements());
 	}
-	
-	
-	
-	
-	
-//	@Override
-//	public Page<User> findAllUsers(Pageable pageable) {
-//		Page<User> userList = userRepo.findAll(pageable);
-//		if(userList.getContent().isEmpty()) {
-//			throw new UserNotFoundException("No users Found in the Database");
-//		}
-//		log.info("Finding All Users is Executed Successfully. and fetched :{} clients", userList.getNumberOfElements());
-//		
-//		/**
-//		 * getting the url of 
-//		 * */
-//		
-//		
-//		
-//		
-//		
-//		
-//		return userList;
-//	}
 	
 	
 	/* Returns "UserAdminDto" this contains userRoles to view in admin-Dashboard */

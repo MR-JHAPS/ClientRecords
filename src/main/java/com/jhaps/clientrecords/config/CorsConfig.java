@@ -11,12 +11,12 @@ import com.jhaps.clientrecords.util.ImageUploadPath;
 @Configuration
 public class CorsConfig implements WebMvcConfigurer{
 
-	 @Override
-	    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-	        registry.addResourceHandler("/images/**")
-	               .addResourceLocations("file:"+ImageUploadPath.PATH.getPath())
-	               .setCachePeriod(3600);
-	    }
+//	 @Override
+//	    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+//	        registry.addResourceHandler("/images/**")
+//	               .addResourceLocations("file:"+ImageUploadPath.PATH.getPath())
+//	               .setCachePeriod(3600);
+//	    }
 	
 	
 	  @Bean

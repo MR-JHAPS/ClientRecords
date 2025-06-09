@@ -10,7 +10,7 @@ import com.jhaps.clientrecords.entity.system.User;
 
 public interface UserService {
 	
-	User getCurrentUser(int userId);
+	UserGeneralResponse getCurrentUser(int userId);
 	
 	User findUserById(int id); /* Return type is "User" | It is used for internal business logic --( Service classes )--*/ 
 	

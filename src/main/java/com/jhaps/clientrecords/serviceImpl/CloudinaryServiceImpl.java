@@ -39,12 +39,14 @@ public class CloudinaryServiceImpl implements CloudinaryService{
 	 * PublicId : is like userFolder/fileName (eg: "41/defaultImage.jpg"). Used to delete specific picture of specific user.
 	 */
 	@Override
-	public Map<String, String> uploadFile(MultipartFile file, String folderName, String customFileName) {
+	public Map<String, String> uploadFile(MultipartFile file, String userId, String customFileName) {
 		/* Creates a custom path for each user with unique folderName. (FolderName will be the userId)*/
-		String cloudinaryPath = folderName + "/" + customFileName;
+//		String publicId = folderName + "/"+ UUID.randomUUID() + "_"  + customFileName;
+		String publicId = userId+ "/" + customFileName;
 		try {			
-			Map<String, Object> uploadOptions =	ObjectUtils.asMap("public_id", cloudinaryPath,
+			Map<String, Object> uploadOptions =	ObjectUtils.asMap("public_id", publicId,
 																	"type", "authenticated");
+//			Map<String, Object> uploadOptions =	ObjectUtils.asMap("public_id", publicId);
 //			uploading to cloudinary.
 			Map<String , String> uploadResponse = cloudinary.uploader().upload(file.getBytes(), uploadOptions);
 			
@@ -63,21 +65,21 @@ public class CloudinaryServiceImpl implements CloudinaryService{
 	@Override
 	public  String getSignedUrl(int userId, String storedFileName ){
 		
+		if(storedFileName==null || storedFileName.isEmpty()) {
+			return null;
+		}
+		
 		try {
-			String folderName = "user_" + String.valueOf(userId);
-			String publicId = folderName + "/"+ UUID.randomUUID() + "_" + storedFileName;
-//		    long expiresAt = Instant.now().plusSeconds(3600).getEpochSecond(); // 1 hour expiry
-		    
-//		    "e_" is expirationTime in cloudinary and "%d" is the unix time system for timestamp.
-//		    Transformation transformation = new Transformation()
-//		            							.rawTransformation(String.format("e_%d", expiresAt));  
-		    return cloudinary.url()
+			String folderName = String.valueOf(userId);
+			String publicId = folderName + "/" + storedFileName;
+
+		    String imageUrl = cloudinary.url()
 	                .type("authenticated")
 	                .publicId(publicId)
 	                .secure(true)
 	                .signed(true)
-//	                .transformation(transformation)
 	                .generate();
+		  return imageUrl;
 	   } catch (Exception ex) {
 	        log.error("Failed to generate signed URL for user {} file {}", userId, storedFileName, ex);
 	        throw new FileException("Failed to generate secure resource URL");
@@ -92,7 +94,7 @@ public class CloudinaryServiceImpl implements CloudinaryService{
 	public void deleteSingleFile(String publicId) {
 		try{
 			log.info("This is the public Id of the Image to be deleted : {}",publicId);
-			Map<String, String> deleteResult = cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+			Map<String, String> deleteResult = cloudinary.uploader().destroy(publicId, ObjectUtils.asMap("type","authenticated"));
 			String response = (String) deleteResult.get("result");
 			log.info("This is the response of deleteFile: {}", response);
 			if(!response.equalsIgnoreCase("ok")) {
@@ -114,7 +116,7 @@ public class CloudinaryServiceImpl implements CloudinaryService{
 		publicIdList.forEach( 
 						publicId ->{
 							try {
-								Map<String, String> deleteResult = cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+								Map<String, String> deleteResult = cloudinary.uploader().destroy(publicId, ObjectUtils.asMap("type","authenticated"));
 								String response = (String) deleteResult.get("result");
 								log.info("This is the response of deleteFile: {}",response);
 								if(!response.equalsIgnoreCase("ok")) {
@@ -130,33 +132,7 @@ public class CloudinaryServiceImpl implements CloudinaryService{
 	}//ends-method
 	
 	
-	
-//	-------------------------------------Probably not necessary-------------------------------------------------------------
 
-
-
-//	@Override
-//	public Map<String, String> uploadPdf(MultipartFile pdfFile, String folderName, String customFileName) {
-//		log.info("Initiating the upload of Pdf file : {} to the cloudinary", customFileName);
-//		String cloudinaryPath = folderName + "/" + customFileName;
-//		try {
-//			//  ObjectUtils.asMap("public_id", cloudinaryPath) telling cloudinary to create a custom path instead of generating random.			
-//			Map<String, Object> uploadedFile = cloudinary.uploader().upload(pdfFile.getBytes(), ObjectUtils.asMap("public_id", cloudinaryPath));
-//			// Getting the url from metaData response from cloudinary.			
-//			String pdfUrl = (String) uploadedFile.get("url");
-//			Map<String, String> uploadResponseDetails = new HashMap<>();
-//			uploadResponseDetails.put("url", pdfUrl);
-//			uploadResponseDetails.put("publicId", cloudinaryPath);
-//			return uploadResponseDetails;
-//		} catch (Exception e) {
-//			log.error("Unable to upload PDF_File to Cloudinary, Something went Wrong.");
-//			throw new PdfException("Failed To Upload The PDF_File");
-//		}
-//	}
-//	
-	
-	
-	
 	
 	
 }//ends class

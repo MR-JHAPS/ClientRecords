@@ -71,8 +71,7 @@ public class UserController {
 	@GetMapping("/me")
 	public ResponseEntity<ApiResponseModel<UserGeneralResponse>> getUserSelf(@AuthenticationPrincipal CustomUserDetails userDetails) {
 		int userId = userDetails.getUser().getId();
-		User user = userService.getCurrentUser(userId);
-		UserGeneralResponse userGeneralResponse = this.userMapper.toUserGeneralResponse(user);
+		UserGeneralResponse userGeneralResponse = userService.getCurrentUser(userId);
 
 	    return apiResponseBuilder.buildApiResponse(
 	            ResponseMessage.SUCCESS,
