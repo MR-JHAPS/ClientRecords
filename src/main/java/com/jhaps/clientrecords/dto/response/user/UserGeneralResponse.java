@@ -20,7 +20,7 @@ public class UserGeneralResponse {
 
 		private String email;
 		
-		private boolean isEmailVerified; //This is to show in profile if the user is registered
+		private boolean emailVerified; //This is to show in profile if the user is registered
 		
 		private LocalDateTime createdOn;
 		

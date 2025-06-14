@@ -129,7 +129,7 @@ public class AuthServiceImpl implements AuthService {
 										.builder()
 										.token(jwtToken)
 										.refreshToken(refreshToken)
-										.isEmailVerified(isEmailVerified)
+										.emailVerified(isEmailVerified)
 										.build();
 		return loginResponse;
 	}

@@ -25,7 +25,7 @@ public class UserAdminResponse {
 	
 	private Set<String> roles;
 	
-	private boolean isEmailVerified;
+	private boolean emailVerified;
 	
 	private LocalDateTime createdOn;
 	

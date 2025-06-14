@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jhaps.clientrecords.apiResponse.ApiResponseBuilder;
@@ -97,7 +98,7 @@ public class AuthController {
 
 		@Operation(summary = "Send Verification Code To Email")
 		@GetMapping("/send-verification-email")
-		@PreAuthorize("hasAuthority('admin')")
+		@PreAuthorize("isAuthenticated()")
 		public ResponseEntity<ApiResponseModel<String>> sendVerificationEmail(@AuthenticationPrincipal CustomUserDetails userDetails){
 			int userId = userDetails.getUserId();
 			emailVerificationService.sendVerificationEmail(userId);
@@ -109,9 +110,9 @@ public class AuthController {
 		
 		
 		@Operation(summary = "verify Email")
-		@PostMapping("/verify-email")
-		@PreAuthorize("hasAuthority('admin')")
-		public ResponseEntity<ApiResponseModel<String>> verifyUserEmail(String verificationCode,
+		@GetMapping("/verify-email")
+		@PreAuthorize("isAuthenticated()")
+		public ResponseEntity<ApiResponseModel<String>> verifyUserEmail(@RequestParam(name = "verification_code") String verificationCode,
 																	@AuthenticationPrincipal CustomUserDetails userDetails){
 			int userId = userDetails.getUserId();
 			emailVerificationService.verifyUserEmailAddress(userId, verificationCode);

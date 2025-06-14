@@ -12,6 +12,7 @@ import com.jhaps.clientrecords.service.EmailService;
 import com.jhaps.clientrecords.service.EmailVerificationService;
 import com.jhaps.clientrecords.service.system.UserService;
 
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -33,55 +34,6 @@ public class EmailVerificationServiceImpl implements EmailVerificationService{
 	
 	
 	
-	@Override
-	public String generateEmailVerificationCode() {	
-		String randomCode = UUID.randomUUID().toString();
-		return randomCode;
-	}
-	
-	
-	
-
-	/**
-	 * @returns : Url that is sent to email. That 
-	 *
-	 */
-	@Override
-	public void verifyUserEmailAddress(int userId,  String verificationCode) {
-		User user = userService.findUserById(userId);
-		String verificationCodeDb = user.getVerificationCode();
-		if(!verificationCodeDb.equals(verificationCode)){
-			log.error("Error! Submitted Verification code mismatches or has Expired");
-			throw new EmailVerificationException("Wrong verification Code.");
-		}		
-		user.setEmailVerified(true);
-		user.setVerificationCode(null);
-		userService.saveUser(user);
-	}
-	
-	
-	
-	
-	/**
-	 * Theoretically This should work.
-	 */
-	@Override
-	public String generateEmailVerificationUrl(int userId) {
-		User user = userService.findUserById(userId);
-		String verificationCode = generateEmailVerificationCode();
-		if(!user.getVerificationCode().isBlank() || user.getVerificationCode()!=null) {
-			user.setVerificationCode(null);
-		}
-		//saving the random generated verificationCode to the user Database.
-		user.setVerificationCode(verificationCode);
-		userService.saveUser(user);
-		String url = frontEndUrl + emailVerificationPath + "?"+"verification_code="+ verificationCode;
-		return url;
-	}
-
-
-
-
 	@Override
 	public void sendVerificationEmail(int userId) {
 		String url = generateEmailVerificationUrl(userId);
@@ -109,6 +61,61 @@ public class EmailVerificationServiceImpl implements EmailVerificationService{
 	}
 	
 	
+
+	
+	/**
+	 * Theoretically This should work.
+	 */
+	@Override
+	@Transactional
+	public String generateEmailVerificationUrl(int userId) {
+		User user = userService.findUserById(userId);
+		log.info("Found User {} by ID: {}", user.getEmail(), userId);
+		String verificationCode = generateEmailVerificationCode();
+		log.info("This is the verification Code that was received to anotherMethod : {}.",verificationCode);
+		if(user.getVerificationCode()!=null && !user.getVerificationCode().isBlank() ) {
+			log.info("Setting the user verification Code to null because it is currently not null.");
+			user.setVerificationCode(null);
+		}
+		//saving the random generated verificationCode to the user Database.
+		user.setVerificationCode(verificationCode);
+		userService.saveUser(user);
+		log.info("Verification Code is saved in the user Database.");
+		String url = frontEndUrl + emailVerificationPath + "?"+"verification_code="+ verificationCode;
+		return url;
+	}
+
+
+
+	
+	@Override
+	public String generateEmailVerificationCode() {	
+		log.info("Generating the verification Code UUID.");
+		String randomCode = UUID.randomUUID().toString();
+		log.info("Generated Code is : {}", randomCode);
+		return randomCode;
+	}
+	
+		
+
+	
+
+	/**
+	 * Validates the Code sent by user through email and from the one saved in the database.
+	 *
+	 */
+	@Override
+	public void verifyUserEmailAddress(int userId,  String verificationCode) {
+		User user = userService.findUserById(userId);
+		String verificationCodeDb = user.getVerificationCode();
+		if(!verificationCodeDb.equals(verificationCode)){
+			log.error("Error! Submitted Verification code mismatches or has Expired");
+			throw new EmailVerificationException("Wrong verification Code.");
+		}		
+		user.setEmailVerified(true);
+		user.setVerificationCode(null);
+		userService.saveUser(user);
+	}
 	
 	
 	
