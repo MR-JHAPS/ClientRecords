@@ -16,7 +16,7 @@ public interface AuthService {
 	 * @return  JWT token(String), refreshToken(String) and emailVerificationStatus(boolean).
 	 * 
 	 * */
-	LoginResponse verifyUser(UserAuthRequest userAuthRequest);
+	LoginResponse handleLoginRequest(UserAuthRequest userAuthRequest);
 	
 	
 //	String logOutUser(String authHeader, HttpServletRequest request, HttpServletResponse response, UserDetails userDetails);

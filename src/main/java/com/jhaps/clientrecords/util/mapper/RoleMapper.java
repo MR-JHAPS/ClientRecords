@@ -24,11 +24,16 @@ public class RoleMapper {
 	
 
 	
-	// Converting to Set<String> of roles. This is to add to jwt Token for front-end.
+	// Converting to Collection<?> of roles. This is to add to jwt Token for front-end.
 	public Set<String> roleToStringSet(Collection<? extends GrantedAuthority> roles){
 		Set<String> roleSet = roles.stream().map(role-> role.toString()).collect(Collectors.toSet());
 		return roleSet;
 	}
 	
+	
+	public Set<String> roleToStringSet(Set<Role> roles){
+		Set<String> roleSet = roles.stream().map(role-> role.toString()).collect(Collectors.toSet());
+		return roleSet;
+	}
 	
 }

@@ -12,6 +12,7 @@ import com.jhaps.clientrecords.exception.system.UserNotFoundException;
 import com.jhaps.clientrecords.repository.system.UserRepository;
 import com.jhaps.clientrecords.service.system.UserService;
 
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
 
@@ -33,19 +34,27 @@ public class UserSecurityServiceImpl implements UserSecurityService{
 
 	/*	THIS IS TO UPDATE THE USER LOGIN ATTEMPTS AFTER EACH WRONG PASSWORD/CREDENTIALS. */
 	@Override
-	public void updateLoginAttempts(UserAuthRequest userAuthRequest) {
-		String email = userAuthRequest.getEmail(); //email of user who made wrong password attempt
-		User user = userRepo.findByEmail(email)
-					.orElseThrow(()-> new UserNotFoundException("Error: User_Not_Found, Email : " + email));
-		int previousAttempts = user.getAttempts(); /* Getting the user wrong password attempts from the Database if exists */
-		int currentAttempts = previousAttempts + 1 ;  /* current wrong password attempts*/
-		user.setAttempts(currentAttempts);		/* Saving the current wrong password attempts in the user Database.*/
+	@Transactional
+	public int updateLoginAttempts(String userEmail) {
+		log.info("Initiating Update of loginAttempts.");
+		User userObj = getUserByEmail(userEmail);
+		/* Getting the user wrong password attempts from the Database if exists */
+		int previousAttempts = userObj.getAttempts(); 
+		log.info("User : {} ,attempts stored previously on database is : {}", userObj.getEmail(), previousAttempts);
+		/* current wrong password attempts*/
+		int currentAttempts = previousAttempts + 1 ;  
+		log.info("Before saving the latest current Attempt is :{}", currentAttempts);
+		/* Saving the current wrong password attempts in the user Database.*/
+		userObj.setAttempts(currentAttempts);		
 		if(currentAttempts >= 3) {				/* If the wrong attempts equals 3 or more than 3 attempts the account will be locked along with TimeStamp*/
-			user.setAccountLocked(true); 
-			user.setLockTime(LocalDateTime.now());
-			log.debug("Warning: You made 3 wrong attempts ");
+			userObj.setAccountLocked(true); 
+			userObj.setLockTime(LocalDateTime.now());
+			log.info("Warning: You made 3 wrong attempts ");
+			//Here will be where we can send email to user to report their account is blocked.
 		}
-		userService.saveUser(user);
+		User savedUser = userService.saveUser(userObj);
+		log.info("Attempts that was saved in the Database : {}", savedUser.getAttempts());
+		return savedUser.getAttempts();
 	}
 	
 	
@@ -70,9 +79,7 @@ public class UserSecurityServiceImpl implements UserSecurityService{
 	
 	
 	@Override
-	public void resetLoginAttempts(String email) {
-		User user = userRepo.findByEmail(email)
-				.orElseThrow(()-> new UserNotFoundException("Error:User_Not_Found, Email : " + email));
+	public void resetLoginAttempts(User user) {
 		user.setAttempts(0);
 		userService.saveUser(user);
 	}
@@ -95,6 +102,14 @@ public class UserSecurityServiceImpl implements UserSecurityService{
 		User user = userService.findUserById(id);
 		user.setAccountLocked(true);
 		userService.saveUser(user);
+	}
+	
+	
+	
+	private User getUserByEmail(String email) {
+		User user = userRepo.findByEmail(email)
+		.orElseThrow(()-> new UserNotFoundException("Error: User_Not_Found, Email : " + email));
+		return user;
 	}
 	
 	

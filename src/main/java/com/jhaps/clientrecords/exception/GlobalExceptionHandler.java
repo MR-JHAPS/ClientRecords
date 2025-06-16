@@ -102,18 +102,16 @@ public class GlobalExceptionHandler {
 	
 	@ExceptionHandler(BadCredentialsException.class)
 	public ResponseEntity<ApiResponseModel<String>> handleBadCredentialsException(BadCredentialsException e){
-		log.error("Bad Credentials Exception Occured : {} ",e.getMessage(), e);
+		log.warn("Bad Credentials Exception Occured : {} ",e.getMessage(), e);
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.BAD_CREDENTIALS, HttpStatus.UNAUTHORIZED);
 	}
 	
 	@ExceptionHandler(CustomBadCredentialsException.class)
 	public ResponseEntity<ApiResponseModel<LoginFailureResponse>> handleCustomBadCredentialsException(CustomBadCredentialsException e){
-		log.error("Custom_Bad_Credentials Exception Occured : {} ",e.getMessage(), e);
-		LoginFailureResponse responseData = new LoginFailureResponse()
-											.builder()
-												.remainingAttempts(e.getRemainingAttempts())
-												.build();
-		return new ApiResponseBuilder().buildApiResponse(ResponseMessage.BAD_CREDENTIALS, HttpStatus.UNAUTHORIZED, responseData);
+		log.warn("Custom_Bad_Credentials Exception Occured : {} ",e.getMessage(), e);
+		LoginFailureResponse responseData = new LoginFailureResponse();
+												responseData.setRemainingAttempts(e.getRemainingAttempts());
+		return apiResponseBuilder.buildApiResponse(ResponseMessage.BAD_CREDENTIALS, HttpStatus.UNAUTHORIZED, responseData);
 	}
 	
 	

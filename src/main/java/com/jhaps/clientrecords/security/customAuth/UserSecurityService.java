@@ -16,13 +16,13 @@ import com.jhaps.clientrecords.entity.system.User;
 
 public interface UserSecurityService {
 
-	public void updateLoginAttempts(UserAuthRequest userAuthRequest); /* After each wrong password attempt user->attempt field will be updated till it reaches 3*/
+	public int updateLoginAttempts(String email); /* After each wrong password attempt user->attempt field will be updated till it reaches 3*/
 	
 	public void unlockAccount(int id);	/* ADMIN - Unlock the locked User Account by ID */
 	
 	public void lockAccount(int id);	/* ADMIN - Lock the user Account by ID*/
 	
-	public void resetLoginAttempts(String email);
+	public void resetLoginAttempts(User user);
 	
 	public boolean unlockAfterGivenTime(User user);
 	

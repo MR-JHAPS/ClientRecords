@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 import com.jhaps.clientrecords.entity.BaseEntity;
 import com.jhaps.clientrecords.entity.client.Client;
 import io.micrometer.common.lang.Nullable;

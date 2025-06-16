@@ -41,7 +41,6 @@ public class AuthController {
 	
 		@Autowired
 		private AuthService authService;
-		
 		@Autowired
 		private EmailVerificationService emailVerificationService;
 		
@@ -65,7 +64,7 @@ public class AuthController {
 		@PreAuthorize("permitAll()")
 		public ResponseEntity<ApiResponseModel<LoginResponse>> userLogin(@Valid @RequestBody UserAuthRequest userAuthRequest){
 			log.info("Requesting verification of userLogin Details.");
-			LoginResponse responseBody =  authService.verifyUser(userAuthRequest);
+			LoginResponse responseBody =  authService.handleLoginRequest(userAuthRequest);
 			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, responseBody);
 		}
 		
@@ -126,25 +125,6 @@ public class AuthController {
 }//ends controller
 
 
-
-		
-/* ------------------------ WILL IMPLEMENT TOKEN LOG OUT WHEN I IMPLEMENT REDIS CACHE ------------------------*/
-	
-		
-		
-	/*	
-	    @Operation(summary = "user LogOut")
-		@PostMapping("/logout")
-		public ResponseEntity<ApiResponseModel<String>> userLogin(@Parameter(hidden=true) @RequestHeader("Authorization") String authHeader,
-				HttpServletRequest request, HttpServletResponse response,
-				@AuthenticationPrincipal UserDetails userDetails){
-			log.info("Logging-Out user --------- ");
-			authService.logOutUser(authHeader, request, response, userDetails);
-			return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, "userLogged out successfully");
-		}
-	*/	
-		
-/* ------------------------ WILL IMPLEMENT TOKEN LOG OUT WHEN I IMPLEMENT REDIS CACHE ------------------------*/		
 		
 		
 
