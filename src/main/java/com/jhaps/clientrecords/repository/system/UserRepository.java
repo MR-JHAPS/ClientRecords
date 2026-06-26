@@ -24,8 +24,12 @@ public interface UserRepository extends JpaRepository<User, Integer>{
 	
 	
 	/* This is only for the search user By userEmail. Just for the searching of the user using email. */
+//	@Query("SELECT u from User u WHERE u.email LIKE(CONCAT('%',:p_email,'%'))")
+//	Optional<User> findUserByEmail(@Param("p_email") String email); 
+//	
+	
 	@Query("SELECT u from User u WHERE u.email LIKE(CONCAT('%',:p_email,'%'))")
-	Optional<User> findUserByEmail(@Param("p_email") String email); 
+	Page<User> findUserByEmail(@Param("p_email") String email, Pageable pageable); 
 	
 	
 	//In findByRole_Name "_" it is used for nested property like 'User.Role.Name' OR 'User-->Role-->Name'

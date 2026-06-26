@@ -59,7 +59,7 @@ public class JWTServiceImpl implements JWTService {
 	
 	@Override
 	public String generateRefreshToken(String email, Set<String> roles) {
-		Map<String, Object> claims = new HashMap<>();
+		Map<String, Set<String>> claims = new HashMap<>();
 		claims.put("role", roles);
 		return Jwts.builder()
 				.claims()

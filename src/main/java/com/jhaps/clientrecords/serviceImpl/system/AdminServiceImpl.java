@@ -161,13 +161,26 @@ public class AdminServiceImpl implements AdminService{
 	}
 
 
+//	/* This is only for the search user By userEmail. Just for the searching of the user using email. */
+//	@Override
+//	public User searchUserByEmail(String email) {
+//		return userRepo.findUserByEmail(email)
+//					.orElseThrow(()-> new UserNotFoundException("Unable to find the user by email:" + email));
+//	}
+		
+	
 	/* This is only for the search user By userEmail. Just for the searching of the user using email. */
 	@Override
-	public User searchUserByEmail(String email) {
-		return userRepo.findUserByEmail(email)
-					.orElseThrow(()-> new UserNotFoundException("Unable to find the user by email:" + email));
+	public Page<User> searchUserByEmail(String email, Pageable pageable) {
+		Page<User> userList = userRepo.findUserByEmail(email, pageable);
+		log.info("UserList obtained from the Database for email : {} are : {}", email, userList.getContent());
+		if(userList.getContent().isEmpty()) {
+			throw new UserNotFoundException("No users found in Database with given Email : " + email );
+		}
+		return userList;
 	}
-		
+	
+	
 		
 	@Override
 	public User findUserById(int userId) {

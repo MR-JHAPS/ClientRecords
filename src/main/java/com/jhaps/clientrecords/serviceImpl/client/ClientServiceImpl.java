@@ -76,7 +76,7 @@ public class ClientServiceImpl implements ClientService  {
 	
 	@Override
 	public void saveClient(String userEmail, ClientRequest clientRequest) {
-		User currentUser = userRepo.findUserByEmail(userEmail).orElseThrow(()-> new UserNotFoundException("ClientService: user not found: " + userEmail));
+		User currentUser = userRepo.findByEmail(userEmail).orElseThrow(()-> new UserNotFoundException("ClientService: user not found: " + userEmail));
 		log.info("Saving Client with name {} .",clientRequest.getFirstName());
 		Client client = clientMapper.toClientEntity(clientRequest);
 		client.setUser(currentUser);

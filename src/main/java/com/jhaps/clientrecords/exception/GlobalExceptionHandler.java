@@ -110,7 +110,7 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ApiResponseModel<LoginFailureResponse>> handleCustomBadCredentialsException(CustomBadCredentialsException e){
 		log.warn("Custom_Bad_Credentials Exception Occured : {} ",e.getMessage(), e);
 		LoginFailureResponse responseData = new LoginFailureResponse();
-												responseData.setRemainingAttempts(e.getRemainingAttempts());
+											responseData.setRemainingAttempts(e.getRemainingAttempts());
 		return apiResponseBuilder.buildApiResponse(ResponseMessage.BAD_CREDENTIALS, HttpStatus.UNAUTHORIZED, responseData);
 	}
 	

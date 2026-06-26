@@ -25,7 +25,8 @@ public interface AdminService {
 	
 	void deleteUserById(int id); /* Admin can delete any user By id */
 	
-	User searchUserByEmail(String email);
+//	User searchUserByEmail(String email);
+	Page<User> searchUserByEmail(String email, Pageable pageable);
 	
 	UserAdminResponse getCurrentAdmin(int userId);
 	

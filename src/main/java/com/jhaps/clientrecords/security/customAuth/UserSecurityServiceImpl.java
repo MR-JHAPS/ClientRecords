@@ -3,6 +3,7 @@ package com.jhaps.clientrecords.security.customAuth;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import org.springframework.security.authentication.LockedException;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.annotation.ObjectIdGenerators.UUIDGenerator;
@@ -37,22 +38,22 @@ public class UserSecurityServiceImpl implements UserSecurityService{
 	@Transactional
 	public int updateLoginAttempts(String userEmail) {
 		log.info("Initiating Update of loginAttempts.");
-		User userObj = getUserByEmail(userEmail);
-		/* Getting the user wrong password attempts from the Database if exists */
-		int previousAttempts = userObj.getAttempts(); 
-		log.info("User : {} ,attempts stored previously on database is : {}", userObj.getEmail(), previousAttempts);
+		User userOnDb = getUserByEmail(userEmail);
+		int previousAttempts = userOnDb.getAttempts(); 
+		log.info("User : {} ,attempts stored previously on database is : {}", userOnDb.getEmail(), previousAttempts);
 		/* current wrong password attempts*/
 		int currentAttempts = previousAttempts + 1 ;  
 		log.info("Before saving the latest current Attempt is :{}", currentAttempts);
-		/* Saving the current wrong password attempts in the user Database.*/
-		userObj.setAttempts(currentAttempts);		
+		/* Setting the current wrong password attempts in the user Database.*/
+		userOnDb.setAttempts(currentAttempts);		
 		if(currentAttempts >= 3) {				/* If the wrong attempts equals 3 or more than 3 attempts the account will be locked along with TimeStamp*/
-			userObj.setAccountLocked(true); 
-			userObj.setLockTime(LocalDateTime.now());
-			log.info("Warning: You made 3 wrong attempts ");
+			userOnDb.setAccountLocked(true); 
+			userOnDb.setLockTime(LocalDateTime.now());
+			log.warn("You made 3 wrong attempts. Your Account is locked.");
 			//Here will be where we can send email to user to report their account is blocked.
+			throw new LockedException("Your account is locked.");
 		}
-		User savedUser = userService.saveUser(userObj);
+		User savedUser = userService.saveUser(userOnDb);
 		log.info("Attempts that was saved in the Database : {}", savedUser.getAttempts());
 		return savedUser.getAttempts();
 	}

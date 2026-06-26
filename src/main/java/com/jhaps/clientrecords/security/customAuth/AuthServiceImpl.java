@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,6 +36,7 @@ import com.jhaps.clientrecords.security.jwt.JWTServiceImpl;
 import com.jhaps.clientrecords.security.model.CustomUserDetails;
 import com.jhaps.clientrecords.util.mapper.RoleMapper;
 
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
@@ -132,13 +134,17 @@ public class AuthServiceImpl implements AuthService {
 		Set<String> roleSet = getUserRoles(user);
 		boolean isEmailVerified = user.isEmailVerified();
 		String jwtToken = jwtService.generateJWTToken(user.getEmail(), roleSet ); //15 min valid.
+		
+		//FOR DEBUGGING
+//		List<String> tokenRoleList = jwtService.extractClaim(jwtToken, claims -> claims.get("role", List.class));
+//		Set<String> tokenRole = new HashSet<>(tokenRoleList);
+//		log.info("THis is the role obtained from the token: {}", tokenRole);
+		
 		String refreshToken = jwtService.generateRefreshToken(user.getEmail(), roleSet); // 12 hours valid
-		LoginResponse loginResponse = new LoginResponse()
-										.builder()
-										.token(jwtToken)
-										.refreshToken(refreshToken)
-										.emailVerified(isEmailVerified)
-										.build();
+		LoginResponse loginResponse = new LoginResponse();
+										loginResponse.setToken(jwtToken);
+										loginResponse.setRefreshToken(refreshToken);
+										loginResponse.setEmailVerified(isEmailVerified);
 		return loginResponse;
 	}
 	
@@ -183,11 +189,13 @@ public class AuthServiceImpl implements AuthService {
 	private Set<String> getUserRoles(User user){
 		String userEmail = user.getEmail();
 		Set<Role> roles = user.getRoles();
+		log.info("These are the roles obtained from user.getRoles() : {} of type set<Role>",roles);
 		/* Checking if the user Role is Empty while logging in.*/
 		if(roles.isEmpty()) {												
 			throw new AccessDeniedException(userEmail + "Error: You don't have required role to login");
 		}
 		Set<String> roleSet = roleMapper.roleToStringSet(roles);
+		log.info("THis is the role of user After mapper to Set<String>: {}",roleSet );
 		return roleSet;
 	}
 	

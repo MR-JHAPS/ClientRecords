@@ -116,15 +116,38 @@ public class AdminController {
 	
 	
 	
+//	 //=== Search Endpoints ===//
+//	@Operation(summary = "Search user by user Email(Unique)", description = "User-Email is unique so it will return only one data.")
+//	@GetMapping("/users/search")
+//	@PreAuthorize("hasAuthority('admin')")
+//	public ResponseEntity<ApiResponseModel<UserAdminResponse>> searchUserByEmail(@RequestParam String email) {
+//		User user = adminService.searchUserByEmail(email);
+//		/* Mapping : User to UserAdminResponse */
+//		UserAdminResponse userResponse = userMapper.toUserAdminResponse(user);
+//		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, userResponse);
+//	}
+	
+	
+	
 	 //=== Search Endpoints ===//
 	@Operation(summary = "Search user by user Email(Unique)", description = "User-Email is unique so it will return only one data.")
 	@GetMapping("/users/search")
 	@PreAuthorize("hasAuthority('admin')")
-	public ResponseEntity<ApiResponseModel<UserAdminResponse>> searchUserByEmail(@RequestParam String email) {
-		User user = adminService.searchUserByEmail(email);
+	public ResponseEntity<ApiResponseModel<PagedModel<EntityModel<UserAdminResponse>>>> searchUserByEmail(
+								@RequestParam String email,
+								@RequestParam(defaultValue="0") int page,
+								@RequestParam(defaultValue="10") int size,
+								@RequestParam(required = false) String sortBy,
+								@RequestParam(required = false) String direction) {
+		log.info("Search User By Email query is : {}", email);
+		Pageable pageable =  PageableUtils.createPageable(page, size, sortBy, direction);
+		Page<User> paginatedUser = adminService.searchUserByEmail(email, pageable);
+		
 		/* Mapping : User to UserAdminResponse */
-		UserAdminResponse userResponse = userMapper.toUserAdminResponse(user);
-		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, userResponse);
+		Page<UserAdminResponse> paginatedUserResponse = paginatedUser.map(userMapper::toUserAdminResponse);
+		log.info("PaginatedUserResponse : {} ",paginatedUserResponse.getContent());
+		PagedModel<EntityModel<UserAdminResponse>> pagedUserModel = pagedResourceAssemblerService.toPagedModel(paginatedUserResponse);
+		return apiResponseBuilder.buildApiResponse(ResponseMessage.SUCCESS, HttpStatus.OK, pagedUserModel);
 	}
 
 	

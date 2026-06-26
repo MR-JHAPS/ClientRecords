@@ -32,7 +32,7 @@ public class RoleMapper {
 	
 	
 	public Set<String> roleToStringSet(Set<Role> roles){
-		Set<String> roleSet = roles.stream().map(role-> role.toString()).collect(Collectors.toSet());
+		Set<String> roleSet = roles.stream().map(role -> role.getName()).collect(Collectors.toSet());
 		return roleSet;
 	}
 	
